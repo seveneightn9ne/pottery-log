@@ -1,6 +1,13 @@
 // @flow
 
-export class Pot {
+export interface Pot {
+  title: string,
+  status: Status,
+  images: string[],
+  uuid: string,
+}
+
+/*export class Pot {
   title: string;
   status: Status;
   images: string[];
@@ -12,7 +19,7 @@ export class Pot {
     this.title = "";
     this.images = [];
   }
-}
+}*/
 
 export const PotStatus = {
   thrown: 'thrown',
