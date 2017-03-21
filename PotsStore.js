@@ -92,12 +92,16 @@ async function loadPot(uuid: string): Pot {
 }
 
 function loadPotStatus(l) {
+  console.log('loadPotStatus ' + JSON.stringify(l));
   const s = {};
-  for (key in Object.keys(PotStatus)) {
+  for (key in PotStatus) {
+    console.log("looking for " + key);
     if (key in l) {
+      console.log("Converting " + key + " to date");
       s[key] = new Date(l[key]);
     }
   }
+  console.log("Returning " + JSON.stringify(s));
   return s;
 }
 

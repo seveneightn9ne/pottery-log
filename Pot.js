@@ -21,6 +21,20 @@ export interface Pot {
   }
 }*/
 
+export function statusText(potStatus: Status): string {
+    const orderedStatuses = ['pickedup', 'glazed', 'bisqued', 'trimmed', 'thrown'];
+    for (let i=0; i < orderedStatuses.length; i++) {
+      const status = orderedStatuses[i];
+      if (potStatus[status]) {
+        const date = potStatus[status];
+        const dateStringLong = date.toDateString();
+        const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
+        return status + ' on ' + dateString;
+      }
+    }
+    return '(status unknown)';
+  }
+
 export const PotStatus = {
   thrown: 'thrown',
   trimmed: 'trimmed',

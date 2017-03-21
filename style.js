@@ -9,10 +9,12 @@ export default StyleSheet.create({
   },
   listItem: {
   	backgroundColor: '#eee',
-  	padding: 10,
+  	//padding: 10,
   	flexDirection: 'row',
   	alignItems: 'center',
-  	height: 80,
+  	height: 50,
+  	borderBottomWidth: 1,
+  	borderColor: '#ccc',
   },
   newPotButton: {
   	fontWeight: 'bold',
@@ -23,8 +25,10 @@ export default StyleSheet.create({
   	//borderWidth: 1,
   	paddingRight: 15,
   },
-  listItemChild: {
-  	//height: 50,
+  listItemImg: {
+  	width: 50,
+  	height: 50,
+  	marginRight: 10,
   },
   h1: {
   	fontSize: 36,
