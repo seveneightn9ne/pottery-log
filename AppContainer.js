@@ -30,6 +30,21 @@ function getState() {
       value: newTitle,
       potId: potId,
     }),
+    onNavigateToList: () => dispatcher.dispatch({
+      type: 'page-list',
+    }),
+    onChangeImages: (potId, newImageUris) => dispatcher.dispatch({
+      type: 'pot-edit-field',
+      field: 'images',
+      value: newImageUris,
+      potId: potId,
+    }),
+    onAddImage: (potId, uri) => dispatcher.dispatch({
+      type: 'pot-edit-field',
+      field: 'images',
+      value: [...PotsStore.getState().pots[potId].images, uri],
+      potId: potId,
+    }),
   };
 }
 

@@ -25,14 +25,18 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         return {pots: action.pots, potIds: action.potIds, hasLoaded: true};
       }
       case 'new': {
-        dispatcher.waitFor(['loaded']);
+        //dispatcher.waitFor(['loaded']);
         const pot = {
           uuid: String(Math.random()).substring(2),
-          title: '',
+          title: 'New Pot',
           images: [],
-          state: PotStatus.thrown,
+          status: {thrown: Date.now()},
         };
-        const newState = {...state, pots: [...state.pots, pot]};
+        const newState = {
+          ...state,
+          potIds: [...state.potIds, pot.uuid],
+          pots: {...state.pots, [pot.uuid]: pot}
+        };
         this.persist(newState, pot);
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;

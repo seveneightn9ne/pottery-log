@@ -27,8 +27,21 @@ export default StyleSheet.create({
   	//height: 50,
   },
   h1: {
-  	fontSize: 48,
+  	fontSize: 36,
   	fontWeight: 'bold',
   	padding: 10,
-  }
+  },
+  back: {
+  	fontSize: 36,
+  	fontWeight: 'bold',
+  	padding: 10,
+  	color: 'blue',
+  	backgroundColor: '#fff',
+  },
+  imagePicker: {
+  	borderStyle: 'dashed',
+  	borderWidth: 1,
+  	borderColor: 'gray',
+  	//textAlign: 'center',
+  },
 });

@@ -21,6 +21,8 @@ class UIStore extends ReduceStore<UIState> {
       case 'page-new-pot':
       case 'page-edit-pot':
         return {page: 'edit-pot', editPotId: action.potId};
+      case 'page-list':
+        return {page: 'list'}
       default:
         return state;
     }
