@@ -46,6 +46,8 @@ export default StyleSheet.create({
   	borderStyle: 'dashed',
   	borderWidth: 1,
   	borderColor: 'gray',
+  	alignItems: 'center',
+  	flexDirection: 'column',
   	//textAlign: 'center',
   },
 });

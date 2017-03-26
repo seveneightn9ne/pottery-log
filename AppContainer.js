@@ -4,6 +4,7 @@ import PotsStore from './PotsStore.js';
 import UIStore from './UIStore.js';
 import AppView from './AppView.js';
 import {Container} from 'flux/utils';
+import {orderedStatuses, getStatus} from './Pot.js';
 
 function getStores() {
   return [
@@ -45,6 +46,22 @@ function getState() {
       value: [...PotsStore.getState().pots[potId].images, uri],
       potId: potId,
     }),
+    onSetMainImage: (potId, uri) => dispatcher.dispatch({
+      type: 'pot-edit-field',
+      field: 'images',
+      value: [uri, ...PotsStore.getState().pots[potId].images.filter(i => i != uri)],
+      potId: potId,
+    }),
+    setStatus: (newStatus) => {
+      const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
+      const newFullStatus = pot.status.withStatus(newStatus);
+      dispatcher.dispatch({
+        type: 'pot-edit-field',
+        field: 'status',
+        value: newFullStatus,
+        potId: pot.uuid,
+      })
+    }
   };
 }
 

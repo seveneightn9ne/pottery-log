@@ -10,20 +10,22 @@ import styles from './style.js';
 
 type ImagePickerProps = {
   onPicked: (uri: string) => void,
-}
+};
 
 export default class ImagePicker extends React.Component {
 
   render() {
     return <TouchableOpacity onPress={this.pickImage}>
-        <View style={styles.imagePicker}><Text>Add Image</Text></View>
+        <View style={[styles.imagePicker, this.props.style]}>
+          <Text style={{textAlign: 'center', flex: 1}}>Add Image</Text>
+        </View>
       </TouchableOpacity>;
   }
 
   pickImage = async () => {
     let result = await Expo.ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      aspect: [16,9]
+      aspect: [4,3]
     });
 
     if (!result.cancelled) {

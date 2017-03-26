@@ -1,6 +1,6 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot, PotStatus} from './Pot.js';
+import {Pot, Status} from './Pot.js';
 import dispatcher from './AppDispatcher.js';
 import { AsyncStorage } from 'react-native';
 
@@ -30,7 +30,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           uuid: String(Math.random()).substring(2),
           title: 'New Pot',
           images: [],
-          status: {thrown: Date.now()},
+          status: new Status({thrown: new Date()}),
         };
         const newState = {
           ...state,
@@ -85,24 +85,10 @@ async function loadPot(uuid: string): Pot {
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     pot.title = loaded.title;
-    pot.status = loadPotStatus(loaded.status);
+    pot.status = new Status(loaded.status);
     pot.images = loaded.images;
   }
   return pot;
-}
-
-function loadPotStatus(l) {
-  console.log('loadPotStatus ' + JSON.stringify(l));
-  const s = {};
-  for (key in PotStatus) {
-    console.log("looking for " + key);
-    if (key in l) {
-      console.log("Converting " + key + " to date");
-      s[key] = new Date(l[key]);
-    }
-  }
-  console.log("Returning " + JSON.stringify(s));
-  return s;
 }
 
 export default new PotsStore();

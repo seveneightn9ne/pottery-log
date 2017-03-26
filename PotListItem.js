@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import {Pot, statusText} from './Pot.js';
+import {Pot} from './Pot.js';
 import { Text, View, TouchableHighlight, Image } from 'react-native';
 import styles from './style.js';
 import dispatcher from './AppDispatcher.js';
@@ -23,7 +23,7 @@ export default class PotListItem extends React.Component {
       <View style={styles.listItem}>
         {img}
         <Text style={styles.listItemChild}>
-          {this.props.pot.title} {statusText(this.props.pot.status)}
+          {this.props.pot.title} {this.props.pot.status.text()}
         </Text>
       </View>
     </TouchableHighlight>);
