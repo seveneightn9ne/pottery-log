@@ -23,12 +23,12 @@ export default StyleSheet.create({
   	//height: 50,
   	//width: 50,
   	//borderWidth: 1,
-  	paddingRight: 15,
+  	paddingRight: 10,
+  	paddingLeft: 10
   },
-  listItemImg: {
+  size50: {
   	width: 50,
   	height: 50,
-  	marginRight: 10,
   },
   h1: {
   	fontSize: 36,

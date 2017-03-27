@@ -53,6 +53,46 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         this.persist(newState, newPot);
         return newState;
       }
+      case 'pot-delete': {
+        const potIndex = state.potIds.indexOf(action.potId);
+        const newPots = {...state.pots, [action.potid]: undefined};
+        const newPotIds = [...state.potIds];
+        if (potIndex > -1) {
+          newPotIds.splice(potIndex, 1);
+          AsyncStorage.removeItem('@Pot:' + action.potId);
+        }
+        const newState = {
+          hasLoaded: true,
+          pots: newPots,
+          potIds: newPotIds,
+        }
+        this.persist(newState);
+        console.log("will navigate to page list");
+        setTimeout(() => dispatcher.dispatch({type: 'page-list'}), 1);
+        return newState;
+      }
+      case 'pot-copy': {
+        const oldPot = state.pots[action.potId];
+        const oldTitleWords = oldPot.title.split(" ");
+        const lastWordIndex = oldTitleWords.length - 1
+        const lastWord = oldTitleWords[lastWordIndex];
+        const newTitle = isNaN(lastWord) ? oldTitleWords.join(" ") :
+            oldTitleWords.slice(0, lastWordIndex).join(" ") + " " + (1 + parseInt(lastWord));
+        const pot = {
+          uuid: String(Math.random()).substring(2),
+          title: newTitle,
+          images: oldPot.images,
+          status: oldPot.status,
+        }
+        const newState = {
+          ...state,
+          potIds: [...state.potIds, pot.uuid],
+          pots: {...state.pots, [pot.uuid]: pot}
+        };
+        this.persist(newState, pot);
+        setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
+        return newState;
+      }
       default:
         return state;
     }
@@ -85,7 +125,10 @@ async function loadPot(uuid: string): Pot {
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     pot.title = loaded.title;
+    console.log("Loaded:");
+    console.log(loaded.status);
     pot.status = new Status(loaded.status);
+    console.log(pot.status.toJSON());
     pot.images = loaded.images;
   }
   return pot;

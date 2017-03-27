@@ -5,12 +5,17 @@ import UIStore from './UIStore.js';
 import AppView from './AppView.js';
 import {Container} from 'flux/utils';
 import {orderedStatuses, getStatus} from './Pot.js';
+import {Alert} from 'react-native';
 
 function getStores() {
   return [
     PotsStore,
     UIStore,
   ];
+}
+
+function currentPot() {
+  return PotsStore.getState().pots[UIStore.getState().editPotId];
 }
 
 function getState() {
@@ -53,15 +58,48 @@ function getState() {
       potId: potId,
     }),
     setStatus: (newStatus) => {
-      const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
-      const newFullStatus = pot.status.withStatus(newStatus);
+      const newFullStatus = currentPot().status.withStatus(newStatus);
       dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'status',
         value: newFullStatus,
-        potId: pot.uuid,
-      })
-    }
+        potId: currentPot().uuid,
+      });
+    },
+    setStatusDate: (date) => {
+      const newFullStatus = currentPot().status.withStatus(
+          currentPot().status.currentStatus(), date);
+      dispatcher.dispatch({
+        type: 'pot-edit-field',
+        field: 'status',
+        value: newFullStatus,
+        potId: currentPot().uuid,
+      });
+    },
+    onDelete: () => {
+      Alert.alert( 'Delete this pot?', undefined,
+       [{text: 'Cancel', style: 'cancel'},
+        {text: 'Delete', onPress: () => dispatcher.dispatch({
+          type: 'pot-delete',
+          potId: currentPot().uuid,
+        })},
+      ]);
+    },
+    onDeleteImage: (uri) => {
+      Alert.alert( 'Delete selected image?', undefined,
+       [{text: 'Cancel', style: 'cancel'},
+        {text: 'Delete', onPress: () => dispatcher.dispatch({
+          type: 'pot-edit-field',
+          field: 'images',
+          value: currentPot().images.filter(i => i != uri),
+          potId: currentPot().uuid,
+        })},
+      ]);
+    },
+    onCopy: () => dispatcher.dispatch({
+      type: 'pot-copy',
+      potId: currentPot().uuid,
+    }),
   };
 }
 

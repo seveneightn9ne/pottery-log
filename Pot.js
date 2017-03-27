@@ -9,7 +9,7 @@ export interface Pot {
 
 export class Status {
   // Immutable! Functions return copies.
-  static ordered
+
   notstarted: Date; // Created date
   thrown: Date;
   trimmed: Date;
@@ -18,18 +18,28 @@ export class Status {
   pickedup: Date;
 
   constructor(status: Status) { // Or status with strings instead of dates.
+    //console.log("Loading status.");
+    if (typeof(status) == "string") {
+      status = JSON.parse(status);
+    }
     if (status) {
+      //console.log("With existing status: " + JSON.stringify(status));
       Status.ordered().forEach(s => {
-        if (status[s]) {
+        //console.log("Looking for " + s + " in " + JSON.stringify(status) + " (it's " + status[s] + ")");
+        if (status[s] != undefined) {
+          //console.log("I see " + s);
           if (typeof(status[s]) == "string" || typeof(status[s]) == "number") {
+            //console.log("Loading " + status[s] + " as a date.");
             this[s] = new Date(status[s]);
           } else {
             // It's already a date, I hope
+            //console.log("It's already a date.");
             this[s] = status[s];
           }
         }
       });
     }
+    //console.log("Done.");
   }
 
   static ordered(): string[] {
@@ -51,19 +61,26 @@ export class Status {
     return JSON.stringify(this.toObj());
   }
 
-  text(): string {
-    const status = this.currentStatus(true /** pretty **/);
-    let date = this[status];
+  static dateText(date) {
     if (date) {
-      if (typeof(date) == "number") {
-        console.log("Stop using Date.now!!");
-        date = new Date(date);
-      }
       const dateStringLong = date.toDateString();
       const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
-      return status + ' on ' + dateString;
+      return dateString;
     }
-    return status;
+  }
+
+  date(): Date {
+    return this[this.currentStatus()];
+  }
+
+  dateText(): string {
+    return Status.dateText(this.date());
+  }
+
+  text(): string {
+    const statusText = this.currentStatus(true /** pretty **/);
+    let dateText = this.dateText();
+    return dateText ? (statusText + ' on ' + dateText) : statusText;
   }
 
   currentStatus(pretty = false): string {
@@ -96,7 +113,17 @@ export class Status {
     for (let i = oldStatusIndex; i < newStatusIndex; i++) {
       newFullStatus[statuses[i]] = undefined;
     }
-    console.log("The new status will be " + JSON.stringify(newFullStatus));
+    //console.log("The new status will be " + JSON.stringify(newFullStatus));
     return new Status(newFullStatus);
+  }
+
+  next(pretty = false): string {
+    const currentI = Status.ordered().indexOf(this.currentStatus());
+    const nextI = currentI - 1;
+    if (nextI >= 0) {
+      return pretty ?
+        Status.prettify(Status.ordered()[nextI]) :
+        Status.ordered()[nextI];
+    }
   }
 }

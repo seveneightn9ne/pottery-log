@@ -18,11 +18,11 @@ export default class PotListItem extends React.Component {
 
   render() {
     const img = this.props.pot.images.length ?
-      <Image source={{uri: this.props.pot.images[0]}} style={styles.listItemImg} /> : null;
+      <Image source={{uri: this.props.pot.images[0]}} style={styles.size50} /> : null;
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>
         {img}
-        <Text style={styles.listItemChild}>
+        <Text style={[styles.listItemChild, {paddingLeft: 10}]}>
           {this.props.pot.title} {this.props.pot.status.text()}
         </Text>
       </View>
