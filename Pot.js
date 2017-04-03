@@ -1,10 +1,13 @@
 // @flow
+import React from 'react';
+import {Text} from 'react-native';
 
 export interface Pot {
   title: string,
   status: Status,
   images: string[],
   uuid: string,
+  notes: string,
 }
 
 export class Status {
@@ -80,7 +83,11 @@ export class Status {
   text(): string {
     const statusText = this.currentStatus(true /** pretty **/);
     let dateText = this.dateText();
-    return dateText ? (statusText + ' on ' + dateText) : statusText;
+    const hour = 1000 * 60 * 60;
+    const week = hour * 24 * 7;
+    const oneWeekIsh = week - (12 * hour);
+    const dateStyle = (new Date() - this.date() >= oneWeekIsh) ? {color: 'red'} : {color: undefined};
+    return dateText ? (<Text>{statusText} on <Text style={dateStyle}>{dateText}</Text></Text>) : statusText;
   }
 
   currentStatus(pretty = false): string {
@@ -98,10 +105,15 @@ export class Status {
     return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
   }
 
+  static progressive(name: string) {
+    return name.replace('bisqued', 'bisquing').replace('glazed', 'glaze firing').replace('pickedup','finished');
+  }
+
   withStatus(name: string, date: Date): Status {
     //const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
     //console.log("I see current status is " + JSON.stringify(pot.status));
-    if (!date) date = new Date();
+    const prevDate = this.toObj()[name];
+    date = date ? date : (prevDate ? prevDate : new Date());
     const newFullStatus = {
       ...this.toObj(),
       [name]: date,

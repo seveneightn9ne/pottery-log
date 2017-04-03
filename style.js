@@ -35,6 +35,17 @@ export default StyleSheet.create({
   	fontWeight: 'bold',
   	padding: 10,
   },
+  lh: {
+    fontWeight: 'bold',
+  },
+  lititle: {
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  lisubtitle: {
+    fontSize: 12,
+    color: '#666666',
+  },
   back: {
   	fontSize: 36,
   	fontWeight: 'bold',

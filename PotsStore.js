@@ -31,6 +31,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           title: 'New Pot',
           images: [],
           status: new Status({thrown: new Date()}),
+          notes: '',
         };
         const newState = {
           ...state,
@@ -74,15 +75,16 @@ class PotsStore extends ReduceStore<PotsStoreState> {
       case 'pot-copy': {
         const oldPot = state.pots[action.potId];
         const oldTitleWords = oldPot.title.split(" ");
-        const lastWordIndex = oldTitleWords.length - 1
+        const lastWordIndex = oldTitleWords.length - 1;
         const lastWord = oldTitleWords[lastWordIndex];
-        const newTitle = isNaN(lastWord) ? oldTitleWords.join(" ") :
+        const newTitle = isNaN(lastWord) ? oldTitleWords.join(" ") + " 2" :
             oldTitleWords.slice(0, lastWordIndex).join(" ") + " " + (1 + parseInt(lastWord));
         const pot = {
           uuid: String(Math.random()).substring(2),
           title: newTitle,
           images: oldPot.images,
           status: oldPot.status,
+          notes: oldPot.notes || '',
         }
         const newState = {
           ...state,
@@ -128,8 +130,9 @@ async function loadPot(uuid: string): Pot {
     console.log("Loaded:");
     console.log(loaded.status);
     pot.status = new Status(loaded.status);
-    console.log(pot.status.toJSON());
+    //console.log(pot.status.toJSON());
     pot.images = loaded.images;
+    pot.notes = loaded.notes || '';
   }
   return pot;
 }

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
 import {Pot, Status} from './Pot.js';
 //import PotsStoreState from './PotsStore.js';
 import styles from './style.js'
@@ -30,13 +30,21 @@ function AppView(props: AppViewProps): ?React.Element<*> {
   const {height, width} = Dimensions.get('window');
   switch (props.ui.page) {
     case 'list': {
-      const potListItems = props.pots.potIds.map(id => (
-        <PotListItem pot={props.pots.pots[id]} key={id}
-          onPress={() => props.onEdit(id)} />));
+      const lists = Status.ordered().reverse().map(status => {
+        const potListItems = props.pots.potIds.
+            filter(id => props.pots.pots[id].status.currentStatus() == status).
+            map(id => (<PotListItem pot={props.pots.pots[id]} key={id}
+              onPress={() => props.onEdit(id)} />));
+        const title = <Text style={styles.lh}>{Status.progressive(status)}</Text>;
+        return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
+      });
+
       return (<View style={styles.container}>
         <Text style={styles.h1}>Pottery Log</Text>
         <NewPotListItem onPress={props.onNew} />
-        {potListItems}
+        <ScrollView>
+          {lists}
+        </ScrollView>
         <View />
       </View>);
     }
@@ -58,7 +66,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       const statuses = Status.ordered(true).map(s =>
         <Picker.Item label={Status.prettify(s)} value={s} key={s} />);
       const nextButton = pot.status.next() ? <Button
-          title={pot.status.next(true /* pretty */) + " today"}
+          title={pot.status.next(true /* pretty */)}
           onPress={() => props.setStatus(pot.status.next())} /> : null;
       return <View style={styles.container}>
         <View style={{flexDirection: 'row'}}>
@@ -74,17 +82,17 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         {mainImage}
         {imageList}
         {/*<Text>{pot.status.text()}</Text>*/}
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', padding: 5}}>
           <Picker selectedValue={pot.status.currentStatus()}
-            onValueChange={props.setStatus} style={{flex: 1}}>
+            onValueChange={props.setStatus} style={{width: 150}}>
             {statuses}
           </Picker>
           <Text style={{paddingLeft: 10, paddingRight: 10}}>on</Text>
           <DatePicker value={pot.status.date()}
             style={{marginRight: 10}}
             onPickDate={props.setStatusDate} />
+          {nextButton}
         </View>
-        {nextButton}
         <Button onPress={props.onDelete} title="Delete" />
         <Button onPress={props.onCopy} title="Copy Pot" />
       </View>

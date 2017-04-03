@@ -22,9 +22,10 @@ export default class PotListItem extends React.Component {
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>
         {img}
-        <Text style={[styles.listItemChild, {paddingLeft: 10}]}>
-          {this.props.pot.title} {this.props.pot.status.text()}
-        </Text>
+        <View style={[styles.listItemChild, {paddingLeft: 10, flexDirection: 'column'}]}>
+          <Text style={styles.lititle}>{this.props.pot.title}</Text>
+          <Text style={styles.lisubtitle}>{this.props.pot.status.text()}</Text>
+        </View>
       </View>
     </TouchableHighlight>);
   }
