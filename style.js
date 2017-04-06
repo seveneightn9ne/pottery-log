@@ -37,6 +37,10 @@ export default StyleSheet.create({
   },
   lh: {
     fontWeight: 'bold',
+    fontSize: 16,
+    paddingTop: 5,
+    paddingLeft: 10,
+    paddingBottom: 0,
   },
   lititle: {
     fontWeight: 'bold',
