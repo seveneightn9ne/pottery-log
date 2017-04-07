@@ -111,7 +111,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
 async function loadInitial(dispatcher): void {
   const potIdsStr = await AsyncStorage.getItem('@Pots');
-  const potIds = JSON.parse(potIdsStr);
+  const potIds = JSON.parse(potIdsStr) || [];
   const pots = {};
   for (let i = 0; i < potIds.length; i++) {
     const pot = await loadPot(potIds[i]);
