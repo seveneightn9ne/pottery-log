@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  View,
+  Modal,
   DatePickerAndroid,
   DatePickerIOS,
   Platform,
@@ -15,14 +17,13 @@ type DatePickerProps = {
   onPickDate: (date: Date) => void,
 };
 
-export default class DatePicker extends React.Component {
+class ImplAndroid extends React.Component {
 
   render() {
-    return Platform.select({
-      // TODO(jessk) - Date picker for iOS
-      ios: <Text>{Status.dateText(this.props.value)}</Text>,
-      android: <TouchableOpacity onPress={this.pickDateAndroid}><Text>{Status.dateText(this.props.value)}</Text></TouchableOpacity>,
-    });
+    return <TouchableOpacity
+      onPress={this.pickDateAndroid}>
+      <Text>{Status.dateText(this.props.value)}</Text>
+    </TouchableOpacity>
   }
 
   pickDateAndroid = async () => {
@@ -39,4 +40,46 @@ export default class DatePicker extends React.Component {
   }
 }
 
-//Expo.registerRootComponent(ImagePicker);
+class ImplIOS extends React.Component {
+  state = {
+    modalVisible: false,
+  }
+
+  render() {
+    return <View>
+      <Modal
+        animationType={"slide"}
+        transparent={false}
+        visible={this.state.modalVisible}
+        onRequestClose={this.onModalClosed}
+        >
+        <DatePickerIOS
+          date={this.props.value}
+          mode="date"
+          onDateChange={this.onDateChange}
+        />
+      </Modal>
+    <TouchableOpacity
+      onPress={this.onStart}>
+      <Text>{Status.dateText(this.props.value)}</Text>
+    </TouchableOpacity>
+    </View>
+  }
+
+  onStart = () => {
+    this.setState({modalVisible: true})
+  }
+
+  onDateChange = (date) => {
+    this.setState({modalVisible: false})
+    this.props.onPickDate(date)
+  }
+}
+
+const DatePicker = Platform.select({
+  ios: ImplIOS,
+  android: ImplAndroid,
+});
+
+
+export default DatePicker
