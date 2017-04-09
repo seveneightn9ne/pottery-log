@@ -103,6 +103,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
             value={pot.notes || ''}
             multiline={true}
             onChangeText={(text) => props.onChangeNotes(pot.uuid, text)}
+            underlineColorAndroid="transparent"
           />
           <Button onPress={props.onDelete} title="Delete" />
           <Button onPress={props.onCopy} title="Copy Pot" />
