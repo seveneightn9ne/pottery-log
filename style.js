@@ -65,4 +65,10 @@ export default StyleSheet.create({
   	flexDirection: 'column',
   	//textAlign: 'center',
   },
+  potDescInput: {
+    minHeight: 40,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    backgroundColor: '#eee',
+  },
 });

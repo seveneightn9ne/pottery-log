@@ -1,6 +1,8 @@
 // @flow
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { ExpandingTextInput } from './expanding-text-input.js'
 import {Pot, Status} from './Pot.js';
 //import PotsStoreState from './PotsStore.js';
 import styles from './style.js'
@@ -15,6 +17,7 @@ type AppViewProps = {
   ui: Object, // UIState
   onNew: () => void,
   onChangeTitle: (text: string) => void,
+  onChangeNotes: (text: string) => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
   onChangeImages: (newImageUris: string[]) => void,
@@ -79,22 +82,31 @@ function AppView(props: AppViewProps): ?React.Element<*> {
             selectTextOnFocus={true}
           />
         </View>
-        {mainImage}
-        {imageList}
-        {/*<Text>{pot.status.text()}</Text>*/}
-        <View style={{flexDirection: 'row', padding: 5}}>
-          <Picker selectedValue={pot.status.currentStatus()}
-            onValueChange={props.setStatus} style={{width: 150}}>
-            {statuses}
-          </Picker>
-          <Text style={{paddingLeft: 10, paddingRight: 10}}>on</Text>
-          <DatePicker value={pot.status.date()}
-            style={{marginRight: 10}}
-            onPickDate={props.setStatusDate} />
-          {nextButton}
-        </View>
-        <Button onPress={props.onDelete} title="Delete" />
-        <Button onPress={props.onCopy} title="Copy Pot" />
+        <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
+          {mainImage}
+          {imageList}
+          {/*<Text>{pot.status.text()}</Text>*/}
+          <View style={{flexDirection: 'row', padding: 5}}>
+            <Picker selectedValue={pot.status.currentStatus()}
+              onValueChange={props.setStatus} style={{width: 150}}>
+              {statuses}
+            </Picker>
+            <Text style={{paddingLeft: 10, paddingRight: 10}}>on</Text>
+            <DatePicker value={pot.status.date()}
+              style={{marginRight: 10}}
+              onPickDate={props.setStatusDate} />
+            {nextButton}
+          </View>
+          <ExpandingTextInput
+            style={styles.potDescInput}
+            placeholder="Description"
+            value={pot.notes || ''}
+            multiline={true}
+            onChangeText={(text) => props.onChangeNotes(pot.uuid, text)}
+          />
+          <Button onPress={props.onDelete} title="Delete" />
+          <Button onPress={props.onCopy} title="Copy Pot" />
+        </KeyboardAwareScrollView>
       </View>
     }
     default: {

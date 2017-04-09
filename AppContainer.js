@@ -36,6 +36,12 @@ function getState() {
       value: newTitle,
       potId: potId,
     }),
+    onChangeNotes: (potId, newNotes) => dispatcher.dispatch({
+      type: 'pot-edit-field',
+      field: 'notes',
+      value: newNotes,
+      potId: potId,
+    }),
     onNavigateToList: () => dispatcher.dispatch({
       type: 'page-list',
     }),
