@@ -132,6 +132,7 @@ async function loadPot(uuid: string): Pot {
     pot.status = new Status(loaded.status);
     //console.log(pot.status.toJSON());
     pot.images = loaded.images;
+    console.log(loaded.images);
     pot.notes = loaded.notes || '';
   }
   return pot;

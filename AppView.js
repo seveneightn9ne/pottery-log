@@ -27,6 +27,9 @@ type AppViewProps = {
   setStatusDate: (date) => void,
   onDelete: () => void,
   onCopy: () => void,
+  onOpenSearch: () => void,
+  onCloseSearch: () => void,
+  onSearch: (search: string) => void,
 };
 
 function AppView(props: AppViewProps): ?React.Element<*> {
@@ -36,14 +39,44 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       const lists = Status.ordered().reverse().map(status => {
         const potListItems = props.pots.potIds.
             filter(id => props.pots.pots[id].status.currentStatus() == status).
+            filter(id => {
+              // Filter for search
+	      if (!props.ui.searching) {return true;}
+	      const pot = props.pots.pots[id];
+	      const searchTerm = props.ui.searchTerm;
+	      if (!searchTerm) return true;
+	      if (pot.title.includes(searchTerm)) return true;
+	      if (pot.notes.includes(searchTerm)) return true;
+	      return false;
+	    }).
             map(id => (<PotListItem pot={props.pots.pots[id]} key={id}
               onPress={() => props.onEdit(id)} />));
         const title = <Text style={styles.lh}>{Status.progressive(status)}</Text>;
         return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
       });
 
+      const topWhenSearching = (
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TextInput style={[styles.h1, {flex: 1, fontWeight: 'normal'}]}
+	    onChangeText={props.onSearch}
+	    autoFocus={true} placeholder={'search'} value={props.ui.searchTerm || ''} />
+          <TouchableHighlight onPress={props.onCloseSearch}>
+	    <Text style={[styles.h1, {color: 'red'}]}>X</Text>
+          </TouchableHighlight>
+        </View>
+      );
+
+      const topWhenNotSearching = (
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={styles.h1}>Pottery Log</Text>
+          <TouchableHighlight onPress={props.onOpenSearch}>
+            <Text style={styles.h1}>🔍</Text>
+          </TouchableHighlight>
+        </View>
+      );
+
       return (<View style={styles.container}>
-        <Text style={styles.h1}>Pottery Log</Text>
+        {props.ui.searching ? topWhenSearching : topWhenNotSearching}
         <NewPotListItem onPress={props.onNew} />
         <ScrollView>
           {lists}

@@ -45,6 +45,16 @@ function getState() {
     onNavigateToList: () => dispatcher.dispatch({
       type: 'page-list',
     }),
+    onOpenSearch: () => dispatcher.dispatch({
+      type: 'list-search-open',
+    }),
+    onCloseSearch: () => dispatcher.dispatch({
+      type: 'list-search-close',
+    }),
+    onSearch: (text: sting) => dispatcher.dispatch({
+      type: 'list-search-term',
+      text,
+    }),
     onChangeImages: (potId, newImageUris) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'images',

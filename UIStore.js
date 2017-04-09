@@ -24,6 +24,13 @@ class UIStore extends ReduceStore<UIState> {
       case 'page-list':
         console.log("Navigate to list");
         return {page: 'list'}
+      case 'list-search-open':
+      	console.log("Opened search");
+        return {page: 'list', searching: true};
+      case 'list-search-close':
+        return {page: 'list', searching: false, searchTerm: ''};
+      case 'list-search-term':
+      	return {page: 'list', searching: true, searchTerm: action.text};
       default:
         return state;
     }
