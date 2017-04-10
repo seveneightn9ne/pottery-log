@@ -10,6 +10,13 @@ export interface Pot {
   notes: string,
 }
 
+const NOTSTARTED = 'notstarted';
+const THROWN = 'thrown';
+const TRIMMED = 'trimmed';
+const BISQUED = 'bisqued';
+const GLAZED = 'glazed';
+const PICKEDUP = 'pickedup';
+
 export class Status {
   // Immutable! Functions return copies.
 
@@ -19,6 +26,34 @@ export class Status {
   bisqued: Date;
   glazed: Date;
   pickedup: Date;
+
+  static prettify(name: string) {
+    return name.replace(PICKEDUP, 'picked up').replace(NOTSTARTED, 'not started');
+  }
+
+  static progressive(name: string) {
+    switch (name) {
+      case BISQUED: return 'bisquing';
+      case GLAZED: return 'glaze firing';
+      case PICKEDUP: return 'finished';
+      default: return name;
+    }
+  }
+
+  static action(name: string) {
+    switch (name) {
+      case THROWN: return 'throw';
+      case TRIMMED: return 'trim';
+      case BISQUED: return 'bisque';
+      case GLAZED: return 'glaze';
+      case PICKEDUP: return 'pick up';
+      default: return name;
+    }
+  }
+
+  static ordered(): string[] {
+    return [PICKEDUP, GLAZED, BISQUED, TRIMMED, THROWN, NOTSTARTED];
+  }
 
   constructor(status: Status) { // Or status with strings instead of dates.
     //console.log("Loading status.");
@@ -43,10 +78,6 @@ export class Status {
       });
     }
     //console.log("Done.");
-  }
-
-  static ordered(): string[] {
-    return ['pickedup', 'glazed', 'bisqued', 'trimmed', 'thrown', 'notstarted'];
   }
 
   toObj() {
@@ -101,13 +132,6 @@ export class Status {
     return 'unknown';
   }
 
-  static prettify(name: string) {
-    return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
-  }
-
-  static progressive(name: string) {
-    return name.replace('bisqued', 'bisquing').replace('glazed', 'glaze firing').replace('pickedup','finished');
-  }
 
   withStatus(name: string, date: Date): Status {
     //const pot = PotsStore.getState().pots[UIStore.getState().editPotId];

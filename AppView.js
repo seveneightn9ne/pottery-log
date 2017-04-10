@@ -102,7 +102,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       const statuses = Status.ordered(true).map(s =>
         <Picker.Item label={Status.prettify(s)} value={s} key={s} />);
       const nextButton = pot.status.next() ? <Button
-          title={pot.status.next(true /* pretty */)}
+          title={Status.action(pot.status.next())}
           onPress={() => props.setStatus(pot.status.next())} /> : null;
       return <View style={styles.container}>
         <View style={{flexDirection: 'row'}}>
