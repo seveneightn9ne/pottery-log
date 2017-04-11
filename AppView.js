@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { ExpandingTextInput } from './expanding-text-input.js'
+import { ExpandingTextInput } from './ExpandingTextInput.js'
 import {Pot, Status} from './Pot.js';
 //import PotsStoreState from './PotsStore.js';
 import styles from './style.js'
