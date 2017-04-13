@@ -17,7 +17,7 @@ type AppViewProps = {
   ui: Object, // UIState
   onNew: () => void,
   onChangeTitle: (text: string) => void,
-  onChangeNotes: (text: string) => void,
+  onChangeNotes: (potId: string, date: Date, text: string) => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
   onChangeImages: (newImageUris: string[]) => void,
@@ -104,6 +104,18 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       const nextButton = pot.status.next() ? <Button
           title={Status.action(pot.status.next())}
           onPress={() => props.setStatus(pot.status.next())} /> : null;
+      const notes = pot.notes.map(noteObj => {
+        const noteText = noteObj.note || '';
+        const noteDate = noteObj.date;
+        return <ExpandingTextInput
+          style={styles.potDescInput}
+          placeholder="Notes"
+          value={noteText}
+          key={noteDate}
+          onChangeText={(text) => props.onChangeNotes(pot.uuid, noteDate, text)}
+          underlineColorAndroid="transparent"
+        />
+      });
       return <View style={styles.container}>
         <View style={{flexDirection: 'row'}}>
           <TouchableHighlight onPress={props.onNavigateToList}>
@@ -130,14 +142,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
               onPickDate={props.setStatusDate} />
             {nextButton}
           </View>
-          <ExpandingTextInput
-            style={styles.potDescInput}
-            placeholder="Description"
-            value={pot.notes || ''}
-            multiline={true}
-            onChangeText={(text) => props.onChangeNotes(pot.uuid, text)}
-            underlineColorAndroid="transparent"
-          />
+          {notes}
           <Button onPress={props.onDelete} title="Delete" />
           <Button onPress={props.onCopy} title="Copy Pot" />
         </KeyboardAwareScrollView>

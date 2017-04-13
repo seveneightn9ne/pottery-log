@@ -11,11 +11,9 @@ export class ExpandingTextInput extends Component {
     return (
       <TextInput
         {...this.props}
-        onChange={(event) => {
-          this.setState({
-            height: event.nativeEvent.contentSize.height,
-          });
-          this.props.onChange && this.props.onChange(event)
+        multiline={true}
+        onContentSizeChange={(event) => {
+          this.setState({height: event.nativeEvent.contentSize.height});
         }}
         style={[this.props.style, {height: this.state.height}]}
       />

@@ -31,7 +31,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           title: 'New Pot',
           images: [],
           status: new Status({thrown: new Date()}),
-          notes: '',
+          notes: [],
         };
         const newState = {
           ...state,
@@ -84,7 +84,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           title: newTitle,
           images: oldPot.images,
           status: oldPot.status,
-          notes: oldPot.notes || '',
+          notes: oldPot.notes || [],
         }
         const newState = {
           ...state,
@@ -122,18 +122,22 @@ async function loadInitial(dispatcher): void {
 
 async function loadPot(uuid: string): Pot {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
-  console.log("Here is some pot json: " + loadedJson);
+  console.log("Loading pot from storage: " + loadedJson);
   const pot = {uuid};
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     pot.title = loaded.title;
-    console.log("Loaded:");
-    console.log(loaded.status);
     pot.status = new Status(loaded.status);
-    //console.log(pot.status.toJSON());
     pot.images = loaded.images;
-    console.log(loaded.images);
-    pot.notes = loaded.notes || '';
+    if (typeof(loaded.notes) == "string" && loaded.notes != "") {
+      // Migrate to new format
+      pot.notes = [{
+        note: loaded.notes,
+        date: pot.status.date(),
+      }];
+    } else {
+      pot.notes = loaded.notes || [];
+    }
   }
   return pot;
 }
