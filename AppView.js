@@ -17,7 +17,8 @@ type AppViewProps = {
   ui: Object, // UIState
   onNew: () => void,
   onChangeTitle: (text: string) => void,
-  onChangeNotes: (potId: string, date: Date, text: string) => void,
+  onChangeNote: (potId: string, date: Date, text: string) => void,
+  onNewNote: () => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
   onChangeImages: (newImageUris: string[]) => void,
@@ -112,7 +113,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
           placeholder="Notes"
           value={noteText}
           key={noteDate}
-          onChangeText={(text) => props.onChangeNotes(pot.uuid, noteDate, text)}
+          onChangeText={(text) => props.onChangeNote(pot.uuid, noteDate, text)}
           underlineColorAndroid="transparent"
         />
       });
@@ -142,6 +143,9 @@ function AppView(props: AppViewProps): ?React.Element<*> {
               onPickDate={props.setStatusDate} />
             {nextButton}
           </View>
+          <TouchableHighlight onPress={props.onNewNote}>
+            <Text>+ Note</Text>
+          </TouchableHighlight>
           {notes}
           <Button onPress={props.onDelete} title="Delete" />
           <Button onPress={props.onCopy} title="Copy Pot" />

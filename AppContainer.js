@@ -36,7 +36,7 @@ function getState() {
       value: newTitle,
       potId: potId,
     }),
-    onChangeNotes: (potId, date, noteText) => {
+    onChangeNote: (potId, date, noteText) => {
       const newNotes = currentPot().notes.map(noteObj => {
         if (noteObj.date != date) {
           return noteObj;
@@ -51,6 +51,23 @@ function getState() {
         field: 'notes',
         value: newNotes,
         potId: potId,
+      });
+    },
+    onNewNote: () => {
+      const newNote = {
+        date: new Date(),
+        note: '',
+      };
+      const newNotes = [newNote, ...currentPot().notes];
+      dispatcher.dispatch({
+        type: 'pot-edit-field',
+        field: 'notes',
+        value: newNotes,
+        potId: currentPot().uuid,
+      });
+      dispatcher.dispatch({
+        // TODO(jessk) how to use this?
+        type: 'page-focus-new-note',
       });
     },
     onNavigateToList: () => dispatcher.dispatch({
