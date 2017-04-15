@@ -1,6 +1,5 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot, PotStatus} from './Pot.js';
 import dispatcher from './AppDispatcher.js';
 
 interface UIState {

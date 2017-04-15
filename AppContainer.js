@@ -4,7 +4,6 @@ import PotsStore from './PotsStore.js';
 import UIStore from './UIStore.js';
 import AppView from './AppView.js';
 import {Container} from 'flux/utils';
-import {orderedStatuses, getStatus} from './Pot.js';
 import {Alert} from 'react-native';
 
 function getStores() {

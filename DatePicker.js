@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 //import Expo from 'expo';
 import styles from './style.js';
-import {Status} from './Pot.js';
+import Status from './Status.js';
 
 type DatePickerProps = {
   value: Date,
