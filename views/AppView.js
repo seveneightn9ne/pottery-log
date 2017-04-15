@@ -1,17 +1,7 @@
 // @flow
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { ExpandingTextInput } from './ExpandingTextInput.js'
-import {Pot} from './Pot.js';
-import Status from './Status.js';
-//import PotsStoreState from './PotsStore.js';
-import styles from './style.js'
-import NewPotListItem from './NewPotListItem.js';
-import PotListItem from './PotListItem.js';
-import ImagePicker from './ImagePicker.js';
-import ImageList from './ImageList.js';
-import DatePicker from './DatePicker.js';
+import {Text, View} from 'react-native';
+import styles from '../style.js'
 import ListPage from './ListPage.js';
 import EditPage from './EditPage.js';
 

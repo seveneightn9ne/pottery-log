@@ -1,8 +1,8 @@
 // @flow
 import dispatcher from './AppDispatcher.js';
-import PotsStore from './PotsStore.js';
-import UIStore from './UIStore.js';
-import AppView from './AppView.js';
+import PotsStore from './stores/PotsStore.js';
+import UIStore from './stores/UIStore.js';
+import AppView from './views/AppView.js';
 import {Container} from 'flux/utils';
 import {Alert} from 'react-native';
 

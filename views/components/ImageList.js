@@ -5,8 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Expo from 'expo';
-import styles from './style.js';
+import styles from '../../style.js';
 import ImagePicker from './ImagePicker.js';
 
 type ImageListProps = {

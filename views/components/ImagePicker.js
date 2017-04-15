@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import Expo from 'expo';
-import styles from './style.js';
+import styles from '../../style.js';
 
 type ImagePickerProps = {
   onPicked: (uri: string) => void,
@@ -33,5 +33,3 @@ export default class ImagePicker extends React.Component {
     }
   }
 }
-
-//Expo.registerRootComponent(ImagePicker);

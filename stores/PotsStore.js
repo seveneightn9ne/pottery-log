@@ -1,8 +1,8 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot} from './Pot.js';
-import Status from './Status.js';
-import dispatcher from './AppDispatcher.js';
+import {Pot} from '../models/Pot.js';
+import Status from '../models/Status.js';
+import dispatcher from '../AppDispatcher.js';
 import { AsyncStorage } from 'react-native';
 
 interface PotsStoreState {

@@ -1,17 +1,11 @@
 // @flow
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { ExpandingTextInput } from './ExpandingTextInput.js'
-import {Pot} from './Pot.js';
-import Status from './Status.js';
-//import PotsStoreState from './PotsStore.js';
-import styles from './style.js'
-import NewPotListItem from './NewPotListItem.js';
-import PotListItem from './PotListItem.js';
-import ImagePicker from './ImagePicker.js';
-import ImageList from './ImageList.js';
-import DatePicker from './DatePicker.js';
+import {Pot} from '../models/Pot.js';
+import Status from '../models/Status.js';
+import styles from '../style.js'
+import NewPotListItem from './components/NewPotListItem.js';
+import PotListItem from './components/PotListItem.js';
 
 type ListPageProps = {
   pots: Object, // PotStoreState
