@@ -32,7 +32,8 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           title: 'New Pot',
           images: [],
           status: new Status({thrown: new Date()}),
-          notes: [],
+          notes2: new Notes(),
+          //notes: [],
         };
         const newState = {
           ...state,
@@ -81,11 +82,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         const newTitle = isNaN(lastWord) ? oldTitleWords.join(" ") + " 2" :
             oldTitleWords.slice(0, lastWordIndex).join(" ") + " " + (1 + parseInt(lastWord));
         const pot = {
+          ...oldPot,
           uuid: String(Math.random()).substring(2),
           title: newTitle,
-          images: oldPot.images,
-          status: oldPot.status,
-          notes: oldPot.notes || [],
         }
         const newState = {
           ...state,
@@ -124,23 +123,19 @@ async function loadInitial(dispatcher): void {
 async function loadPot(uuid: string): Pot {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
   console.log("Loading pot from storage: " + loadedJson);
-  const pot = {uuid};
+  //const pot = {uuid};
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
-    pot.title = loaded.title;
+    // Add all fields, for version compatibility
+    pot = {...loaded};
     pot.status = new Status(loaded.status);
-    pot.images = loaded.images;
-    if (typeof(loaded.notes) == "string" && loaded.notes != "") {
-      // Migrate to new format
-      pot.notes = [{
-        note: loaded.notes,
-        date: pot.status.date(),
-      }];
-    } else {
-      pot.notes = loaded.notes || [];
+    if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
+      // Nope nope nope - killing this format.
+      pot.notes = undefined;
     }
+    return pot;
   }
-  return pot;
+  return {uuid};
 }
 
 export default new PotsStore();

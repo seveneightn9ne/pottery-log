@@ -9,13 +9,13 @@ import styles from '../style.js'
 import ImagePicker from './components/ImagePicker.js';
 import ImageList from './components/ImageList.js';
 import DatePicker from './components/DatePicker.js';
+import StatusDetail from './components/StatusDetail.js';
 
 type EditPageProps = {
   pot: Pot,
   ui: Object, // UIState
   onChangeTitle: (text: string) => void,
-  onChangeNote: (potId: string, date: Date, text: string) => void,
-  onNewNote: () => void,
+  onChangeNotes: (potId: string, status: Status, text: string) => void,
   onNavigateToList: () => void,
   onChangeImages: (newImageUris: string[]) => void,
   onAddImage: (potId, uri) => void,
@@ -48,7 +48,7 @@ export default class ListPage extends React.Component {
     const nextButton = pot.status.next() ? <Button
         title={Status.action(pot.status.next())}
         onPress={() => this.props.setStatus(pot.status.next())} /> : null;
-    const notes = pot.notes.map(noteObj => {
+    /*const notes = pot.notes.map(noteObj => {
       const noteText = noteObj.note || '';
       const noteDate = noteObj.date;
       return <ExpandingTextInput
@@ -59,7 +59,13 @@ export default class ListPage extends React.Component {
         onChangeText={(text) => this.props.onChangeNote(pot.uuid, noteDate, text)}
         underlineColorAndroid="transparent"
       />
-    });
+    });*/
+    const details = Status.ordered().filter(s => pot.status[s] != undefined).map(s =>
+      <StatusDetail key={s}
+        note={pot.notes2 && pot.notes2[s] || undefined}
+        status={s}
+        date={pot.status[s]} />
+    );
     return <View style={styles.container}>
       <View style={{flexDirection: 'row'}}>
         <TouchableHighlight onPress={this.props.onNavigateToList}>
@@ -86,10 +92,12 @@ export default class ListPage extends React.Component {
             onPickDate={this.props.setStatusDate} />
           {nextButton}
         </View>
-        <TouchableHighlight onPress={this.props.onNewNote}>
-          <Text>+ Note</Text>
+        <TouchableHighlight onPress={() => {
+          // TODO(jessk) add a modal in the UI to edit..
+        }}>
+          <Text>+ {Status.action(pot.status.currentStatus())} note</Text>
         </TouchableHighlight>
-        {notes}
+        {details}
         <Button onPress={this.props.onDelete} title="Delete" />
         <Button onPress={this.props.onCopy} title="Copy Pot" />
       </KeyboardAwareScrollView>
