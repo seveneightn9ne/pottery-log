@@ -10,12 +10,13 @@ import ImagePicker from './components/ImagePicker.js';
 import ImageList from './components/ImageList.js';
 import DatePicker from './components/DatePicker.js';
 import StatusDetail from './components/StatusDetail.js';
+import Note from './components/Note.js';
 
 type EditPageProps = {
   pot: Pot,
   ui: Object, // UIState
   onChangeTitle: (text: string) => void,
-  onChangeNotes: (potId: string, status: Status, text: string) => void,
+  onChangeNote: (potId: string, status: string, text: string) => void,
   onNavigateToList: () => void,
   onChangeImages: (newImageUris: string[]) => void,
   onAddImage: (potId, uri) => void,
@@ -60,12 +61,15 @@ export default class ListPage extends React.Component {
         underlineColorAndroid="transparent"
       />
     });*/
-    const details = Status.ordered().filter(s => pot.status[s] != undefined).map(s =>
+    const currentStatusIndex = Status.ordered().indexOf(pot.status.currentStatus());
+    const numStatusDetails = Status.ordered().length - currentStatusIndex - 2;
+    const details = Status.ordered().splice(currentStatusIndex+1, numStatusDetails).map(s =>
       <StatusDetail key={s}
         note={pot.notes2 && pot.notes2[s] || undefined}
-        status={s}
-        date={pot.status[s]} />
+        status={s} potId={pot.uuid} date={pot.status[s]}
+        onChangeNote={this.props.onChangeNote} />
     );
+    const currentNoteText = pot.notes2[pot.status.currentStatus()];
     return <View style={styles.container}>
       <View style={{flexDirection: 'row'}}>
         <TouchableHighlight onPress={this.props.onNavigateToList}>
@@ -92,11 +96,9 @@ export default class ListPage extends React.Component {
             onPickDate={this.props.setStatusDate} />
           {nextButton}
         </View>
-        <TouchableHighlight onPress={() => {
-          // TODO(jessk) add a modal in the UI to edit..
-        }}>
-          <Text>+ {Status.action(pot.status.currentStatus())} note</Text>
-        </TouchableHighlight>
+        <Note status={pot.status.currentStatus()} potId={pot.uuid}
+          note={pot.notes2[pot.status.currentStatus()]}
+          onChangeNote={this.props.onChangeNote} />
         {details}
         <Button onPress={this.props.onDelete} title="Delete" />
         <Button onPress={this.props.onCopy} title="Copy Pot" />

@@ -35,6 +35,11 @@ export default StyleSheet.create({
   	fontWeight: 'bold',
   	padding: 10,
   },
+  h2: {
+  	fontSize: 24,
+  	fontWeight: 'bold',
+  	padding: 10,
+  },
   lh: {
     fontWeight: 'bold',
     fontSize: 16,

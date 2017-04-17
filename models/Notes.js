@@ -7,6 +7,13 @@ export default class Notes {
   // Immutable! Functions return copies.
 
   constructor(notes: Notes) { // Or status with strings instead of dates.
+    if (typeof(notes) == "string") {
+      try {
+        notes = JSON.parse(notes);
+      } catch (err) {
+        return;
+      }
+    }
     Status.ordered().forEach(s => {
       if (notes != undefined && notes[s] != undefined) {
         this[s] = notes[s];
@@ -16,7 +23,7 @@ export default class Notes {
 
   toObj() {
     const obj = {}
-    Status.ordered.forEach(s => {
+    Status.ordered().forEach(s => {
       if (this[s]) {
         obj[s] = this[s];
       }
@@ -28,8 +35,8 @@ export default class Notes {
     return JSON.stringify(this.toObj());
   }
 
-  withNoteForStatus(status: Status, note: string): Note {
-    return new Note({...this.toObj(), [status.currentStatus()]: note});
+  withNoteForStatus(status: string, note: string): Note {
+    return new Notes({...this.toObj(), [status]: note});
   }
 
   forStatus(status: Status): string {

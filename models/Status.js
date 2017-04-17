@@ -23,10 +23,21 @@ export default class Status {
     return name.replace(PICKEDUP, 'picked up').replace(NOTSTARTED, 'not started');
   }
 
-  static progressive(name: string) {
+  static longterm(name: string) {
     switch (name) {
       case BISQUED: return 'bisquing';
       case GLAZED: return 'glaze firing';
+      case PICKEDUP: return 'finished';
+      default: return name;
+    }
+  }
+
+  static progressive(name: string) {
+    switch (name) {
+      case THROWN: return 'throwing';
+      case TRIMMED: return 'trimming';
+      case BISQUED: return 'bisquing';
+      case GLAZED: return 'glazing';
       case PICKEDUP: return 'finished';
       default: return name;
     }

@@ -2,6 +2,7 @@
 import {ReduceStore} from 'flux/utils';
 import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
+import Notes from '../models/Notes.js';
 import dispatcher from '../AppDispatcher.js';
 import { AsyncStorage } from 'react-native';
 
@@ -129,10 +130,12 @@ async function loadPot(uuid: string): Pot {
     // Add all fields, for version compatibility
     pot = {...loaded};
     pot.status = new Status(loaded.status);
+    pot.notes2 = new Notes(loaded.notes2);
     if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
       // Nope nope nope - killing this format.
       pot.notes = undefined;
     }
+    console.log("Done building pot", pot);
     return pot;
   }
   return {uuid};

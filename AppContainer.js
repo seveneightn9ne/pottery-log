@@ -35,10 +35,10 @@ function getState() {
       value: newTitle,
       potId: potId,
     }),
-    onChangeNotes: (potId, status, noteText) => dispatcher.dispatch({
+    onChangeNote: (potId, statusText, noteText) => dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'notes2',
-        value: currentPot().notes2.withNoteForStatus(status, noteText),
+        value: currentPot().notes2.withNoteForStatus(statusText, noteText),
         potId: potId,
     }),
     onNavigateToList: () => dispatcher.dispatch({
