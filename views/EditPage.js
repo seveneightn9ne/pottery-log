@@ -10,6 +10,7 @@ import ImagePicker from './components/ImagePicker.js';
 import ImageList from './components/ImageList.js';
 import DatePicker from './components/DatePicker.js';
 import StatusDetail from './components/StatusDetail.js';
+import StatusSwitcher from './components/StatusSwitcher.js';
 import Note from './components/Note.js';
 
 type EditPageProps = {
@@ -84,17 +85,12 @@ export default class ListPage extends React.Component {
       <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
         {mainImage}
         {imageList}
-        {/*<Text>{pot.status.text()}</Text>*/}
         <View style={{flexDirection: 'row', padding: 5}}>
-          <Picker selectedValue={pot.status.currentStatus()}
-            onValueChange={this.props.setStatus} style={{width: 150}}>
-            {statuses}
-          </Picker>
+          <StatusSwitcher status={pot.status} setStatus={this.props.setStatus} />
           <Text style={{paddingLeft: 10, paddingRight: 10}}>on</Text>
           <DatePicker value={pot.status.date()}
             style={{marginRight: 10}}
             onPickDate={this.props.setStatusDate} />
-          {nextButton}
         </View>
         <Note status={pot.status.currentStatus()} potId={pot.uuid}
           note={pot.notes2[pot.status.currentStatus()]}

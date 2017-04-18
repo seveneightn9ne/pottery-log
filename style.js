@@ -76,4 +76,56 @@ export default StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#eee',
   },
+  ssLeft: {
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderWidth: 1,
+    borderRightWidth: 0,
+    padding: 5,
+  },
+  ssMiddle: {
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    padding: 5,
+  },
+  ssRight: {
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    padding: 5,
+  },
+  bisqued: {
+    backgroundColor: '#edc495',
+    borderColor: '#ce995c',
+  },
+  trimmed: {
+    backgroundColor: '#95beed',
+    borderColor: '#4e90db',
+  },
+  thrown: {
+    backgroundColor: '#9f95ed',
+    borderColor: '#6252d8',
+  },
+  glazed: {
+    backgroundColor: '#ed95e4',
+    borderColor: '#d145c3',
+  },
+  pickedup: {
+    backgroundColor: '#a1ed95',
+    borderColor: '#4ecc3b',
+  },
+  notstarted: {
+    backgroundColor: '#ed9595',
+    borderColor: '#e03535',
+  },
+  status: {
+    borderRadius: 1,
+    borderWidth: 1,
+    padding: 1,
+  },
+  statusT: {
+    color: '#666',
+  },
 });

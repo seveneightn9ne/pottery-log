@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
-import {Text} from 'react-native';
+import {Text, View} from 'react-native';
+import styles from '../style.js';
 
 const NOTSTARTED = 'notstarted';
 const THROWN = 'thrown';
@@ -115,13 +116,19 @@ export default class Status {
   }
 
   text(): string {
-    const statusText = this.currentStatus(true /** pretty **/);
+    const statusText = //<View style={styles.status}>
+      <Text>{/* style={[styles.statusT, styles[this.currentStatus()]]}>*/}
+      {this.currentStatus(true /** pretty **/)}
+    </Text>;//</View>;
     let dateText = this.dateText();
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
     const dateStyle = (new Date() - this.date() >= oneWeekIsh) ? {color: 'red'} : {color: undefined};
-    return dateText ? (<Text>{statusText} on <Text style={dateStyle}>{dateText}</Text></Text>) : statusText;
+    return dateText ? (<View style={{flexDirection: 'row'}}>
+      {statusText}
+      <Text> on </Text>
+      <Text style={dateStyle}>{dateText}</Text></View>) : statusText;
   }
 
   currentStatus(pretty = false): string {
@@ -163,6 +170,16 @@ export default class Status {
       return pretty ?
         Status.prettify(Status.ordered()[nextI]) :
         Status.ordered()[nextI];
+    }
+  }
+
+  prev(pretty = false): string {
+    const currentI = Status.ordered().indexOf(this.currentStatus());
+    const prevI = currentI + 1;
+    if (prevI < Status.ordered().length) {
+      return pretty ?
+        Status.prettify(Status.ordered()[prevI]) :
+        Status.ordered()[prevI];
     }
   }
 }

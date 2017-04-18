@@ -24,7 +24,7 @@ export default class PotListItem extends React.Component {
         {img}
         <View style={[styles.listItemChild, {paddingLeft: 10, flexDirection: 'column'}]}>
           <Text style={styles.lititle}>{this.props.pot.title}</Text>
-          <Text style={styles.lisubtitle}>{this.props.pot.status.text()}</Text>
+          {this.props.pot.status.text()}
         </View>
       </View>
     </TouchableHighlight>);
