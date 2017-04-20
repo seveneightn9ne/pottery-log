@@ -1,6 +1,13 @@
-- notes area
+- Fix deleting images
+- Put the "+ $stage note" on the same line as the status line
+- Better styling of the status lines
+- Android back button behavior
 - post-bisque state
 - glaze hospital state
-- clarify names of states on buttons
 - ios datepicker
-- capitalize titles
+- capitalize titles on the list page
+- make sure that many images for 1 pot will scroll horizontally / not hide the "Add Image" button
+- Handle the fact that the images are square on iOS, maybe
+- Get rid of the auto-focus on "New Pot" title
+- Old "picked up" dates should not be red
+- Further ideas: https://paper.dropbox.com/doc/Pottery-App-Feedback-DtrncauSVsyrfMrBF0Ira
