@@ -30,7 +30,7 @@ export default class ListPage extends React.Component {
             const searchTerm = this.props.ui.searchTerm;
             if (!searchTerm) return true;
             if (pot.title.includes(searchTerm)) return true;
-            if (pot.notes.includes(searchTerm)) return true;
+            if (pot.notes2.includes(searchTerm)) return true;
             return false;
           }).map(id => (<PotListItem pot={this.props.pots.pots[id]} key={id}
             onPress={() => this.props.onClickPot(id)} />));

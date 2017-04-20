@@ -43,4 +43,14 @@ export default class Notes {
     return this[status.currentStatus()];
   }
 
+  includes(text: string): boolean {
+    let contains = false;
+    Status.ordered().forEach(s => {
+      if (this[s] && this[s].includes(text)) {
+        contains = true;
+      }
+    });
+    return contains;
+  }
+
 }
