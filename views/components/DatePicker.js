@@ -20,8 +20,12 @@ class ImplAndroid extends React.Component {
 
   render() {
     return <TouchableOpacity
+      style={[styles.ssLeft, styles.ssRight, {
+        backgroundColor: '#ddd',
+        borderColor: '#999',
+      }]}
       onPress={this.pickDateAndroid}>
-      <Text>{Status.dateText(this.props.value)}</Text>
+      <Text>{Status.dateText(this.props.value)} 📅</Text>
     </TouchableOpacity>
   }
 

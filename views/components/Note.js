@@ -18,23 +18,29 @@ export default class Note extends React.Component {
   }
   render() {
     console.log("note props", this.props);
+    closeModal = () => {this.setState({modalOpen: false})}
     return <View>
       <Modal animationType={"slide"} transparent={true}
         visible={this.state.modalOpen}
-        onRequestClose={() => this.setState({modalOpen: false})}>
-        <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}><View>
-          <Text style={styles.h2}>{Status.progressive(this.props.status)} Note</Text>
-        <TextInput value={this.props.note} multiline={true} numberOfLines={4}
-          onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
-          autoFocus={true} />
-        <Button title="Done" onPress={() => {
-          this.setState({modalOpen: false})
-        }} />
-      </View></View></Modal>
-      <TouchableOpacity onPress={() => {
-      this.setState({modalOpen: true})
-      }}><Text>{this.props.note ? this.props.note :
-        "+ " + Status.progressive(this.props.status) + " note"}</Text>
-    </TouchableOpacity></View>;
+        onRequestClose={closeModal}>
+        <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}>
+          <View>
+            <Text style={styles.h2}>{Status.progressive(this.props.status).capitalize()} Note</Text>
+            <TextInput value={this.props.note} multiline={true} numberOfLines={4}
+              onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
+              autoFocus={true} />
+            <Button title="Done" onPress={closeModal} />
+          </View>
+        </View>
+      </Modal>
+
+      <TouchableOpacity onPress={() => this.setState({modalOpen: true})}
+        style={styles.note}>
+        <Text style={this.props.note ? {fontSize: 16} : styles.noteBlankText}>
+          {this.props.note ? this.props.note :
+            "+ " + Status.progressive(this.props.status) + " note"}
+        </Text>
+      </TouchableOpacity>
+    </View>;
   }
 }

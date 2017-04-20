@@ -87,7 +87,11 @@ export default class ListPage extends React.Component {
         {imageList}
         <View style={{flexDirection: 'row', padding: 5}}>
           <StatusSwitcher status={pot.status} setStatus={this.props.setStatus} />
-          <Text style={{paddingLeft: 10, paddingRight: 10}}>on</Text>
+          <Text style={{
+            paddingLeft: 10, paddingRight: 10,
+            color: '#666', fontStyle: 'italic',
+            fontSize: 14, padding: 5,
+          }}>on</Text>
           <DatePicker value={pot.status.date()}
             style={{marginRight: 10}}
             onPickDate={this.props.setStatusDate} />
@@ -96,8 +100,14 @@ export default class ListPage extends React.Component {
           note={pot.notes2[pot.status.currentStatus()]}
           onChangeNote={this.props.onChangeNote} />
         {details}
-        <Button onPress={this.props.onDelete} title="Delete" />
-        <Button onPress={this.props.onCopy} title="Copy Pot" />
+        <View style={{flexDirection: 'row'}}>
+          <View style={{margin: 10}}>
+            <Button onPress={this.props.onDelete} title="Delete Pot" />
+          </View>
+          <View style={{margin: 10}}>
+            <Button onPress={this.props.onCopy} title="Copy Pot" />
+          </View>
+        </View>
       </KeyboardAwareScrollView>
     </View>;
   }

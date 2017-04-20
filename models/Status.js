@@ -10,6 +10,10 @@ const BISQUED = 'bisqued';
 const GLAZED = 'glazed';
 const PICKEDUP = 'pickedup';
 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
 export default class Status {
   // Immutable! Functions return copies.
 

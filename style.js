@@ -128,4 +128,12 @@ export default StyleSheet.create({
   statusT: {
     color: '#666',
   },
+  note: {
+    padding: 10,
+  },
+  noteBlankText: {
+    fontSize: 16,
+    color: '#666',
+    fontStyle: 'italic',
+  }
 });
