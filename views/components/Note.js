@@ -3,6 +3,7 @@ import React from 'react';
 import Status from '../../models/Status.js';
 import { Text, View, Button, TouchableOpacity, Modal, TextInput } from 'react-native';
 import styles from '../../style.js';
+import { ExpandingTextInput } from './ExpandingTextInput.js'
 
 type NoteProps = {
   potId: string,
@@ -26,7 +27,8 @@ export default class Note extends React.Component {
         <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}>
           <View>
             <Text style={styles.h2}>{Status.progressive(this.props.status).capitalize()} Note</Text>
-            <TextInput value={this.props.note} multiline={true} numberOfLines={4}
+            <ExpandingTextInput value={this.props.note} multiline={true} numberOfLines={4}
+              style={{fontSize: 16, marginBottom: 20}}
               onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
               autoFocus={true} />
             <Button title="Done" onPress={closeModal} />

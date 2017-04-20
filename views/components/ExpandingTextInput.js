@@ -12,6 +12,7 @@ export class ExpandingTextInput extends Component {
       <TextInput
         {...this.props}
         multiline={true}
+        underlineColorAndroid={'transparent'}
         onContentSizeChange={(event) => {
           this.setState({height: event.nativeEvent.contentSize.height});
         }}
