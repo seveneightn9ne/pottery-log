@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Image,
   Text,
   TouchableOpacity,
@@ -15,15 +16,30 @@ type ImagePickerProps = {
 export default class ImagePicker extends React.Component {
 
   render() {
-    return <TouchableOpacity onPress={this.pickImage}>
+    return <TouchableOpacity onPress={this.popup}>
         <View style={[styles.imagePicker, this.props.style]}>
           <Text style={{textAlign: 'center', flex: 1}}>Add Image</Text>
         </View>
       </TouchableOpacity>;
   }
 
-  pickImage = async () => {
-    let result = await Expo.ImagePicker.launchImageLibraryAsync({
+  popup = () => {
+    Alert.alert( 'Add Image', 'Choose a source', [
+      {text: 'Camera', onPress: this.pickImageFromCamera},
+      {text: 'Image Library', onPress: this.pickImageFromLibrary}]);
+
+  }
+
+  pickImageFromCamera = async () => {
+    await this.pickImage(Expo.ImagePicker.launchCameraAsync);
+  }
+
+  pickImageFromLibrary = async () => {
+    await this.pickImage(Expo.ImagePicker.launchImageLibraryAsync);
+  }
+
+  pickImage = async (picker) => {
+    let result = await picker({
       allowsEditing: true,
       aspect: [4,3]
     });
