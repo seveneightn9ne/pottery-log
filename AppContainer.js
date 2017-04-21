@@ -63,7 +63,7 @@ function getState() {
     onAddImage: (potId, uri) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'images',
-      value: [...PotsStore.getState().pots[potId].images, uri],
+      value: [uri, ...PotsStore.getState().pots[potId].images],
       potId: potId,
     }),
     onSetMainImage: (potId, uri) => dispatcher.dispatch({
