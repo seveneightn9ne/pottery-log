@@ -22,6 +22,7 @@ type EditPageProps = {
   onChangeImages: (newImageUris: string[]) => void,
   onAddImage: (potId, uri) => void,
   onSetMainImage: (potId, uri) => void,
+  onDeleteImage: (uri) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,

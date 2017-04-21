@@ -17,6 +17,7 @@ type AppViewProps = {
   onChangeImages: (newImageUris: string[]) => void,
   onAddImage: (potId, uri) => void,
   onSetMainImage: (potId, uri) => void,
+  onDeleteImage: (uri) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,
@@ -45,6 +46,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onNavigateToList={props.onNavigateToList}
         onChangeImages={props.onChangeImages}
         onAddImage={props.onAddImage}
+        onDeleteImage={props.onDeleteImage}
         onSetMainImage={props.onSetMainImage}
         setStatus={props.setStatus}
         setStatusDate={props.setStatusDate}
