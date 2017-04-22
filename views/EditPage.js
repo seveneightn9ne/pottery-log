@@ -79,8 +79,7 @@ export default class ListPage extends React.Component {
         </TouchableHighlight>
         <TextInput style={[styles.h1, {flex: 1}]}
           onChangeText={(text) => this.props.onChangeTitle(pot.uuid, text)}
-          value={pot.title} autoFocus={pot.title == 'New Pot'}
-          selectTextOnFocus={true}
+          value={pot.title} selectTextOnFocus={true}
         />
       </View>
       <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
@@ -99,7 +98,7 @@ export default class ListPage extends React.Component {
         </View>
         <Note status={pot.status.currentStatus()} potId={pot.uuid}
           note={pot.notes2[pot.status.currentStatus()]}
-          onChangeNote={this.props.onChangeNote}
+          onChangeNote={this.props.onChangeNote} showNote={true} showAddNote={true}
           style={{padding: 10, paddingTop: 0}}
          />
         {details}
