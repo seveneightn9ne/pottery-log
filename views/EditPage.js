@@ -86,7 +86,7 @@ export default class ListPage extends React.Component {
       <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
         {mainImage}
         {imageList}
-        <View style={{flexDirection: 'row', padding: 5}}>
+        <View style={{flexDirection: 'row', padding: 10}}>
           <StatusSwitcher status={pot.status} setStatus={this.props.setStatus} />
           <Text style={{
             paddingLeft: 10, paddingRight: 10,
@@ -99,7 +99,9 @@ export default class ListPage extends React.Component {
         </View>
         <Note status={pot.status.currentStatus()} potId={pot.uuid}
           note={pot.notes2[pot.status.currentStatus()]}
-          onChangeNote={this.props.onChangeNote} />
+          onChangeNote={this.props.onChangeNote}
+          style={{padding: 10, paddingTop: 0}}
+         />
         {details}
         <View style={{flexDirection: 'row'}}>
           <View style={{margin: 10}}>

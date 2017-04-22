@@ -121,15 +121,17 @@ export default StyleSheet.create({
     borderColor: '#e03535',
   },
   status: {
-    borderRadius: 1,
+    borderRadius: 5,
     borderWidth: 1,
     padding: 1,
+    paddingLeft: 3,
+    paddingRight: 3,
   },
   statusT: {
     color: '#666',
   },
   note: {
-    padding: 10,
+    //padding: 10,
   },
   noteBlankText: {
     fontSize: 16,

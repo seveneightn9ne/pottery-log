@@ -12,37 +12,60 @@ type NoteProps = {
   onChangeNote: (potId, status, newNote) => void,
 };
 
+class NoteModal extends React.Component {
+  render() {
+    return <Modal animationType={"slide"} transparent={true}
+      visible={this.props.modalOpen}
+      onRequestClose={this.props.closeModal}>
+      <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}>
+        <View>
+          <Text style={styles.h2}>{Status.progressive(this.props.status).capitalize()} Note</Text>
+          <ExpandingTextInput value={this.props.note} multiline={true} numberOfLines={4}
+            style={{fontSize: 16, marginBottom: 20}}
+            onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
+            autoFocus={true} />
+          <Button title="Done" onPress={this.props.closeModal} />
+        </View>
+      </View>
+    </Modal>
+  }
+}
+
+class AddNote extends React.Component {
+  render() {
+    return <TouchableOpacity onPress={this.props.onPress}>
+      <Text style={styles.noteBlankText}>
+        {"+ " + Status.progressive(this.props.status) + " note"}
+      </Text>
+    </TouchableOpacity>
+  }
+}
+
+class ShowNote extends React.Component {
+  render() {
+    return <TouchableOpacity onPress={this.props.onPress}>
+      <View><Text style={{fontSize: 16}}>{this.props.note}</Text></View>
+    </TouchableOpacity>
+  }
+
+}
+
 export default class Note extends React.Component {
   constructor(props: NoteProps) {
     super(props);
     this.state = { modalOpen: false };
   }
   render() {
-    console.log("note props", this.props);
     closeModal = () => {this.setState({modalOpen: false})}
-    return <View>
-      <Modal animationType={"slide"} transparent={true}
-        visible={this.state.modalOpen}
-        onRequestClose={closeModal}>
-        <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}>
-          <View>
-            <Text style={styles.h2}>{Status.progressive(this.props.status).capitalize()} Note</Text>
-            <ExpandingTextInput value={this.props.note} multiline={true} numberOfLines={4}
-              style={{fontSize: 16, marginBottom: 20}}
-              onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
-              autoFocus={true} />
-            <Button title="Done" onPress={closeModal} />
-          </View>
-        </View>
-      </Modal>
-
-      <TouchableOpacity onPress={() => this.setState({modalOpen: true})}
-        style={styles.note}>
-        <Text style={this.props.note ? {fontSize: 16} : styles.noteBlankText}>
-          {this.props.note ? this.props.note :
-            "+ " + Status.progressive(this.props.status) + " note"}
-        </Text>
-      </TouchableOpacity>
+    openModal = () => {this.setState({modalOpen: true})}
+    const addNote = <AddNote onPress={openModal} status={this.props.status} />
+    const showNote = <ShowNote onPress={openModal} note={this.props.note} />
+    return <View style={this.props.style}>
+      <NoteModal note={this.props.note} status={this.props.status} potId={this.props.potId}
+        modalOpen={this.state.modalOpen} closeModal={closeModal}
+        onChangeNote={this.props.onChangeNote} />
+      {this.props.note ? (this.props.showNote ? showNote : null) :
+        (this.props.showAddNote ? addNote : null)}
     </View>;
   }
 }

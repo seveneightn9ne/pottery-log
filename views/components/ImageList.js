@@ -3,7 +3,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  View,
+  ScrollView,
 } from 'react-native';
 import styles from '../../style.js';
 import ImagePicker from './ImagePicker.js';
@@ -22,9 +22,9 @@ export default class ImageList extends React.Component {
         onLongPress={() => this.props.onDeleteImage(uri)}>
         <Image source={{uri}} style={styles.size50} />
       </TouchableOpacity>);
-    return <View style={{flexDirection: 'row'}}>
+    return <ScrollView horizontal={true}>
       {images}
       <ImagePicker style={styles.size50} onPicked={this.props.onAddImage} />
-    </View>;
+    </ScrollView>;
   }
 }
