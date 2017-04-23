@@ -34,7 +34,7 @@ export default class ListPage extends React.Component {
             return false;
           }).map(id => (<PotListItem pot={this.props.pots.pots[id]} key={id}
             onPress={() => this.props.onClickPot(id)} />));
-      const title = <Text style={styles.lh}>{Status.longterm(status)}</Text>;
+      const title = <Text style={styles.lh}>{Status.longterm(status).capitalize()}</Text>;
       return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
     });
 

@@ -1,9 +1,7 @@
-- capitalize titles on the list page
-- Handle the fact that the images are square on iOS, maybe
-- Get rid of the auto-focus on "New Pot" title
 - Old "picked up" dates should not be red
 - Further ideas: https://paper.dropbox.com/doc/Pottery-App-Feedback-DtrncauSVsyrfMrBF0Ira
 
 Rejected ideas:
 - glaze hospital state - can instead use a bisque note
 - post-bisque state - Miles will add it if he wants it
+- Handle the fact that the images are square on iOS - leave it to Miles

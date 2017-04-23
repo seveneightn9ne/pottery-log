@@ -128,7 +128,8 @@ export default class Status {
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
-    const dateStyle = (new Date() - this.date() >= oneWeekIsh) ? {color: 'red'} : {color: undefined};
+    console.log(this.currentStatus());
+    const dateStyle = (new Date() - this.date() >= oneWeekIsh && this.currentStatus() != "pickedup") ? {color: 'red'} : {color: undefined};
     return dateText ? (<View style={{flexDirection: 'row'}}>
       {statusText}
       <Text> on </Text>
