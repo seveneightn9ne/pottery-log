@@ -1,0 +1,11 @@
+Pottery Log Privacy Policy
+Effective May 17, 2017
+
+This policy describes how we handle your personally identifiable information collected through the use of the app.
+The following personally identifying information is collected by the app:
+(1) Text that you enter in the Title and Notes fields
+(2) Images that you select and save in the app
+This information is only stored locally. We do not collect this information, and we do not distribute it to any third parties. The information will be retained on your local device until you delete it using the delete buttons available in the app.
+Any information stored by the app can be edited or deleted by you at any time.
+We may amend this privacy policy at any time by posting the amended terms which will be available on the Google Play page for the app.
+If you have any questions or concerns, please contact jess+pottery-log-privacy@jesskenney.com
