@@ -4,12 +4,10 @@
   "slug": "pottery-log",
   "version": "1.0.0",
   "android": {
-    "package": "com.jesskenney.pottery-log"
+    "package": "com.jesskenney.pottery_log"
   },
   "ios": {
     "bundleIdentifier": "org.rnplay.exp"
   },
-  "expo": {
-    "sdkVersion": "15.0.0"
-  }
+  "sdkVersion": "15.0.0"
 }
