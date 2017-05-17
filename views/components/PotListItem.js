@@ -19,12 +19,16 @@ export default class PotListItem extends React.Component {
   render() {
     const img = this.props.pot.images.length ?
       <Image source={{uri: this.props.pot.images[0]}} style={styles.size50} /> : null;
+    const noteStar = this.props.pot.notes2.isEmpty() ? null : <Text>*</Text>
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>
         {img}
         <View style={[styles.listItemChild, {paddingLeft: 10, flexDirection: 'column'}]}>
           <Text style={styles.lititle}>{this.props.pot.title}</Text>
-          {this.props.pot.status.text()}
+          <View style={{flexDirection: 'row'}}>
+            {this.props.pot.status.text()}
+            {noteStar}
+          </View>
         </View>
       </View>
     </TouchableHighlight>);

@@ -35,6 +35,16 @@ export default class Notes {
     return JSON.stringify(this.toObj());
   }
 
+  isEmpty(): boolean {
+    let empty = true;
+    Status.ordered().forEach(s => {
+      if (this[s]) {
+        empty = false;
+      }
+    });
+    return empty;
+  }
+
   withNoteForStatus(status: string, note: string): Note {
     return new Notes({...this.toObj(), [status]: note});
   }

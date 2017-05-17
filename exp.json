@@ -1,0 +1,15 @@
+{
+  "name": "Pottery Log",
+  "icon": "./assets/launcher_512.png",
+  "slug": "pottery-log",
+  "version": "1.0.0",
+  "android": {
+    "package": "com.jesskenney.pottery-log"
+  },
+  "ios": {
+    "bundleIdentifier": "org.rnplay.exp"
+  },
+  "expo": {
+    "sdkVersion": "15.0.0"
+  }
+}

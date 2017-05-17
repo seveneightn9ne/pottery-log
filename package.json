@@ -1,7 +1,7 @@
 {
   "name": "pottery-log",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "devDependencies": {
     "flow-bin": "^0.42.0",
     "jest-expo": "^0.3.0",
