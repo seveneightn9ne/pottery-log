@@ -1,6 +1,6 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot} from '../models/Pot.js';
+import {Pot, Image} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import Notes from '../models/Notes.js';
 import dispatcher from '../AppDispatcher.js';
@@ -31,7 +31,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         const pot = {
           uuid: String(Math.random()).substring(2),
           title: 'New Pot',
-          images: [],
+          images2: [],
           status: new Status({thrown: new Date()}),
           notes2: new Notes(),
           //notes: [],
@@ -96,6 +96,29 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;
       }
+      case 'image-remote-uri': {
+        const newPots = {};
+        Object.keys(state.pots).forEach(uuid => {
+          pot = state.pots[uuid];
+          newPot = {...pot};
+          newPot.images2 = newPot.images2.map((img) => {
+            if (img.localUri == action.localUri) {
+              console.log("Set a remote uri " + action.remoteUri + " for pot " + pot.uuid);
+              return {
+                localUri: img.localUri,
+                remoteUri: action.remoteUri,
+              };
+            }
+            return img;
+          });
+          newPots[uuid] = newPot;
+        });
+        console.log("Pots: ", newPots);
+        return {
+          ...state,
+          pots: newPots,
+        };
+      }
       default:
         return state;
     }
@@ -135,6 +158,18 @@ async function loadPot(uuid: string): Pot {
       // Nope nope nope - killing this format.
       pot.notes = undefined;
     }
+    if (loaded.images != undefined && loaded.images2 == undefined) {
+      // migrate - read the old data and convert to the new one, Miles said
+      // it's ok for his old clients to lose the images.
+      console.log("Migrating images.")
+      pot.images2 = [];
+      for (let i=0; i<loaded.images.length; i++) {
+        pot.images2.push({
+          localUri: loaded.images[i],
+        });
+      }
+    }
+    pot.images = undefined;
     console.log("Done building pot", pot);
     return pot;
   }

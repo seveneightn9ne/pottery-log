@@ -1,5 +1,6 @@
 // @flow
 import {Dispatcher} from 'flux';
+import ImageUploader from './ImageUploader.js'
 
 const msDispatcher = new Dispatcher();
 
@@ -16,6 +17,23 @@ function logDispatch(action) {
   }
 }
 
-msDispatcher.register(logDispatch)
+function uploadImages(action) {
+  switch (action.type) {
+    case 'image-add':
+      ImageUploader.upload(action.image.localUri);
+      break;
+    case 'image-delete-from-pot':
+      // image; potId;
+      // TODO(jessk)
+      break;
+    case 'image-delete-all-from-pot':
+      // images; potId;
+      // TODO(jessk)
+      break;
+  }
+}
+
+msDispatcher.register(logDispatch);
+msDispatcher.register(uploadImages);
 
 export default msDispatcher;

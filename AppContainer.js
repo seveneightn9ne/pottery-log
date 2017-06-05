@@ -16,6 +16,11 @@ function getStores() {
 function currentPot() {
   return PotsStore.getState().pots[UIStore.getState().editPotId];
 }
+
+function imageEquals(i1, i2) {
+  return i1.localUri == i2.localUri && i1.remoteUri == i2.remoteUri;
+}
+
 BackAndroid.addEventListener('hardwareBackPress', function() {
   if (UIStore.getState().page == "list") {
     if (UIStore.getState().searching) {
@@ -69,22 +74,22 @@ function getState() {
       type: 'list-search-term',
       text,
     }),
-    onChangeImages: (potId, newImageUris) => dispatcher.dispatch({
+    onAddImage: (potId, img) => {
+      dispatcher.dispatch({
+        type: 'image-add',
+        image: img,
+      });
+      dispatcher.dispatch({
+        type: 'pot-edit-field',
+        field: 'images2',
+        value: [img, ...PotsStore.getState().pots[potId].images2],
+        potId: potId,
+      });
+    },
+    onSetMainImage: (potId, image) => dispatcher.dispatch({
       type: 'pot-edit-field',
-      field: 'images',
-      value: newImageUris,
-      potId: potId,
-    }),
-    onAddImage: (potId, uri) => dispatcher.dispatch({
-      type: 'pot-edit-field',
-      field: 'images',
-      value: [uri, ...PotsStore.getState().pots[potId].images],
-      potId: potId,
-    }),
-    onSetMainImage: (potId, uri) => dispatcher.dispatch({
-      type: 'pot-edit-field',
-      field: 'images',
-      value: [uri, ...PotsStore.getState().pots[potId].images.filter(i => i != uri)],
+      field: 'images2',
+      value: [image, ...PotsStore.getState().pots[potId].images2.filter(i => !imageEquals(i, image))],
       potId: potId,
     }),
     setStatus: (newStatus) => {
@@ -109,21 +114,37 @@ function getState() {
     onDelete: () => {
       Alert.alert( 'Delete this pot?', undefined,
        [{text: 'Cancel', style: 'cancel'},
-        {text: 'Delete', onPress: () => dispatcher.dispatch({
-          type: 'pot-delete',
-          potId: currentPot().uuid,
-        })},
+        {text: 'Delete', onPress: () => {
+          dispatcher.dispatch({
+            type: 'pot-delete',
+            potId: currentPot().uuid,
+          });
+          dispatcher.dispatch({
+            type: 'image-delete-all-from-pot',
+            potId: currentPot().uuid,
+            images: currentPot().images2,
+          });
+        }},
       ]);
     },
-    onDeleteImage: (uri) => {
+    onDeleteImage: (image) => {
       Alert.alert( 'Delete selected image?', undefined,
        [{text: 'Cancel', style: 'cancel'},
-        {text: 'Delete', onPress: () => dispatcher.dispatch({
-          type: 'pot-edit-field',
-          field: 'images',
-          value: currentPot().images.filter(i => i != uri),
-          potId: currentPot().uuid,
-        })},
+        {text: 'Delete', onPress: () => {
+          dispatcher.dispatch({
+            type: 'pot-edit-field',
+            field: 'images2',
+            value: currentPot().images2.filter(i => !imageEquals(i, image)),
+            potId: currentPot().uuid,
+          });
+          dispatcher.dispatch({
+            type: 'image-delete-from-pot',
+            image: image,
+            // We use the pot UUID just to identify the image that should be deleted.
+            // This handler will not modify the pot.
+            potId: currentPot().uuid,
+          });
+        }},
       ]);
     },
     onCopy: () => dispatcher.dispatch({

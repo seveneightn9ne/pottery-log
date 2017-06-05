@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import {Text, View} from 'react-native';
+import {Image} from '../models/Pot.js';
 import styles from '../style.js'
 import ListPage from './ListPage.js';
 import EditPage from './EditPage.js';
@@ -14,10 +15,9 @@ type AppViewProps = {
   onNewNote: () => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
-  onChangeImages: (newImageUris: string[]) => void,
-  onAddImage: (potId, uri) => void,
-  onSetMainImage: (potId, uri) => void,
-  onDeleteImage: (uri) => void,
+  onAddImage: (potId, Image) => void,
+  onSetMainImage: (potId, Image) => void,
+  onDeleteImage: (Image) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,
@@ -44,7 +44,6 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onChangeNote={props.onChangeNote}
         onNewNote={props.onNewNote}
         onNavigateToList={props.onNavigateToList}
-        onChangeImages={props.onChangeImages}
         onAddImage={props.onAddImage}
         onDeleteImage={props.onDeleteImage}
         onSetMainImage={props.onSetMainImage}

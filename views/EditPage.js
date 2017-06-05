@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ExpandingTextInput } from './components/ExpandingTextInput.js'
-import {Pot} from '../models/Pot.js';
+import {Pot, Image as PotImage} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
 import ImagePicker from './components/ImagePicker.js';
@@ -19,10 +19,9 @@ type EditPageProps = {
   onChangeTitle: (text: string) => void,
   onChangeNote: (potId: string, status: string, text: string) => void,
   onNavigateToList: () => void,
-  onChangeImages: (newImageUris: string[]) => void,
-  onAddImage: (potId, uri) => void,
-  onSetMainImage: (potId, uri) => void,
-  onDeleteImage: (uri) => void,
+  onAddImage: (potId, PotImage) => void,
+  onSetMainImage: (potId, PotImage) => void,
+  onDeleteImage: (PotImage) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,
@@ -34,14 +33,14 @@ export default class ListPage extends React.Component {
     const {height, width} = Dimensions.get('window');
     const pot = this.props.pot;
     const mainImgHeight = width * .75; // Images have 4:3 aspect ratio
-    const mainImage = (pot.images.length) ?
-      <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images[0])}>
-        <Image source={{uri: pot.images[0]}} style={{height: mainImgHeight}} />
+    const mainImage = (pot.images2.length) ?
+      <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images2[0])}>
+        <Image source={{uri: pot.images2[0].remoteUri || pot.images2[0].localUri}} style={{height: mainImgHeight}} />
       </TouchableOpacity> :
       <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
         style={{height: 150}} />;
-    const imageList = (pot.images.length) ?
-      <ImageList images={pot.images}
+    const imageList = (pot.images2.length) ?
+      <ImageList images={pot.images2}
         onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
         onClickImage={(i) => this.props.onSetMainImage(pot.uuid, i)}
         onDeleteImage={(i) => this.props.onDeleteImage(i)} /> :
