@@ -3,7 +3,7 @@ import Expo from 'expo';
 import dispatcher from './AppDispatcher.js';
 
 export default ImageUploader = {
- 	upload: async function(uri) {
+ 	upload: async function(uri, uuid) {
 	  let apiUrl = 'https://jesskenney.com/pottery-log-images/upload';
 
 	  let uriParts = uri.split('/');
@@ -37,6 +37,7 @@ export default ImageUploader = {
               type: 'image-remote-uri',
               localUri: uri,
               remoteUri: r.uri,
+              potId: uuid,
             });
           } else {
             console.log("ERROR: Upload response", r);

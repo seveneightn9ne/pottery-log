@@ -20,7 +20,7 @@ function logDispatch(action) {
 function uploadImages(action) {
   switch (action.type) {
     case 'image-add':
-      ImageUploader.upload(action.image.localUri);
+      ImageUploader.upload(action.image.localUri, action.potId);
       break;
     case 'image-delete-from-pot':
       // image; potId;

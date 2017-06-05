@@ -97,27 +97,26 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         return newState;
       }
       case 'image-remote-uri': {
-        const newPots = {};
-        Object.keys(state.pots).forEach(uuid => {
-          pot = state.pots[uuid];
-          newPot = {...pot};
-          newPot.images2 = newPot.images2.map((img) => {
-            if (img.localUri == action.localUri) {
-              console.log("Set a remote uri " + action.remoteUri + " for pot " + pot.uuid);
-              return {
-                localUri: img.localUri,
-                remoteUri: action.remoteUri,
-              };
-            }
-            return img;
-          });
-          newPots[uuid] = newPot;
+        const newPot = {...state.pots[action.potId]};
+        newPot.images2 = newPot.images2.map((img) => {
+          if (img.localUri == action.localUri) {
+            console.log("Set a remote uri " + action.remoteUri + " for pot " + pot.uuid);
+            return {
+              localUri: img.localUri,
+              remoteUri: action.remoteUri,
+            };
+          }
+          return img;
         });
+        newPots = {...state.pots};
+        newPots[newPot.uuid] = newPot;
         console.log("Pots: ", newPots);
-        return {
+        const newState = {
           ...state,
           pots: newPots,
         };
+        this.persist(newState, newPot);
+        return newState;
       }
       default:
         return state;
@@ -167,6 +166,13 @@ async function loadPot(uuid: string): Pot {
         pot.images2.push({
           localUri: loaded.images[i],
         });
+      }
+    }
+    for (let i=0; i<pot.images2.length; i++) {
+      if (!pot.images2[i].remoteUri) {
+        console.log("Gonna upload", pot.images2[i]);
+        ImageUploader.upload(pot.images2[i].localUri, pot.uuid);
+        console.log("Uploading image " + pot.images2[i].localUri);
       }
     }
     pot.images = undefined;

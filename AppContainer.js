@@ -78,6 +78,7 @@ function getState() {
       dispatcher.dispatch({
         type: 'image-add',
         image: img,
+        potId: potId,
       });
       dispatcher.dispatch({
         type: 'pot-edit-field',

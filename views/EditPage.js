@@ -45,23 +45,20 @@ export default class ListPage extends React.Component {
         onClickImage={(i) => this.props.onSetMainImage(pot.uuid, i)}
         onDeleteImage={(i) => this.props.onDeleteImage(i)} /> :
       null;
-    const statuses = Status.ordered(true).map(s =>
-      <Picker.Item label={Status.prettify(s)} value={s} key={s} />);
-    const nextButton = pot.status.next() ? <Button
-        title={Status.action(pot.status.next())}
-        onPress={() => this.props.setStatus(pot.status.next())} /> : null;
-    /*const notes = pot.notes.map(noteObj => {
-      const noteText = noteObj.note || '';
-      const noteDate = noteObj.date;
-      return <ExpandingTextInput
-        style={styles.potDescInput}
-        placeholder="Notes"
-        value={noteText}
-        key={noteDate}
-        onChangeText={(text) => this.props.onChangeNote(pot.uuid, noteDate, text)}
-        underlineColorAndroid="transparent"
-      />
-    });*/
+
+    /* syncing */
+    let isSyncing = false;
+    for (let i=0; i<pot.images2.length; i++) {
+      if (!pot.images2[i].remoteUri) {
+        isSyncing = true;
+        break;
+      }
+    }
+    const syncingText = isSyncing ? "🔁" : "✓";
+    const syncingColor = isSyncing ? "#1122FF" : "#00CC00";
+    const syncing = <Text style={{color: syncingColor, padding: 5, paddingLeft: 15}}>{syncingText}</Text>
+
+    /* status text */
     const currentStatusIndex = Status.ordered().indexOf(pot.status.currentStatus());
     const numStatusDetails = Status.ordered().length - currentStatusIndex - 2;
     const details = Status.ordered().splice(currentStatusIndex+1, numStatusDetails).map(s =>
@@ -94,6 +91,7 @@ export default class ListPage extends React.Component {
           <DatePicker value={pot.status.date()}
             style={{marginRight: 10}}
             onPickDate={this.props.setStatusDate} />
+          {syncing}
         </View>
         <Note status={pot.status.currentStatus()} potId={pot.uuid}
           note={pot.notes2[pot.status.currentStatus()]}
