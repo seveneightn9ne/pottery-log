@@ -1,7 +1,32 @@
-- Use the Expo fork of react-native, if it provides benefits
-- Further ideas: https://paper.dropbox.com/doc/Pottery-App-Feedback-DtrncauSVsyrfMrBF0Ira
+# Bug fixes
+- "Notstarted" header -> "Not started"
+- Remove the screen on lock
+- [iOS] images are square, put them in a square frame
 
-Rejected ideas:
+# Features
+- Make a settings / sidebar pullout thing
+  - Check with Miles about how the iOS UI should be
+  - Allow export & import
+  - Page to keep track of notes about wheels at the studio
+    - How could this possibly be useful to other users? Can it be a hidden feature?
+    - "Configure Your Studio" -> user sets N for a 2xN grid of wheels. Studios are usually 2xN. Ours isn't but can approximate.
+  - Inspiration page
+  - Feedback / Developer info / donate (servers cost money yo)?
+- Add multiple images from library at once
+
+# Technical / meta
+- Use the Expo fork of react-native, if it provides benefits
+- [iOS] Publish to iOS store
+- [server] Delete images from s3 when the user deletes the image or the pot
+- [server] Enforce limits for uploads per user per week and/or global limits in s3
+
+# User Education / UX
+- Users don't know how to delete images
+- It's ugly
+
+Further ideas: https://paper.dropbox.com/doc/Pottery-App-Feedback-DtrncauSVsyrfMrBF0Ira
+
+# Rejected ideas
 - glaze hospital state - can instead use a bisque note
 - post-bisque state - Miles will add it if he wants it
 - Handle the fact that the images are square on iOS - leave it to Miles
