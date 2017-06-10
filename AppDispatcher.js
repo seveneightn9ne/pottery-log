@@ -23,11 +23,13 @@ function uploadImages(action) {
       ImageUploader.upload(action.image.localUri, action.potId);
       break;
     case 'image-delete-from-pot':
-      // image; potId;
-      // TODO(jessk)
+      ImageUploader.delete(action.image.remoteUri);
       break;
     case 'image-delete-all-from-pot':
       // images; potId;
+      for (let i=0; i<action.images.length; i++) {
+        ImageUploader.delete(action.images[i].remoteUri);
+      }
       // TODO(jessk)
       break;
   }

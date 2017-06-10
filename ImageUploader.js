@@ -47,11 +47,32 @@ export default ImageUploader = {
           throw err;
         });
       } else {
-        console.log("ERROR: Response " + response.status + " : " + response.statusText);
+        console.log("upload ERROR: Response " + response.status + " : " + response.statusText);
       }
     }).catch((reason) => {
       throw reason;
 
     });
-	}
+	},
+  delete: async function(uri) {
+	  let apiUrl = 'https://jesskenney.com/pottery-log-images/delete';
+
+	  let formData = new FormData();
+    formData.append('uri', uri);
+
+	  let options = {
+	    method: 'POST',
+	    body: formData,
+	  };
+
+	  fetch(apiUrl, options).then((response) => {
+      if (response.ok) {
+        console.log("Deleted remote image.")
+      } else {
+        console.log("delete ERROR: Response " + response.status + " : " + response.statusText);
+      }
+    }).catch((reason) => {
+      throw reason;
+    });
+  }
 }
