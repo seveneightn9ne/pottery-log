@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ExpandingTextInput } from './components/ExpandingTextInput.js'
-import {Pot, Image as PotImage} from '../models/Pot.js';
+import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
 import ImagePicker from './components/ImagePicker.js';
@@ -12,16 +12,18 @@ import DatePicker from './components/DatePicker.js';
 import StatusDetail from './components/StatusDetail.js';
 import StatusSwitcher from './components/StatusSwitcher.js';
 import Note from './components/Note.js';
+import {nameToUri, isAnySyncing} from '../stores/ImageStore.js';
 
 type EditPageProps = {
   pot: Pot,
   ui: Object, // UIState
+  imageStoreState: Object, // ImageStoreState
   onChangeTitle: (text: string) => void,
   onChangeNote: (potId: string, status: string, text: string) => void,
   onNavigateToList: () => void,
-  onAddImage: (potId, PotImage) => void,
-  onSetMainImage: (potId, PotImage) => void,
-  onDeleteImage: (PotImage) => void,
+  onAddImage: (potId, localUri) => void,
+  onSetMainImage: (potId, imageName) => void,
+  onDeleteImage: (imageName) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,
@@ -33,27 +35,21 @@ export default class ListPage extends React.Component {
     const {height, width} = Dimensions.get('window');
     const pot = this.props.pot;
     const mainImgHeight = width * .75; // Images have 4:3 aspect ratio
-    const mainImage = (pot.images2.length) ?
-      <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images2[0])}>
-        <Image source={{uri: pot.images2[0].remoteUri || pot.images2[0].localUri}} style={{height: mainImgHeight}} />
+    const mainImage = (pot.images3.length) ?
+      <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images3[0])}>
+        <Image source={{uri: nameToUri(pot.images3[0])}} style={{height: mainImgHeight}} />
       </TouchableOpacity> :
       <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
         style={{height: 150}} />;
-    const imageList = (pot.images2.length) ?
-      <ImageList images={pot.images2}
+    const imageList = (pot.images3.length) ?
+      <ImageList images={pot.images3}
         onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
         onClickImage={(i) => this.props.onSetMainImage(pot.uuid, i)}
         onDeleteImage={(i) => this.props.onDeleteImage(i)} /> :
       null;
 
     /* syncing */
-    let isSyncing = false;
-    for (let i=0; i<pot.images2.length; i++) {
-      if (!pot.images2[i].remoteUri) {
-        isSyncing = true;
-        break;
-      }
-    }
+    const isSyncing = isAnySyncing(pot.images3);
     const syncingText = isSyncing ? "🔁" : "✓";
     const syncingColor = isSyncing ? "#1122FF" : "#00CC00";
     const syncing = <Text style={{color: syncingColor, padding: 5, paddingLeft: 15}}>{syncingText}</Text>

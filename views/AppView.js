@@ -9,15 +9,16 @@ import EditPage from './EditPage.js';
 type AppViewProps = {
   pots: Object, // PotStoreState
   ui: Object, // UIState
+  images: Object, // ImageStoreState
   onNew: () => void,
   onChangeTitle: (text: string) => void,
   onChangeNote: (potId: string, date: Date, text: string) => void,
   onNewNote: () => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
-  onAddImage: (potId, Image) => void,
-  onSetMainImage: (potId, Image) => void,
-  onDeleteImage: (Image) => void,
+  onAddImage: (potId, localUri) => void,
+  onSetMainImage: (potId, name) => void,
+  onDeleteImage: (name) => void,
   setStatus: (newStatus) => void,
   setStatusDate: (date) => void,
   onDelete: () => void,
@@ -40,6 +41,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}
         ui={props.ui}
+        images={props.images}
         onChangeTitle={props.onChangeTitle}
         onChangeNote={props.onChangeNote}
         onNewNote={props.onNewNote}

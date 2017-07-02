@@ -1,19 +1,22 @@
 // @flow
 import Expo from 'expo';
 import dispatcher from './AppDispatcher.js';
+import {nameFromUri} from './stores/ImageStore.js';
 
 export default ImageUploader = {
- 	upload: async function(uri, uuid) {
+ 	upload: async function(localUri) {
 	  let apiUrl = 'https://jesskenney.com/pottery-log-images/upload';
 
-	  let uriParts = uri.split('/');
-    let fileName = uriParts[uriParts.length - 1];
+    let fileName = nameFromUri(localUri);
     let fileNameParts = fileName.split('.');
 	  let fileType = fileNameParts[fileNameParts.length - 1];
+    if (fileType == "jpg") {
+      fileType = "jpeg";
+    }
 
 	  let formData = new FormData();
 	  formData.append('image', {
-	    uri,
+	    uri: localUri,
 	    name: fileName,
 	    type: `image/${fileType}`,
 	  });
@@ -28,6 +31,8 @@ export default ImageUploader = {
 	    },
 	  };
 
+    console.log("Will upload " + localUri);
+
 	  fetch(apiUrl, options).then((response) => {
       if (response.ok) {
         response.json().then(r => {
@@ -35,15 +40,15 @@ export default ImageUploader = {
             console.log("Uploaded image available at " + r.uri);
             dispatcher.dispatch({
               type: 'image-remote-uri',
-              localUri: uri,
+              name: fileName,
               remoteUri: r.uri,
-              potId: uuid,
             });
           } else {
             console.log("ERROR: Upload response", r);
           }
         }).catch (err => {
           console.log("ERROR couldn't parse response");
+          console.log(response);
           throw err;
         });
       } else {
@@ -51,9 +56,9 @@ export default ImageUploader = {
       }
     }).catch((reason) => {
       throw reason;
-
     });
 	},
+
   delete: async function(uri) {
 	  let apiUrl = 'https://jesskenney.com/pottery-log-images/delete';
 
@@ -64,6 +69,8 @@ export default ImageUploader = {
 	    method: 'POST',
 	    body: formData,
 	  };
+
+    console.log("Will delete " + uri);
 
 	  fetch(apiUrl, options).then((response) => {
       if (response.ok) {

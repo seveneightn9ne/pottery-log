@@ -5,20 +5,18 @@ import UIStore from './stores/UIStore.js';
 import AppView from './views/AppView.js';
 import {Container} from 'flux/utils';
 import {Alert, BackAndroid} from 'react-native';
+import {ImageStore, nameFromUri} from './stores/ImageStore.js';
 
 function getStores() {
   return [
     PotsStore,
     UIStore,
+    ImageStore,
   ];
 }
 
 function currentPot() {
   return PotsStore.getState().pots[UIStore.getState().editPotId];
-}
-
-function imageEquals(i1, i2) {
-  return i1.localUri == i2.localUri && i1.remoteUri == i2.remoteUri;
 }
 
 BackAndroid.addEventListener('hardwareBackPress', function() {
@@ -41,6 +39,7 @@ function getState() {
   return {
     pots: PotsStore.getState(),
     ui: UIStore.getState(),
+    images: ImageStore.getState(),
 
     onNew: () => dispatcher.dispatch({
       type: 'new',
@@ -74,23 +73,23 @@ function getState() {
       type: 'list-search-term',
       text,
     }),
-    onAddImage: (potId, img) => {
+    onAddImage: (potId, localUri) => {
       dispatcher.dispatch({
         type: 'image-add',
-        image: img,
+        localUri: localUri,
         potId: potId,
       });
       dispatcher.dispatch({
         type: 'pot-edit-field',
-        field: 'images2',
-        value: [img, ...PotsStore.getState().pots[potId].images2],
+        field: 'images3',
+        value: [nameFromUri(localUri), ...PotsStore.getState().pots[potId].images3],
         potId: potId,
       });
     },
-    onSetMainImage: (potId, image) => dispatcher.dispatch({
+    onSetMainImage: (potId, name) => dispatcher.dispatch({
       type: 'pot-edit-field',
-      field: 'images2',
-      value: [image, ...PotsStore.getState().pots[potId].images2.filter(i => !imageEquals(i, image))],
+      field: 'images3',
+      value: [name, ...PotsStore.getState().pots[potId].images3.filter(i => i != name)],
       potId: potId,
     }),
     setStatus: (newStatus) => {
@@ -123,26 +122,24 @@ function getState() {
           dispatcher.dispatch({
             type: 'image-delete-all-from-pot',
             potId: currentPot().uuid,
-            images: currentPot().images2,
+            imageNames: currentPot().images3,
           });
         }},
       ]);
     },
-    onDeleteImage: (image) => {
+    onDeleteImage: (name) => {
       Alert.alert( 'Delete selected image?', undefined,
        [{text: 'Cancel', style: 'cancel'},
         {text: 'Delete', onPress: () => {
           dispatcher.dispatch({
             type: 'pot-edit-field',
-            field: 'images2',
-            value: currentPot().images2.filter(i => !imageEquals(i, image)),
+            field: 'images3',
+            value: currentPot().images3.filter(i => i != name),
             potId: currentPot().uuid,
           });
           dispatcher.dispatch({
             type: 'image-delete-from-pot',
-            image: image,
-            // We use the pot UUID just to identify the image that should be deleted.
-            // This handler will not modify the pot.
+            imageName: name,
             potId: currentPot().uuid,
           });
         }},
@@ -151,6 +148,7 @@ function getState() {
     onCopy: () => dispatcher.dispatch({
       type: 'pot-copy',
       potId: currentPot().uuid,
+      imageNames: currentPot().images3,
     }),
   };
 }

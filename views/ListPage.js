@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
 import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
@@ -20,7 +20,7 @@ type ListPageProps = {
 export default class ListPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
-    const lists = Status.ordered().reverse().map(status => {
+    const lists = this.props.pots.hasLoaded ? Status.ordered().reverse().map(status => {
       const potListItems = this.props.pots.potIds.
           filter(id => this.props.pots.pots[id].status.currentStatus() == status).
           filter(id => {
@@ -36,7 +36,7 @@ export default class ListPage extends React.Component {
             onPress={() => this.props.onClickPot(id)} />));
       const title = <Text style={styles.lh}>{Status.longterm(status).capitalize()}</Text>;
       return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
-    });
+    }) : null;
 
     const topWhenSearching = (
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>

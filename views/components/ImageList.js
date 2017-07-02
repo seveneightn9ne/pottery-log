@@ -5,23 +5,23 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {Image as PotImage} from '../../models/Pot.js';
 import styles from '../../style.js';
 import ImagePicker from './ImagePicker.js';
+import {nameToUri} from '../../stores/ImageStore.js';
 
 type ImageListProps = {
-  images: PotImage[],
-  onAddImage: (img: PotImage) => void,
-  onClickImage: (img: PotImage) => void,
-  onDeleteImage: (img: PotImage) => void,
+  images: string[],
+  onAddImage: (localUri) => void,
+  onClickImage: (name) => void,
+  onDeleteImage: (name) => void,
 };
 
 export default class ImageList extends React.Component {
   render() {
-    const images = this.props.images.slice(1).map(img => {
-      const uri = img.remoteUri ? img.remoteUri : img.localUri;
-      return (<TouchableOpacity onPress={() => this.props.onClickImage(img)} key={uri}
-        onLongPress={() => this.props.onDeleteImage(img)}>
+    const images = this.props.images.slice(1).map(name => {
+      const uri = nameToUri(name);
+      return (<TouchableOpacity onPress={() => this.props.onClickImage(name)} key={uri}
+        onLongPress={() => this.props.onDeleteImage(name)}>
         <Image source={{uri}} style={styles.size50} />
       </TouchableOpacity>);
     });

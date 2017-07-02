@@ -7,11 +7,10 @@ import {
   View,
 } from 'react-native';
 import Expo from 'expo';
-import {Image as PotImage} from '../../models/Pot.js';
 import styles from '../../style.js';
 
 type ImagePickerProps = {
-  onPicked: (img: PotImage) => void,
+  onPicked: (localUri) => void,
 };
 
 export default class ImagePicker extends React.Component {
@@ -46,7 +45,7 @@ export default class ImagePicker extends React.Component {
     });
 
     if (!result.cancelled) {
-      this.props.onPicked({localUri: result.uri});
+      this.props.onPicked(result.uri);
     }
   }
 }

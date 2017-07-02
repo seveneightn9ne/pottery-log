@@ -1,10 +1,12 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot, Image} from '../models/Pot.js';
+import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import Notes from '../models/Notes.js';
 import dispatcher from '../AppDispatcher.js';
+import {StorageWriter} from './sync.js';
 import { AsyncStorage } from 'react-native';
+import {nameFromUri} from './ImageStore.js';
 
 interface PotsStoreState {
   potIds: string[];
@@ -31,10 +33,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         const pot = {
           uuid: String(Math.random()).substring(2),
           title: 'New Pot',
-          images2: [],
+          images3: [],
           status: new Status({thrown: new Date()}),
           notes2: new Notes(),
-          //notes: [],
         };
         const newState = {
           ...state,
@@ -63,7 +64,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         const newPotIds = [...state.potIds];
         if (potIndex > -1) {
           newPotIds.splice(potIndex, 1);
-          AsyncStorage.removeItem('@Pot:' + action.potId);
+          StorageWriter.delete('@Pot:' + action.potId);
         }
         const newState = {
           hasLoaded: true,
@@ -96,28 +97,6 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;
       }
-      case 'image-remote-uri': {
-        const newPot = {...state.pots[action.potId]};
-        newPot.images2 = newPot.images2.map((img) => {
-          if (img.localUri == action.localUri) {
-            console.log("Set a remote uri " + action.remoteUri + " for pot " + pot.uuid);
-            return {
-              localUri: img.localUri,
-              remoteUri: action.remoteUri,
-            };
-          }
-          return img;
-        });
-        newPots = {...state.pots};
-        newPots[newPot.uuid] = newPot;
-        console.log("Pots: ", newPots);
-        const newState = {
-          ...state,
-          pots: newPots,
-        };
-        this.persist(newState, newPot);
-        return newState;
-      }
       default:
         return state;
     }
@@ -125,9 +104,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
   persist(state: PotsStoreState, pot: Pot = null) {
     if (pot != null) {
-      AsyncStorage.setItem('@Pot:' + pot.uuid, JSON.stringify(pot));
+      StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot));
     }
-    AsyncStorage.setItem('@Pots', JSON.stringify(state.potIds));
+    StorageWriter.put('@Pots', JSON.stringify(state.potIds));
   }
 
 }
@@ -135,51 +114,48 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 async function loadInitial(dispatcher): void {
   const potIdsStr = await AsyncStorage.getItem('@Pots');
   const potIds = JSON.parse(potIdsStr) || [];
-  const pots = {};
+  const promises = [];
   for (let i = 0; i < potIds.length; i++) {
-    const pot = await loadPot(potIds[i]);
-    pots[potIds[i]] = pot;
+    promises.push(loadPot(potIds[i]));
   }
-  dispatcher.dispatch({type: 'loaded', pots: pots, potIds: potIds});
+  Promise.all(promises).then((pots) => {
+    const potsById = {};
+    pots.forEach(p => potsById[p.uuid] = p);
+    dispatcher.dispatch({type: 'loaded', pots: potsById, potIds: potIds});
+  });
 }
 
 async function loadPot(uuid: string): Pot {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
   console.log("Loading pot from storage: " + loadedJson);
-  //const pot = {uuid};
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     // Add all fields, for version compatibility
     pot = {...loaded};
     pot.status = new Status(loaded.status);
     pot.notes2 = new Notes(loaded.notes2);
-    if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
-      // Nope nope nope - killing this format.
-      pot.notes = undefined;
-    }
-    if (loaded.images != undefined && loaded.images2 == undefined) {
-      // migrate - read the old data and convert to the new one, Miles said
-      // it's ok for his old clients to lose the images.
-      console.log("Migrating images.")
-      pot.images2 = [];
-      for (let i=0; i<loaded.images.length; i++) {
-        pot.images2.push({
-          localUri: loaded.images[i],
-        });
+    if (loaded.images2 != undefined && loaded.images3 == undefined) {
+      console.log("Migrating images.");
+      dispatcher.dispatch({
+        type: 'migrate-from-images2',
+        images2: loaded.images2,
+        potId: pot.uuid,
+      });
+      pot.images3 = [];
+      for (let i=0; i<loaded.images2.length; i++) {
+        pot.images3.push(nameFromUri(loaded.images2[i].localUri));
       }
     }
-    for (let i=0; i<pot.images2.length; i++) {
-      if (!pot.images2[i].remoteUri) {
-        console.log("Gonna upload", pot.images2[i]);
-        ImageUploader.upload(pot.images2[i].localUri, pot.uuid);
-        console.log("Uploading image " + pot.images2[i].localUri);
-      }
-    }
-    pot.images = undefined;
+    delete pot.images2;
     console.log("Done building pot", pot);
     return pot;
   }
-  return {uuid};
+  return {
+    uuid,
+    status: new Status(),
+    notes2: new Notes(),
+    images3: [],
+  };
 }
 
 export default new PotsStore();
