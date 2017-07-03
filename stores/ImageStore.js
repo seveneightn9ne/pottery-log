@@ -4,7 +4,6 @@ import {Image} from '../models/Pot.js';
 import dispatcher from '../AppDispatcher.js';
 import {StorageWriter} from './sync.js';
 import { AsyncStorage } from 'react-native';
-import { LegacyAsyncStorage } from 'expo';
 import ImageUploader from '../ImageUploader.js';
 
 interface ImageState {
@@ -31,7 +30,6 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
 
   async _loadInitial() {
     console.log("Loading ImageStore");
-    await LegacyAsyncStorage.migrateItems(['@ImageStore']);
     const json = await AsyncStorage.getItem("@ImageStore");
 
     if (!json) {

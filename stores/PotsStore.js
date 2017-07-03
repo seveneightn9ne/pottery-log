@@ -6,7 +6,6 @@ import Notes from '../models/Notes.js';
 import dispatcher from '../AppDispatcher.js';
 import {StorageWriter} from './sync.js';
 import { AsyncStorage } from 'react-native';
-import { LegacyAsyncStorage } from 'expo';
 import {nameFromUri} from './ImageStore.js';
 
 interface PotsStoreState {
@@ -113,10 +112,8 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 }
 
 async function loadInitial(dispatcher): void {
-  await LegacyAsyncStorage.migrateItems(['@Pots']);
   const potIdsStr = await AsyncStorage.getItem('@Pots');
   const potIds = JSON.parse(potIdsStr) || [];
-  await LegacyAsyncStorage.migrateItems(potIds.map(p => '@Pot:' + p));
   const promises = [];
   for (let i = 0; i < potIds.length; i++) {
     promises.push(loadPot(potIds[i]));
