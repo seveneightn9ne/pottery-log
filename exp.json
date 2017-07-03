@@ -9,5 +9,5 @@
   "ios": {
     "bundleIdentifier": "org.rnplay.exp"
   },
-  "sdkVersion": "16.0.0"
+  "sdkVersion": "17.0.0"
 }
