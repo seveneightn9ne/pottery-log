@@ -6,6 +6,7 @@ import Status from '../models/Status.js';
 import styles from '../style.js'
 import NewPotListItem from './components/NewPotListItem.js';
 import PotListItem from './components/PotListItem.js';
+import {shouldShowSettings} from '../export.js';
 
 type ListPageProps = {
   pots: Object, // PotStoreState
@@ -15,6 +16,7 @@ type ListPageProps = {
   onOpenSearch: () => void,
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
+  onNavigateToSettings: () => void,
 };
 
 export default class ListPage extends React.Component {
@@ -48,13 +50,20 @@ export default class ListPage extends React.Component {
         </TouchableHighlight>
       </View>
     );
+    
+    let showSettings = shouldShowSettings();
 
     const topWhenNotSearching = (
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text style={styles.h1}>Pottery Log</Text>
-        <TouchableHighlight onPress={this.props.onOpenSearch}>
-          <Text style={styles.h1}>🔍</Text>
-        </TouchableHighlight>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableHighlight onPress={this.props.onOpenSearch}>
+            <Text style={styles.h1}>🔍</Text>
+          </TouchableHighlight>
+          {showSettings && <TouchableHighlight onPress={this.props.onNavigateToSettings}>
+            <Text style={styles.h1}>⚙</Text>
+          </TouchableHighlight>}
+        </View>
       </View>
     );
 

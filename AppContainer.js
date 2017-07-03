@@ -63,16 +63,31 @@ function getState() {
     onNavigateToList: () => dispatcher.dispatch({
       type: 'page-list',
     }),
+    onNavigateToSettings: () => dispatcher.dispatch({
+      type: 'page-settings',
+    }),
+    onExport: () => dispatcher.dispatch({
+      type: 'export-start',
+    }),
     onOpenSearch: () => dispatcher.dispatch({
       type: 'list-search-open',
     }),
     onCloseSearch: () => dispatcher.dispatch({
       type: 'list-search-close',
     }),
-    onSearch: (text: sting) => dispatcher.dispatch({
-      type: 'list-search-term',
-      text,
-    }),
+    onSearch: (text: string) => {
+      console.log("search", text);
+      if (text.toLowerCase() === "secretsettings") {
+        dispatcher.dispatch({
+          type: 'page-settings',
+        })
+      } else {
+        dispatcher.dispatch({
+          type: 'list-search-term',
+          text,
+        })
+      }
+    },
     onAddImage: (potId, localUri) => {
       dispatcher.dispatch({
         type: 'image-add',

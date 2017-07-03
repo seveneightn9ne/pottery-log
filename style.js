@@ -137,5 +137,9 @@ export default StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontStyle: 'italic',
+  },
+  settingsText: {
+  	fontSize: 16,
+    textAlign: 'center',
   }
 });

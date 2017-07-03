@@ -30,7 +30,7 @@ type EditPageProps = {
   onCopy: () => void,
 };
 
-export default class ListPage extends React.Component {
+export default class EditPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     const pot = this.props.pot;

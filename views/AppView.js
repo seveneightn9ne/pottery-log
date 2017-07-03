@@ -5,6 +5,7 @@ import {Image} from '../models/Pot.js';
 import styles from '../style.js'
 import ListPage from './ListPage.js';
 import EditPage from './EditPage.js';
+import SettingsPage from './SettingsPage.js';
 
 type AppViewProps = {
   pots: Object, // PotStoreState
@@ -16,6 +17,7 @@ type AppViewProps = {
   onNewNote: () => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
+  onNavigateToSettings: () => void,
   onAddImage: (potId, localUri) => void,
   onSetMainImage: (potId, name) => void,
   onDeleteImage: (name) => void,
@@ -37,6 +39,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onOpenSearch={props.onOpenSearch}
         onCloseSearch={props.onCloseSearch}
         onSearch={props.onSearch}
+        onNavigateToSettings={props.onNavigateToSettings}
       />;
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}
@@ -53,6 +56,11 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         setStatusDate={props.setStatusDate}
         onDelete={props.onDelete} onCopy={props.onCopy}
       />;
+    case 'settings':
+      return <SettingsPage
+        onNavigateToList={props.onNavigateToList}
+        onExport={props.onExport}
+        />;
     default:
       return <View style={styles.container}>
         <Text style={styles.h1}>Unknown Page</Text>
