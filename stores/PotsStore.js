@@ -134,18 +134,34 @@ async function loadPot(uuid: string): Pot {
     pot = {...loaded};
     pot.status = new Status(loaded.status);
     pot.notes2 = new Notes(loaded.notes2);
-    if (loaded.images2 != undefined && loaded.images3 == undefined) {
-      console.log("Migrating images.");
+
+    if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
+      delete pot.notes;
+    }
+    if (loaded.images != undefined && loaded.images2 == undefined) {
+      // migrate - read the old data and convert to the new one, Miles said
+      // it's ok for his old clients to lose the images.
+      console.log("Migrating images 1-2.")
+      pot.images2 = [];
+      for (let i=0; i<loaded.images.length; i++) {
+        pot.images2.push({
+          localUri: loaded.images[i],
+        });
+      }
+    }
+    if (pot.images2 != undefined && pot.images3 == undefined) {
+      console.log("Migrating images 2-3.");
       dispatcher.dispatch({
         type: 'migrate-from-images2',
-        images2: loaded.images2,
+        images2: pot.images2,
         potId: pot.uuid,
       });
       pot.images3 = [];
-      for (let i=0; i<loaded.images2.length; i++) {
-        pot.images3.push(nameFromUri(loaded.images2[i].localUri));
+      for (let i=0; i<pot.images2.length; i++) {
+        pot.images3.push(nameFromUri(pot.images2[i].localUri));
       }
     }
+    delete pot.images;
     delete pot.images2;
     console.log("Done building pot", pot);
     return pot;
