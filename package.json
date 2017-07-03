@@ -4,7 +4,7 @@
   "private": false,
   "devDependencies": {
     "flow-bin": "^0.42.0",
-    "jest-expo": "^0.3.0",
+    "jest-expo": "~0.4.0",
     "react-native-scripts": "0.0.22",
     "react-test-renderer": "~15.4.1"
   },
@@ -20,11 +20,10 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "expo": "^15.0.2",
+    "expo": "^16.0.0",
     "flux": "^3.1.2",
-    "react": "~15.4.0",
-    "react-native": "0.42.3",
-    "react-native-keyboard-aware-scroll-view": "^0.2.8",
-    "react-navigation": "^1.0.0-beta.7"
+    "react": "16.0.0-alpha.6",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-16.0.0.tar.gz",
+    "react-native-keyboard-aware-scroll-view": "^0.2.8"
   }
 }
