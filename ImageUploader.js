@@ -75,6 +75,10 @@ export default ImageUploader = {
 	  fetch(apiUrl, options).then((response) => {
       if (response.ok) {
         console.log("Deleted remote image.")
+        dispatcher.dispatch({
+          type: 'image-delete-succeeded',
+          imageName: nameFromUri(uri),
+        });
       } else {
         console.log("delete ERROR: Response " + response.status + " : " + response.statusText);
       }
