@@ -182,7 +182,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   }
 
   persist(state: ImageStoreState) {
-    console.log("Persisting ImageStore:", state);
+    console.log("Persisting ImageStore");
     StorageWriter.put('@ImageStore', JSON.stringify(state));
   }
 }
