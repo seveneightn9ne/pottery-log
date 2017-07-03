@@ -1,6 +1,4 @@
 # Bug fixes
-- !! Copy pot -> delete image -> image deleted on both pots.
-- !! Copy pot -> delete copied pot -> images deleted on original pot.
 - "Notstarted" header -> "Not started"
 - Remove the screen on lock
 - [iOS] images are square, put them in a square frame
