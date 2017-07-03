@@ -23,19 +23,45 @@ export default class ListPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     const lists = this.props.pots.hasLoaded ? Status.ordered().reverse().map(status => {
-      const potListItems = this.props.pots.potIds.
-          filter(id => this.props.pots.pots[id].status.currentStatus() == status).
-          filter(id => {
-            // Filter for search
-            if (!this.props.ui.searching) {return true;}
-            const pot = this.props.pots.pots[id];
-            const searchTerm = this.props.ui.searchTerm;
-            if (!searchTerm) return true;
-            if (pot.title.includes(searchTerm)) return true;
-            if (pot.notes2.includes(searchTerm)) return true;
-            return false;
-          }).map(id => (<PotListItem pot={this.props.pots.pots[id]} key={id}
-            onPress={() => this.props.onClickPot(id)} />));
+      const potListItems = this.props.pots.potIds
+        .filter(id => this.props.pots.pots[id].status.currentStatus() == status)
+        .filter(id => {
+          // Filter for search
+          if (!this.props.ui.searching) {return true;}
+          const pot = this.props.pots.pots[id];
+          const searchTerm = this.props.ui.searchTerm;
+          if (!searchTerm) return true;
+          if (pot.title.includes(searchTerm)) return true;
+          if (pot.notes2.includes(searchTerm)) return true;
+          return false;
+        })
+        .sort((idA, idB) => {
+          // Sort the pots by date most recent at bottom.
+          // Except sort pots with that are 'Finished' most recent at top.
+          let potA = this.props.pots.pots[idA]
+          let potB = this.props.pots.pots[idB];
+          let tA = potA.status.date().getTime();
+          let tB = potB.status.date().getTime();
+          let cmp = 0;
+          if (tA < tB) {
+            cmp = -1;
+          } else {
+            cmp = 1;
+          }
+          if (tA == tB) {
+            cmp = 0;
+          }
+          if (potA.status.currentStatus() === "pickedup") {
+            cmp *= -1;
+          }
+          return cmp;
+        })
+        .map(id => (
+              <PotListItem key={id}
+            pot={this.props.pots.pots[id]}
+            onPress={() => this.props.onClickPot(id)}
+              />
+          ));
       const title = <Text style={styles.lh}>{Status.longterm(status).capitalize()}</Text>;
       return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
     }) : null;
