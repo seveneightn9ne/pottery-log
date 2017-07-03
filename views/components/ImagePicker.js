@@ -41,7 +41,7 @@ export default class ImagePicker extends React.Component {
   pickImage = async (picker) => {
     let result = await picker({
       allowsEditing: true,
-      aspect: [4,3]
+      aspect: [4,4],
     });
 
     if (!result.cancelled) {
