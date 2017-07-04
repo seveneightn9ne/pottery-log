@@ -4,7 +4,7 @@ import PotsStore from './stores/PotsStore.js';
 import UIStore from './stores/UIStore.js';
 import AppView from './views/AppView.js';
 import {Container} from 'flux/utils';
-import {Alert, BackAndroid} from 'react-native';
+import {Alert, BackHandler} from 'react-native';
 import {ImageStore, nameFromUri} from './stores/ImageStore.js';
 
 function getStores() {
@@ -19,7 +19,7 @@ function currentPot() {
   return PotsStore.getState().pots[UIStore.getState().editPotId];
 }
 
-BackAndroid.addEventListener('hardwareBackPress', function() {
+BackHandler.addEventListener('hardwareBackPress', function() {
   if (UIStore.getState().page == "list") {
     if (UIStore.getState().searching) {
       dispatcher.dispatch({
