@@ -40,7 +40,7 @@ export default class EditPage extends React.Component {
         <Image source={{uri: nameToUri(pot.images3[0])}} style={{height: mainImgSize, width: mainImgSize}} />
       </TouchableOpacity> :
       <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
-        style={{height: 150}} />;
+        style={{height: 150, width: width}} />;
     const imageList = (pot.images3.length) ?
       <ImageList images={pot.images3} style={{height: mainImgSize}}
         onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
