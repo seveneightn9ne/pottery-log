@@ -49,7 +49,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         const im = state.images[action.imageName];
         if (!im) {
           console.log("Deleting " + action.imageName + " from pot but it's nowhere");
-          return;
+          return state;
         }
         const newState = {images: {...state.images,
           [action.imageName]:
@@ -207,6 +207,7 @@ export function isAnySyncing(imageNames: string[]): boolean {
   const state = ImageStore.getState();
   for (let i=0; i<imageNames.length; i++) {
     const image = state.images[imageNames[i]];
+    if (image === undefined) continue;
     if (!image.remoteUri) return true;
     if (image.pots.length == 0) return true;
   }
