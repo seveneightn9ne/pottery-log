@@ -34,15 +34,15 @@ export default class EditPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     const pot = this.props.pot;
-    const mainImgHeight = width * .75; // Images have 4:3 aspect ratio
+    const mainImgSize = width - 50;
     const mainImage = (pot.images3.length) ?
       <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images3[0])}>
-        <Image source={{uri: nameToUri(pot.images3[0])}} style={{height: mainImgHeight}} />
+        <Image source={{uri: nameToUri(pot.images3[0])}} style={{height: mainImgSize, width: mainImgSize}} />
       </TouchableOpacity> :
       <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
         style={{height: 150}} />;
     const imageList = (pot.images3.length) ?
-      <ImageList images={pot.images3}
+      <ImageList images={pot.images3} style={{height: mainImgSize}}
         onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
         onClickImage={(i) => this.props.onSetMainImage(pot.uuid, i)}
         onDeleteImage={(i) => this.props.onDeleteImage(i)} /> :
@@ -75,8 +75,11 @@ export default class EditPage extends React.Component {
         />
       </View>
       <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
-        {mainImage}
-        {imageList}
+
+        <View style={{flexDirection: 'row', backgroundColor: 'black'}}>
+          {imageList}
+          {mainImage}
+        </View>
         <View style={{flexDirection: 'row', padding: 10}}>
           <StatusSwitcher status={pot.status} setStatus={this.props.setStatus} />
           <Text style={{

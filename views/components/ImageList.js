@@ -25,9 +25,9 @@ export default class ImageList extends React.Component {
         <Image source={{uri}} style={styles.size50} />
       </TouchableOpacity>);
     });
-    return <ScrollView horizontal={true}>
-      {images}
+    return <ScrollView horizontal={false}>
       <ImagePicker style={styles.size50} onPicked={this.props.onAddImage} />
+      {images}
     </ScrollView>;
   }
 }

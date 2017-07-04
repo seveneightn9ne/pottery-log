@@ -65,9 +65,12 @@ export default StyleSheet.create({
   imagePicker: {
   	borderStyle: 'dashed',
   	borderWidth: 1,
-  	borderColor: 'gray',
+  	borderColor: 'black',
   	alignItems: 'center',
   	flexDirection: 'column',
+    backgroundColor: 'white',
+    // The borderRadius thing is a react-native bug with the dashed border
+    borderRadius: 0.5,
   	//textAlign: 'center',
   },
   potDescInput: {
