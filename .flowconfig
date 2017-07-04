@@ -27,6 +27,13 @@
 ; https://github.com/exponent/exponent-sdk/issues/36
 .*/node_modules/expo/src/*
 
+; Ignore more node_modules packages
+.*/node_modules/flux/*
+.*/node_modules/react-native-fbads/*
+.*/node_modules/react-native-keyboard-aware-scroll-view/*
+; Screw it, ignore them all.
+.*/node_modules/*
+
 [include]
 
 [libs]
@@ -56,4 +63,4 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowFixedInNextDeploy
 unsafe.enable_getters_and_setters=true
 
 [version]
-^0.38.0
+^0.42.0

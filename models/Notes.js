@@ -6,7 +6,7 @@ import Status from './Status.js';
 export default class Notes {
   // Immutable! Functions return copies.
 
-  constructor(notes: Notes) { // Or status with strings instead of dates.
+  constructor(notes: Notes | Object) { // Or status with strings instead of dates.
     if (typeof(notes) == "string") {
       try {
         notes = JSON.parse(notes);
@@ -15,7 +15,9 @@ export default class Notes {
       }
     }
     Status.ordered().forEach(s => {
+      // $FlowFixMe
       if (notes != undefined && notes[s] != undefined) {
+        // $FlowFixMe
         this[s] = notes[s];
       }
     });
@@ -24,6 +26,7 @@ export default class Notes {
   toObj() {
     const obj = {}
     Status.ordered().forEach(s => {
+      // $FlowFixMe
       if (this[s]) {
         obj[s] = this[s];
       }
@@ -38,6 +41,7 @@ export default class Notes {
   isEmpty(): boolean {
     let empty = true;
     Status.ordered().forEach(s => {
+      // $FlowFixMe
       if (this[s]) {
         empty = false;
       }
@@ -45,17 +49,19 @@ export default class Notes {
     return empty;
   }
 
-  withNoteForStatus(status: string, note: string): Note {
+  withNoteForStatus(status: string, note: string): Notes {
     return new Notes({...this.toObj(), [status]: note});
   }
 
   forStatus(status: Status): string {
+    // $FlowFixMe
     return this[status.currentStatus()];
   }
 
   includes(text: string): boolean {
     let contains = false;
     Status.ordered().forEach(s => {
+      // $FlowFixMe
       if (this[s] && this[s].includes(text)) {
         contains = true;
       }

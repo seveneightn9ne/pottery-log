@@ -10,9 +10,10 @@ const BISQUED = 'bisqued';
 const GLAZED = 'glazed';
 const PICKEDUP = 'pickedup';
 
+// $FlowFixMe
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 export default class Status {
   // Immutable! Functions return copies.
@@ -63,7 +64,7 @@ export default class Status {
     return [PICKEDUP, GLAZED, BISQUED, TRIMMED, THROWN, NOTSTARTED];
   }
 
-  constructor(status: Status) { // Or status with strings instead of dates.
+  constructor(status: Status | Object) { // Or status with strings instead of dates.
     //console.log("Loading status.");
     if (typeof(status) == "string") {
       status = JSON.parse(status);
@@ -72,14 +73,17 @@ export default class Status {
       //console.log("With existing status: " + JSON.stringify(status));
       Status.ordered().forEach(s => {
         //console.log("Looking for " + s + " in " + JSON.stringify(status) + " (it's " + status[s] + ")");
+        // $FlowFixMe
         if (status[s] != undefined) {
           //console.log("I see " + s);
           if (typeof(status[s]) == "string" || typeof(status[s]) == "number") {
             //console.log("Loading " + status[s] + " as a date.");
+            // $FlowFixMe
             this[s] = new Date(status[s]);
           } else {
             // It's already a date, I hope
             //console.log("It's already a date.");
+            // $FlowFixMe
             this[s] = status[s];
           }
         }
@@ -103,7 +107,7 @@ export default class Status {
     return JSON.stringify(this.toObj());
   }
 
-  static dateText(date) {
+  static dateText(date): ?string {
     if (date) {
       const dateStringLong = date.toDateString();
       const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
@@ -112,14 +116,15 @@ export default class Status {
   }
 
   date(): Date {
+    // $FlowFixMe
     return this[this.currentStatus()];
   }
 
-  dateText(): string {
+  dateText(): ?string {
     return Status.dateText(this.date());
   }
 
-  text(): string {
+  text(): React$Element<any> {
     const statusText = //<View style={styles.status}>
       <Text>{/* style={[styles.statusT, styles[this.currentStatus()]]}>*/}
       {this.currentStatus(true /** pretty **/)}
@@ -135,9 +140,10 @@ export default class Status {
       <Text style={dateStyle}>{dateText}</Text></View>) : statusText;
   }
 
-  currentStatus(pretty = false): string {
-    const statuses = Status.ordered();
+  currentStatus(pretty: bool = false): string {
+   const statuses = Status.ordered();
     for (let i=0; i < statuses.length; i++) {
+      // $FlowFixMe
       if (this[statuses[i]]) {
         if (pretty) return Status.prettify(statuses[i]);
         return statuses[i];
@@ -167,7 +173,7 @@ export default class Status {
     return new Status(newFullStatus);
   }
 
-  next(pretty = false): string {
+  next(pretty: bool = false): ?string {
     const currentI = Status.ordered().indexOf(this.currentStatus());
     const nextI = currentI - 1;
     if (nextI >= 0) {
@@ -177,7 +183,7 @@ export default class Status {
     }
   }
 
-  prev(pretty = false): string {
+  prev(pretty: bool = false): ?string {
     const currentI = Status.ordered().indexOf(this.currentStatus());
     const prevI = currentI + 1;
     if (prevI < Status.ordered().length) {

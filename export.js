@@ -13,7 +13,7 @@ function shouldShowSettings() {
 async function storageExport() {
   let allKeys = await AsyncStorage.getAllKeys();
   let pairs = await AsyncStorage.multiGet(allKeys);
-  snapshot = {};
+  let snapshot = {};
   pairs.forEach((pair) => {
     snapshot[pair[0]] = pair[1];
   });

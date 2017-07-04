@@ -4,7 +4,7 @@ import {Image} from '../models/Pot.js';
 import dispatcher from '../AppDispatcher.js';
 import {StorageWriter} from './sync.js';
 import { AsyncStorage } from 'react-native';
-import ImageUploader from '../ImageUploader.js';
+import * as ImageUploader from '../ImageUploader.js';
 
 interface ImageState {
   name: string,
@@ -56,7 +56,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, pots: im.pots.filter(p => p != action.potId)},
         }};
         if (newState.images[action.imageName].pots.length == 0 && im.remoteUri) {
-          ImageUploader.delete(im.remoteUri);
+          ImageUploader.remove(im.remoteUri);
         }
         this.persist(newState);
         return newState;
@@ -68,7 +68,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, remoteUri: action.remoteUri},
         }};
         if (newState.images[action.name].pots.length == 0) {
-          ImageUploader.delete(action.remoteUri);
+          ImageUploader.remove(action.remoteUri);
         }
         this.persist(newState);
         return newState;
@@ -81,7 +81,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           const newI = {...oldI, pots: oldI.pots.filter((p) => p != action.potId)};
           newState.images[action.imageNames[i]] = newI;
           if (newI.pots.length == 0 && newI.remoteUri) {
-            ImageUploader.delete(newI.remoteUri);
+            ImageUploader.remove(newI.remoteUri);
           }
         }
         this.persist(newState);
@@ -99,7 +99,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         for (let imageName in action.images) {
           const image = action.images[imageName];
           if (image.pots && image.pots.length == 0 && image.remoteUri) {
-            ImageUploader.delete(image.remoteUri);
+            ImageUploader.remove(image.remoteUri);
           }
         }
         const newState = {
@@ -168,7 +168,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           if (newPots.length == 0) {
             console.log("Uh, an unused image: " + imageName);
             if (newImage.remoteUri) {
-              ImageUploader.delete(newImage.remoteUri);
+              ImageUploader.remove(newImage.remoteUri);
             }
           }
           newState.images[imageName] = newImage;
