@@ -33,6 +33,8 @@ class UIStore extends ReduceStore<UIState> {
         return {page: 'list', searching: false, searchTerm: ''};
       case 'list-search-term':
       	return {page: 'list', searching: true, searchTerm: action.text};
+      case 'reload':
+        return this.getInitialState();
       default:
         return state;
     }

@@ -97,6 +97,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;
       }
+      case 'reload': {
+        return this.getInitialState();
+      }
       default:
         return state;
     }

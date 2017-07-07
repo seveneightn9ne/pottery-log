@@ -176,6 +176,9 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         this.persist(newState);
         return newState;
       }
+      case 'reload': {
+        return this.getInitialState();
+      }
       default:
         return state;
     }

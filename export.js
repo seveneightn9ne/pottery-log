@@ -20,4 +20,12 @@ async function storageExport() {
   return snapshot;
 }
 
-export { storageExport, shouldShowSettings };
+async function storageImport(datastr: string) {
+  data = JSON.parse(datastr);
+  await AsyncStorage.clear();
+  const kvpairs = Object.keys(data).map((k) => [k, data[k]]);
+  await AsyncStorage.multiSet(kvpairs);
+  return;
+}
+
+export { storageExport, shouldShowSettings, storageImport };

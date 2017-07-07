@@ -69,6 +69,9 @@ function getState() {
     onExport: () => dispatcher.dispatch({
       type: 'export-start',
     }),
+    onImport: () => dispatcher.dispatch({
+      type: 'import-start',
+    }),
     onOpenSearch: () => dispatcher.dispatch({
       type: 'list-search-open',
     }),

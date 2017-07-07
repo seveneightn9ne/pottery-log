@@ -28,6 +28,8 @@ type AppViewProps = {
   onOpenSearch: () => void,
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
+  onExport: () => void,
+  onImport: () => void,
 };
 
 function AppView(props: AppViewProps): ?React.Element<*> {
@@ -60,6 +62,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       return <SettingsPage
         onNavigateToList={props.onNavigateToList}
         onExport={props.onExport}
+        onImport={props.onImport}
         />;
     default:
       return <View style={styles.container}>

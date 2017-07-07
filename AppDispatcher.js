@@ -26,6 +26,13 @@ function exportMiddleware(action) {
       ReactNative.Share.share(shareArg)
     });
     break;
+  case 'import-start':
+    storageImport().then(() => {
+      dispatcher.dispatch({
+        type: 'reload',
+      });
+    });
+    break;
   }
 }
 
