@@ -56,8 +56,12 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, pots: im.pots.filter(p => p != action.potId)},
         }};
         if (newState.images[action.imageName].pots.length == 0) {
-          delete newState.images[action.imageName];
-          //ImageUploader.remove(im.remoteUri);
+          //delete newState.images[action.imageName];
+          if (im.remoteUri) {
+            ImageUploader.remove(im.remoteUri);
+          } else {
+            delete newState.images[action.imageName];
+          }
         }
         this.persist(newState);
         return newState;
@@ -69,8 +73,8 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, remoteUri: action.remoteUri},
         }};
         if (newState.images[action.name].pots.length == 0) {
-          delete newState.images[action.name];
-          //  ImageUploader.remove(action.remoteUri);
+          //delete newState.images[action.name];
+          ImageUploader.remove(action.remoteUri);
         }
         this.persist(newState);
         return newState;
@@ -83,8 +87,12 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           const newI = {...oldI, pots: oldI.pots.filter((p) => p != action.potId)};
           newState.images[action.imageNames[i]] = newI;
           if (newI.pots.length == 0) {
-            delete newState.images[newI.name];
-            //ImageUploader.remove(newI.remoteUri);
+            //delete newState.images[newI.name];
+            if (newI.remoteUri) {
+              ImageUploader.remove(newI.remoteUri);
+            } else {
+              delete newState.images[newI.name];
+            }
           }
         }
         this.persist(newState);
@@ -107,8 +115,12 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           newState.images[imageName] = action.images[imageName];
           const image = action.images[imageName];
           if (image.pots && image.pots.length == 0) {
-            delete newState.images[imageName]
-            //ImageUploader.remove(image.remoteUri);
+            //delete newState.images[imageName]
+            if (image.remoteUri) {
+              ImageUploader.remove(image.remoteUri);
+            } else {
+              delete newState.images[imageName];
+            }
           }
         }
         this.persist(newState);
@@ -176,10 +188,12 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           newImage.pots = newPots;
           if (newPots.length == 0) {
             console.log("Uh, an unused image: " + imageName);
-            delete newState.images[imageName];
-            //if (newImage.remoteUri) {
-              //ImageUploader.remove(newImage.remoteUri);
-            //}
+            //delete newState.images[imageName];
+            if (newImage.remoteUri) {
+              ImageUploader.remove(newImage.remoteUri);
+            } else {
+              delete newState.images[imageName];
+            }
           }
           newState.images[imageName] = newImage;
         }
@@ -195,8 +209,13 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         if (action.uri == i.remoteUri) {
           // Re upload it
           ImageUploader.upload(state.images[action.name].localUri);
-          return state;
         }
+        return state;
+      }
+      case 'image-remote-failed': {
+        const i = state.images[action.name];
+        // TODO(jessk) handle... by deleting the image
+        // and removing it from its pot(s)
       }
       default:
         return state;

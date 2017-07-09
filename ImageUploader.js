@@ -55,6 +55,11 @@ export async function upload(localUri: string) {
       console.log("upload ERROR: Response " + response.status + " : " + response.statusText);
     }
   }).catch((reason) => {
+    console.log("upload threw", reason);
+    dispatcher.dispatch({
+      type: 'image-remote-failed',
+      name: fileName,
+    });
     throw reason;
   });
 };
@@ -69,7 +74,7 @@ export async function remove(uri: string) {
     method: 'POST',
     body: formData,
   };
- 
+
   console.log("Will delete " + uri);
 
   fetch(apiUrl, options).then((response) => {
