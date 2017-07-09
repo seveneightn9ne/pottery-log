@@ -60,7 +60,6 @@ export async function upload(localUri: string) {
       type: 'image-remote-failed',
       name: fileName,
     });
-    throw reason;
   });
 };
 

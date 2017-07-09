@@ -170,7 +170,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             ImageUploader.upload(localUri);
           }
         }
-        this.persist(newState);
+        //this.persist(newState);
         console.log("Migrated images", newState);
         return newState;
       }
@@ -197,7 +197,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           }
           newState.images[imageName] = newImage;
         }
-        this.persist(newState);
+        //this.persist(newState);
         return newState;
       }
       case 'reload': {
@@ -216,6 +216,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         const i = state.images[action.name];
         // TODO(jessk) handle... by deleting the image
         // and removing it from its pot(s)
+        return state;
       }
       default:
         return state;
