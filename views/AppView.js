@@ -30,6 +30,7 @@ type AppViewProps = {
   onSearch: (search: string) => void,
   onExport: () => void,
   onImport: () => void,
+  onImageError: (name ,uri) => void,
 };
 
 function AppView(props: AppViewProps): ?React.Element<*> {
@@ -42,6 +43,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onCloseSearch={props.onCloseSearch}
         onSearch={props.onSearch}
         onNavigateToSettings={props.onNavigateToSettings}
+        onImageError={props.onImageError}
       />;
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}

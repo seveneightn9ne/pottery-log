@@ -1,6 +1,7 @@
 // @flow
 import Expo from 'expo';
 import { AsyncStorage } from 'react-native';
+import dispatcher from './AppDispatcher.js';
 
 function shouldShowSettings() {
   let m = {

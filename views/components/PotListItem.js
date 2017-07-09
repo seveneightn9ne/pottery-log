@@ -9,6 +9,7 @@ import {nameToUri} from '../../stores/ImageStore.js';
 type PotListItemProps = {
   pot: Pot,
   onPress: () => void,
+  onError: (name: string, uri: string) => void,
 };
 
 export default class PotListItem extends React.Component {
@@ -20,7 +21,8 @@ export default class PotListItem extends React.Component {
     const imgUri = this.props.pot.images3.length ?
       nameToUri(this.props.pot.images3[0]) : null;
     const img = this.props.pot.images3.length ?
-      <Image source={{uri: imgUri}} style={styles.size50} /> : null;
+      <Image source={{uri: imgUri}} style={styles.size50} onError={(e) =>
+        this.props.onError(this.props.pot.images3[0], imgUri)} /> : null;
     const noteStar = this.props.pot.notes2.isEmpty() ? null : <Text>*</Text>
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>

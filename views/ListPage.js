@@ -17,6 +17,7 @@ type ListPageProps = {
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
   onNavigateToSettings: () => void,
+  onImageError: (name, uri) => void,
 };
 
 export default class ListPage extends React.Component {
@@ -60,6 +61,7 @@ export default class ListPage extends React.Component {
               <PotListItem key={id}
             pot={this.props.pots.pots[id]}
             onPress={() => this.props.onClickPot(id)}
+            onError={this.props.onImageError}
               />
           ));
       const title = <Text style={styles.lh}>{Status.longterm(status).capitalize()}</Text>;
@@ -76,7 +78,7 @@ export default class ListPage extends React.Component {
         </TouchableHighlight>
       </View>
     );
-    
+
     let showSettings = shouldShowSettings();
 
     const topWhenNotSearching = (

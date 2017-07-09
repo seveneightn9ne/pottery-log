@@ -1,7 +1,7 @@
 // @flow
 import ReactNative from 'react-native';
 import {Dispatcher} from 'flux';
-import {storageExport} from './export.js'
+import {storageExport, storageImport} from './export.js'
 
 const msDispatcher = new Dispatcher();
 

@@ -168,6 +168,9 @@ function getState() {
       potId: currentPot().uuid,
       imageNames: currentPot().images3,
     }),
+    onImageError: (name, uri) => dispatcher.dispatch({
+      type: 'image-error', name, uri,
+    })
   };
 }
 
