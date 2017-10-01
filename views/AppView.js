@@ -29,7 +29,7 @@ type AppViewProps = {
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
   onExport: () => void,
-  onImport: () => void,
+  onImport: (data: string) => void,
   onImageError: (name ,uri) => void,
 };
 

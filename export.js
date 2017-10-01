@@ -21,11 +21,19 @@ async function storageExport() {
   return snapshot;
 }
 
-async function storageImport(datastr: string) {
-  data = JSON.parse(datastr);
+async function storageImport(fileUri: string) {
+  console.log("Start storageImport");
+  const {uri} = await Expo.FileSystem.downloadAsync(
+      fileUri, Expo.FileSystem.cacheDirectory + 'import.json');
+  console.log("Saved import file locally");
+  const dataStr = await Expo.FileSystem.readAsStringAsync(uri);
+  console.log("Got the import data (" + dataStr.length + " bytes)");
+  data = JSON.parse(dataStr);
+  console.log("Parsed imported data");
   await AsyncStorage.clear();
   const kvpairs = Object.keys(data).map((k) => [k, data[k]]);
   await AsyncStorage.multiSet(kvpairs);
+  console.log("Import finished");
   return;
 }
 

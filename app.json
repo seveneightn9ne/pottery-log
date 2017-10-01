@@ -9,5 +9,7 @@
   "ios": {
     "bundleIdentifier": "org.rnplay.exp"
   },
-  "sdkVersion": "18.0.0"
+  "expo": {
+      "sdkVersion": "19.0.0"
+  }
 }

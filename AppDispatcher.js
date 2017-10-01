@@ -27,7 +27,8 @@ function exportMiddleware(action) {
     });
     break;
   case 'import-start':
-    storageImport().then(() => {
+    console.log("Hit the middleware");
+    storageImport(action.data).then(() => {
       dispatcher.dispatch({
         type: 'reload',
       });
