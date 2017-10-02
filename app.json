@@ -1,15 +1,17 @@
 {
-  "name": "Pottery Log",
-  "icon": "./assets/launcher_512.png",
-  "slug": "pottery-log",
-  "version": "1.0.0",
-  "android": {
-    "package": "com.jesskenney.pottery_log"
-  },
-  "ios": {
-    "bundleIdentifier": "org.rnplay.exp"
-  },
   "expo": {
-      "sdkVersion": "19.0.0"
+    "sdkVersion": "21.0.0",
+    "name": "Pottery Log",
+    "icon": "./assets/launcher_512.png",
+    "slug": "pottery-log",
+    "version": "2.0.0",
+    "privacy": "public",
+    "android": {
+      "package": "com.jesskenney.pottery_log",
+      "versionCode": 2
+    },
+    "ios": {
+      "bundleIdentifier": "org.rnplay.exp"
+    }
   }
 }
