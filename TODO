@@ -3,6 +3,13 @@
 - Remove the screen on lock
 - [iOS] images are square, put them in a square frame
 
+# Performance Improvements
+- Load the cached image and onerror fall back to the s3 image
+- Retry loading images from s3
+- Prefetch all images
+- Use the AppLoading when loading from AsyncStorage
+- Hide the Finished items by default
+
 # Features
 - Make a settings / sidebar pullout thing
   - Check with Miles about how the iOS UI should be
@@ -13,6 +20,8 @@
   - Inspiration page
   - Feedback / Developer info / donate (servers cost money yo)?
 - Add multiple images from library at once
+- Don't show the * unless the current state has a comment
+- Left bar black stuff is ugly
 
 # Technical / meta
 - Use the Expo fork of react-native, if it provides benefits
