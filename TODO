@@ -4,8 +4,6 @@
 - [iOS] images are square, put them in a square frame
 
 # Performance Improvements
-- Load the cached image and onerror fall back to the s3 image
-- Retry loading images from s3
 - Prefetch all images
 - Use the AppLoading when loading from AsyncStorage
 - Hide the Finished items by default
