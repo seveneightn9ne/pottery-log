@@ -203,14 +203,18 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       case 'reload': {
         return this.getInitialState();
       }
-      case 'image-error': {
-        const i = state.images[action.name];
-        console.log("Fixing image " + i.name);
-        if (action.uri == i.remoteUri) {
-          // Re upload it
-          ImageUploader.upload(state.images[action.name].localUri);
-        }
+      case 'image-error-remote': {
+        // There's nothing to do, I guess
         return state;
+      }
+      case 'image-error-local': {
+        const i = state.images[action.name];
+        const newImage = {...i};
+        const newState = {images: {...state.images,
+          [action.name]: newImage}};
+        console.log("Fixing image " + i.name);
+        delete newImage.localUri;
+        return newState;
       }
       case 'image-remote-failed': {
         const i = state.images[action.name];
@@ -242,7 +246,11 @@ export function nameToUri(name: string): string {
     console.log("That image named " + name + " is not in the image store.");
     return "";
   }
-  return i.remoteUri || i.localUri;
+  return i.localUri || i.remoteUri;
+}
+
+export function nameToImageState(name: string) {
+  return ImageStore.getState().images[name];
 }
 
 export function isAnySyncing(imageNames: string[]): boolean {

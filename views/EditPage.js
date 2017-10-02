@@ -8,11 +8,12 @@ import Status from '../models/Status.js';
 import styles from '../style.js'
 import ImagePicker from './components/ImagePicker.js';
 import ImageList from './components/ImageList.js';
+import Image3 from './components/Image3.js';
 import DatePicker from './components/DatePicker.js';
 import StatusDetail from './components/StatusDetail.js';
 import StatusSwitcher from './components/StatusSwitcher.js';
 import Note from './components/Note.js';
-import {nameToUri, isAnySyncing} from '../stores/ImageStore.js';
+import {nameToImageState, isAnySyncing} from '../stores/ImageStore.js';
 
 type EditPageProps = {
   pot: Pot,
@@ -37,7 +38,7 @@ export default class EditPage extends React.Component {
     const mainImgSize = width - 50;
     const mainImage = (pot.images3.length) ?
       <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images3[0])}>
-        <Image source={{uri: nameToUri(pot.images3[0])}} style={{height: mainImgSize, width: mainImgSize}} />
+        <Image3 image={nameToImageState(pot.images3[0])} style={{height: mainImgSize, width: mainImgSize}} />
       </TouchableOpacity> :
       <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
         style={{height: 150, width: width}} />;

@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 import styles from '../../style.js';
 import ImagePicker from './ImagePicker.js';
-import {nameToUri} from '../../stores/ImageStore.js';
+import Image3 from './Image3.js';
+import {nameToImageState} from '../../stores/ImageStore.js';
 
 type ImageListProps = {
   images: string[],
@@ -19,10 +20,9 @@ type ImageListProps = {
 export default class ImageList extends React.Component {
   render() {
     const images = this.props.images.slice(1).map(name => {
-      const uri = nameToUri(name);
-      return (<TouchableOpacity onPress={() => this.props.onClickImage(name)} key={uri}
+      return (<TouchableOpacity onPress={() => this.props.onClickImage(name)} key={name}
         onLongPress={() => this.props.onDeleteImage(name)}>
-        <Image source={{uri}} style={styles.size50} />
+        <Image3 image={nameToImageState(name)} style={styles.size50} />
       </TouchableOpacity>);
     });
     return <ScrollView horizontal={false}>

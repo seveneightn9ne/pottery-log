@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity, SectionList } from 'react-native';
 import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
@@ -19,6 +19,37 @@ type ListPageProps = {
   onNavigateToSettings: () => void,
   onImageError: (name, uri) => void,
 };
+
+function filterSortedPots(allPots, status, searching, searchTerm) {
+  return allPots
+    .filter(pot => pot.status.currentStatus() == status)
+    .filter(pot => {
+      // Filter for search
+      if (!searching || !searchTerm) {return true;}
+      if (pot.title.includes(searchTerm)) return true;
+      if (pot.notes2.includes(searchTerm)) return true;
+      return false;
+    })
+    .sort((potA, potB) => {
+      // Sort the pots by date most recent at bottom.
+      // Except sort pots with that are 'Finished' most recent at top.
+      let tA = potA.status.date().getTime();
+      let tB = potB.status.date().getTime();
+      let cmp = 0;
+      if (tA < tB) {
+        cmp = -1;
+      } else {
+        cmp = 1;
+      }
+      if (tA == tB) {
+        cmp = 0;
+      }
+      if (potA.status.currentStatus() === "pickedup") {
+        cmp *= -1;
+      }
+      return cmp;
+    });
+}
 
 export default class ListPage extends React.Component {
   render() {
@@ -95,13 +126,32 @@ export default class ListPage extends React.Component {
       </View>
     );
 
+    const allPots = this.props.pots.potIds.map(id => this.props.pots.pots[id]);
+    const searching = this.props.ui.searching;
+    const searchTerm = this.props.ui.searchTerm;
+
+    const sections = Status.ordered().reverse().map(status => {
+      return {
+        data: filterSortedPots(allPots, status, searching, searchTerm),
+        title: status,
+      };
+    }).filter((section) => section.data.length > 0);
+
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
       <NewPotListItem onPress={this.props.onNewPot} />
-      <ScrollView>
-        {lists}
-      </ScrollView>
-      <View />
+        <SectionList
+          renderItem={({item}) => <PotListItem
+            key={item.uuid}
+            pot={item}
+            onPress={() => this.props.onClickPot(item.uuid)}
+            onError={this.props.onImageError}
+          />}
+          renderSectionHeader={({section}) =>  <Text style={styles.lh}>
+            {Status.longterm(section.title).capitalize()}
+            </Text>}
+          sections={sections}
+          keyExtractor={(pot, index) => pot.uuid} />
     </View>);
   }
 }

@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
 import {Pot} from '../../models/Pot.js';
+import Image3 from './Image3.js';
 import { Text, View, TouchableHighlight, Image } from 'react-native';
 import styles from '../../style.js';
 import dispatcher from '../../AppDispatcher.js';
-import {nameToUri} from '../../stores/ImageStore.js';
+import {nameToImageState} from '../../stores/ImageStore.js';
 
 type PotListItemProps = {
   pot: Pot,
@@ -18,11 +19,10 @@ export default class PotListItem extends React.Component {
   }
 
   render() {
-    const imgUri = this.props.pot.images3.length ?
-      nameToUri(this.props.pot.images3[0]) : null;
+    const imgstate = this.props.pot.images3.length ?
+      nameToImageState(this.props.pot.images3[0]) : null;
     const img = this.props.pot.images3.length ?
-      <Image source={{uri: imgUri}} style={styles.size50} onError={(e) =>
-        this.props.onError(this.props.pot.images3[0], imgUri)} /> : null;
+      <Image3 image={imgstate} style={styles.size50} /> : null;
     const noteStar = this.props.pot.notes2.isEmpty() ? null : <Text>*</Text>
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>
