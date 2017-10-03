@@ -167,11 +167,16 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             }
           }
           if (!remoteUri) {
-            ImageUploader.upload(localUri);
+            try {
+              ImageUploader.upload(localUri);
+            } catch (e) {
+              //console.error(e);
+              console.log("Oh that doesn't work.");
+            }
           }
         }
         //this.persist(newState);
-        console.log("Migrated images", newState);
+        console.log("Migrated images (omitted)"); //, newState);
         return newState;
       }
       case 'loaded': { // Pots loaded

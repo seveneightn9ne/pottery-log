@@ -7,6 +7,12 @@ const msDispatcher = new Dispatcher();
 
 function logDispatch(action) {
   switch (action.type) {
+  case 'loaded':
+    console.log('Action: loaded (body omitted)');
+    return;
+  case 'migrate-from-images2':
+    console.log('Action: migrate-from-images2 ' + action.images2.length + ' images (body omitted)');
+    return;
   default: {
     console.log('Action:', action)
     return

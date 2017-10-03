@@ -130,7 +130,7 @@ async function loadInitial(dispatcher): void {
 
 async function loadPot(uuid: string): Pot {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
-  console.log("Loading pot from storage: " + loadedJson);
+  //console.log("Loading pot from storage: " + loadedJson);
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     // Add all fields, for version compatibility
@@ -166,7 +166,7 @@ async function loadPot(uuid: string): Pot {
     }
     delete pot.images;
     delete pot.images2;
-    console.log("Done building pot", pot);
+    //console.log("Done building pot", pot);
     return pot;
   }
   return {
