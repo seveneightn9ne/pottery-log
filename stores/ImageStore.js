@@ -255,7 +255,12 @@ export function nameToUri(name: string): string {
 }
 
 export function nameToImageState(name: string) {
-  return ImageStore.getState().images[name];
+  const i = ImageStore.getState().images[name];
+  if (!i) {
+    console.log("That image named " + name + " is not in the image store.");
+    return {};
+  }
+  return i;
 }
 
 export function isAnySyncing(imageNames: string[]): boolean {
