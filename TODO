@@ -1,3 +1,7 @@
+# New features in Expo SDK
+- https://docs.expo.io/versions/latest/sdk/imagemanipulator.html
+- limit imagePicker to images https://docs.expo.io/versions/latest/sdk/imagepicker.html#mediatypes-string--choose-what-type-of-media-to-pick-usage-imagepickermediatypeoptionstype-where-type-is-one-of-images-videos-all
+
 # Bug fixes
 - "Notstarted" header -> "Not started"
 - Remove the screen on lock
