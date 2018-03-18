@@ -1,14 +1,14 @@
 {
   "expo": {
-    "sdkVersion": "21.0.0",
+    "sdkVersion": "24.0.0",
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.0.0",
+    "version": "2.0.24",
     "privacy": "public",
     "android": {
       "package": "com.jesskenney.pottery_log",
-      "versionCode": 2
+      "versionCode": 3
     },
     "ios": {
       "bundleIdentifier": "org.rnplay.exp"
