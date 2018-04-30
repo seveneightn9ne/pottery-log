@@ -35,11 +35,14 @@ BackHandler.addEventListener('hardwareBackPress', function() {
   return true;
 });
 
-function getState() {
+function getState(prevState, props) {
+    console.log("AppContainer Props");
+    console.log(props);
   return {
     pots: PotsStore.getState(),
     ui: UIStore.getState(),
     images: ImageStore.getState(),
+    fontLoaded: props.fontLoaded,
 
     onNew: () => dispatcher.dispatch({
       type: 'new',
@@ -175,4 +178,4 @@ function getState() {
   };
 }
 
-export default Container.createFunctional(AppView, getStores, getState);
+export default Container.createFunctional(AppView, getStores, getState, {withProps: true});

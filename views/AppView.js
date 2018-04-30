@@ -11,6 +11,9 @@ type AppViewProps = {
   pots: Object, // PotStoreState
   ui: Object, // UIState
   images: Object, // ImageStoreState
+
+  fontLoaded: bool,
+
   onNew: () => void,
   onChangeTitle: (text: string) => void,
   onChangeNote: (potId: string, date: Date, text: string) => void,
@@ -37,6 +40,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
   switch (props.ui.page) {
     case 'list':
       return <ListPage pots={props.pots} ui={props.ui}
+        fontLoaded={props.fontLoaded}
         onNewPot={props.onNew}
         onClickPot={props.onEdit}
         onOpenSearch={props.onOpenSearch}
@@ -49,6 +53,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}
         ui={props.ui}
         images={props.images}
+        fontLoaded={props.fontLoaded}
         onChangeTitle={props.onChangeTitle}
         onChangeNote={props.onChangeNote}
         onNewNote={props.onNewNote}
@@ -62,6 +67,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       />;
     case 'settings':
       return <SettingsPage
+        fontLoaded={props.fontLoaded}
         onNavigateToList={props.onNavigateToList}
         onExport={props.onExport}
         onImport={props.onImport}

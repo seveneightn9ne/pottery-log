@@ -1,11 +1,13 @@
 import { StyleSheet } from 'react-native';
 
+const ORANGE = "#ff5722";
+
 export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'flex-start',
-    paddingTop: 20,
+    //paddingTop: 20,
   },
   listItem: {
   	backgroundColor: '#eee',
@@ -30,10 +32,28 @@ export default StyleSheet.create({
   	width: 50,
   	height: 50,
   },
+  header: {
+    backgroundColor: ORANGE,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    elevation: 4,
+    paddingTop: 20,
+  },
   h1: {
-  	fontSize: 36,
-  	fontWeight: 'bold',
-  	padding: 10,
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "400",
+    padding: 20,
+    //paddingLeft: 72,
+  },
+  search: {
+    fontFamily: 'material-icons',
+    fontSize: 24,
+    padding: 20,
+    paddingRight: 16,
+    paddingTop: 22,
+    color: "#fff",
+    //backgroundColor: "#000",
   },
   h2: {
   	fontSize: 24,

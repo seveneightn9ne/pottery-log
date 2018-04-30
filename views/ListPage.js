@@ -100,7 +100,7 @@ export default class ListPage extends React.Component {
     }) : null;
 
     const topWhenSearching = (
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={styles.header}>
         <TextInput style={[styles.h1, {flex: 1, fontWeight: 'normal'}]}
           onChangeText={this.props.onSearch}
           autoFocus={true} placeholder={'search'} value={this.props.ui.searchTerm || ''} />
@@ -111,14 +111,17 @@ export default class ListPage extends React.Component {
     );
 
     let showSettings = shouldShowSettings();
+    let searchButton = this.props.fontLoaded ?
+          <TouchableHighlight onPress={this.props.onOpenSearch}>
+	   <Text style={styles.search}>search</Text>
+          </TouchableHighlight>
+        : null;
 
     const topWhenNotSearching = (
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={styles.header}>
         <Text style={styles.h1}>Pottery Log</Text>
         <View style={{flexDirection: 'row'}}>
-          <TouchableHighlight onPress={this.props.onOpenSearch}>
-            <Text style={styles.h1}>🔍</Text>
-          </TouchableHighlight>
+	  {searchButton}
           {showSettings && <TouchableHighlight onPress={this.props.onNavigateToSettings}>
             <Text style={styles.h1}>⚙</Text>
           </TouchableHighlight>}
