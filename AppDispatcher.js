@@ -35,7 +35,7 @@ function exportMiddleware(action) {
   case 'import-start':
     console.log("Hit the middleware");
     storageImport(action.data).then(() => {
-      dispatcher.dispatch({
+      msDispatcher.dispatch({
         type: 'reload',
       });
     });

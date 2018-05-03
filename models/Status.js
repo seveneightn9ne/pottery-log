@@ -126,18 +126,18 @@ export default class Status {
 
   text(): React$Element<any> {
     const statusText = //<View style={styles.status}>
-      <Text>{/* style={[styles.statusT, styles[this.currentStatus()]]}>*/}
+      <Text style={styles.lisubtitle}>{/* style={[styles.statusT, styles[this.currentStatus()]]}>*/}
       {this.currentStatus(true /** pretty **/)}
     </Text>;//</View>;
     let dateText = this.dateText();
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
-    const dateStyle = (new Date() - this.date() >= oneWeekIsh && this.currentStatus() != "pickedup") ? {color: 'red'} : {color: undefined};
+    const dateStyle = (new Date() - this.date() >= oneWeekIsh && this.currentStatus() != "pickedup") ? {color: "#ff5722"} : {};
     return dateText ? (<View style={{flexDirection: 'row'}}>
       {statusText}
-      <Text> on </Text>
-      <Text style={dateStyle}>{dateText}</Text></View>) : statusText;
+      <Text style={styles.lisubtitle}> on </Text>
+      <Text style={[styles.lisubtitle, dateStyle]}>{dateText}</Text></View>) : statusText;
   }
 
   currentStatus(pretty: bool = false): string {

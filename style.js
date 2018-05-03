@@ -1,6 +1,10 @@
 import { StyleSheet } from 'react-native';
 
 const ORANGE = "#ff5722";
+const LIME = "#cddc39";
+const BLACK = "rgba(0,0,0,.87)";
+const GRAY = "rgba(0,0,0,.54)";
+const LIGHT_GRAY = "rgba(0,0,0,.10)";
 
 export default StyleSheet.create({
   container: {
@@ -9,24 +13,21 @@ export default StyleSheet.create({
     justifyContent: 'flex-start',
     //paddingTop: 20,
   },
-  listItem: {
-  	backgroundColor: '#eee',
-  	//padding: 10,
-  	flexDirection: 'row',
-  	alignItems: 'center',
-  	height: 50,
-  	borderBottomWidth: 1,
-  	borderColor: '#ccc',
-  },
   newPotButton: {
-  	fontWeight: 'bold',
-  	fontSize: 48,
-  	color: 'green',
-  	//height: 50,
-  	//width: 50,
-  	//borderWidth: 1,
-  	paddingRight: 10,
-  	paddingLeft: 10
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: LIME,
+    marginLeft: 16,
+    marginTop: -24,
+    elevation: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  newPotButtonText: {
+    fontFamily: 'material-icons',
+    fontSize: 24,
+    color: "#fff",
   },
   size50: {
   	width: 50,
@@ -44,7 +45,7 @@ export default StyleSheet.create({
     fontSize: 20,
     fontWeight: "400",
     padding: 20,
-    //paddingLeft: 72,
+    paddingLeft: 72,
   },
   search: {
     fontFamily: 'material-icons',
@@ -55,25 +56,79 @@ export default StyleSheet.create({
     color: "#fff",
     //backgroundColor: "#000",
   },
+  searchBox: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "400",
+    padding: 20,
+    flex: 1,
+  },
+  searchBack: {
+    fontFamily: 'material-icons',
+    fontSize: 24,
+    padding: 20,
+    paddingLeft: 16,
+    paddingTop: 22,
+    color: "#fff",
+    //backgroundColor: "#000",
+  },
   h2: {
   	fontSize: 24,
   	fontWeight: 'bold',
   	padding: 10,
   },
-  lh: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    paddingTop: 5,
-    paddingLeft: 10,
-    paddingBottom: 0,
+  lh: { // list header
+    //fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: "400",
+    //paddingTop: 5,
+    paddingLeft: 72,
+    color: GRAY,
+    paddingBottom: 8,
+  },
+  listItem: {
+    paddingLeft: 16,
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  liImage: {
+    width:48,height:48,
+    borderRadius: 24,
+  },
+  liImagePlaceholder: {
+    backgroundColor: 'rgba(0,0,0,.55)',
+    width:36,height:36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+
+  },
+  liImagePlaceholderText: {
+    fontFamily: 'material-icons',
+    fontSize: 22,
+    color: "#fff",
   },
   lititle: {
-    fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
+    color: BLACK,
   },
   lisubtitle: {
-    fontSize: 12,
-    color: '#666666',
+    fontSize: 13,
+    color: GRAY,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: LIGHT_GRAY,
+    marginBottom: 16,
+    marginLeft: 72,
+    marginTop: 8,
+  },
+  eraseLastSeparator: {
+    backgroundColor: LIME,
+    marginTop: -10,
+    height: 5,
   },
   back: {
   	fontSize: 36,

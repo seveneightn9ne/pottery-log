@@ -22,7 +22,10 @@ export default class PotListItem extends React.Component {
     const imgstate = this.props.pot.images3.length ?
       nameToImageState(this.props.pot.images3[0]) : null;
     const img = this.props.pot.images3.length ?
-      <Image3 image={imgstate} style={styles.size50} /> : null;
+      <Image3 image={imgstate} style={styles.liImage} /> :
+      <View style={styles.liImagePlaceholder}>
+        {this.props.fontLoaded ? <Text style={styles.liImagePlaceholderText}>folder</Text> : null}
+      </View>;
     const noteStar = this.props.pot.notes2.isEmpty() ? null : <Text>*</Text>
     return (<TouchableHighlight onPress={this.props.onPress}>
       <View style={styles.listItem}>

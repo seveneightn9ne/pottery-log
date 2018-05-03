@@ -5,6 +5,7 @@ import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
 import NewPotListItem from './components/NewPotListItem.js';
+import NewPotButton from './components/NewPotButton.js';
 import PotListItem from './components/PotListItem.js';
 import {shouldShowSettings} from '../export.js';
 
@@ -54,59 +55,19 @@ function filterSortedPots(allPots, status, searching, searchTerm) {
 export default class ListPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
-    const lists = this.props.pots.hasLoaded ? Status.ordered().reverse().map(status => {
-      const potListItems = this.props.pots.potIds
-        .filter(id => this.props.pots.pots[id].status.currentStatus() == status)
-        .filter(id => {
-          // Filter for search
-          if (!this.props.ui.searching) {return true;}
-          const pot = this.props.pots.pots[id];
-          const searchTerm = this.props.ui.searchTerm;
-          if (!searchTerm) return true;
-          if (pot.title.includes(searchTerm)) return true;
-          if (pot.notes2.includes(searchTerm)) return true;
-          return false;
-        })
-        .sort((idA, idB) => {
-          // Sort the pots by date most recent at bottom.
-          // Except sort pots with that are 'Finished' most recent at top.
-          let potA = this.props.pots.pots[idA]
-          let potB = this.props.pots.pots[idB];
-          let tA = potA.status.date().getTime();
-          let tB = potB.status.date().getTime();
-          let cmp = 0;
-          if (tA < tB) {
-            cmp = -1;
-          } else {
-            cmp = 1;
-          }
-          if (tA == tB) {
-            cmp = 0;
-          }
-          if (potA.status.currentStatus() === "pickedup") {
-            cmp *= -1;
-          }
-          return cmp;
-        })
-        .map(id => (
-              <PotListItem key={id}
-            pot={this.props.pots.pots[id]}
-            onPress={() => this.props.onClickPot(id)}
-            onError={this.props.onImageError}
-              />
-          ));
-      const title = <Text style={styles.lh}>{Status.longterm(status).capitalize()}</Text>;
-      return potListItems.length ? <View key={status}>{title}{potListItems}</View> : null;
-    }) : null;
 
+    const backButton = this.props.fontLoaded ?
+      <TouchableHighlight onPress={this.props.onCloseSearch}>
+        <Text style={styles.searchBack}>arrow_back</Text>
+      </TouchableHighlight> : null;
     const topWhenSearching = (
       <View style={styles.header}>
-        <TextInput style={[styles.h1, {flex: 1, fontWeight: 'normal'}]}
+        {backButton}
+        <TextInput style={styles.searchBox}
+          underlineColorAndroid='transparent'
+          placeholderTextColor='#FFCCBC'
           onChangeText={this.props.onSearch}
           autoFocus={true} placeholder={'search'} value={this.props.ui.searchTerm || ''} />
-        <TouchableHighlight onPress={this.props.onCloseSearch}>
-          <Text style={[styles.h1, {color: 'red'}]}>X</Text>
-        </TouchableHighlight>
       </View>
     );
 
@@ -142,9 +103,10 @@ export default class ListPage extends React.Component {
 
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
-      <NewPotListItem onPress={this.props.onNewPot} />
+      <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
         <SectionList
           renderItem={({item}) => <PotListItem
+            fontLoaded={this.props.fontLoaded}
             key={item.uuid}
             pot={item}
             onPress={() => this.props.onClickPot(item.uuid)}
@@ -154,7 +116,10 @@ export default class ListPage extends React.Component {
             {Status.longterm(section.title).capitalize()}
             </Text>}
           sections={sections}
-          keyExtractor={(pot, index) => pot.uuid} />
+          keyExtractor={(pot, index) => pot.uuid}
+          renderSectionFooter={() => <View style={styles.separator} />}
+        />
+      {/*<View style={styles.eraseLastSeparator} />*/}
     </View>);
   }
 }
