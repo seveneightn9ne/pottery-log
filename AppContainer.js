@@ -174,7 +174,10 @@ function getState(prevState, props) {
     }),
     onImageError: (name, uri) => dispatcher.dispatch({
       type: 'image-error', name, uri,
-    })
+    }),
+    onCollapse: (section) => dispatcher.dispatch({
+      type: 'list-collapse', section
+    }),
   };
 }
 

@@ -94,12 +94,20 @@ export default class ListPage extends React.Component {
     const searching = this.props.ui.searching;
     const searchTerm = this.props.ui.searchTerm;
 
+    const collapsed = (section) => {
+      return this.props.ui.collapsed.indexOf(section) != -1;
+    }
+
     const sections = Status.ordered().reverse().map(status => {
       return {
         data: filterSortedPots(allPots, status, searching, searchTerm),
         title: status,
       };
-    }).filter((section) => section.data.length > 0);
+    }).filter((section) => section.data.length > 0)
+      .map((section) => collapsed(section.title) ? {
+        data: [],
+        title: section.title,
+      } : section);
 
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
@@ -112,9 +120,13 @@ export default class ListPage extends React.Component {
             onPress={() => this.props.onClickPot(item.uuid)}
             onError={this.props.onImageError}
           />}
-          renderSectionHeader={({section}) =>  <Text style={styles.lh}>
-            {Status.longterm(section.title).capitalize()}
-            </Text>}
+          renderSectionHeader={({section}) =>
+            <TouchableHighlight onPress={() => this.props.onCollapse(section.title)}><View style={styles.lh}>
+            <Text style={styles.lhText}>{Status.longterm(section.title).capitalize()}</Text>
+            {this.props.fontLoaded ?
+              <Text style={[styles.rhText, styles.collapse]}>{collapsed(section.title) ?
+                "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
+            </View></TouchableHighlight>}
           sections={sections}
           keyExtractor={(pot, index) => pot.uuid}
           renderSectionFooter={() => <View style={styles.separator} />}

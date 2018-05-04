@@ -48,6 +48,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onSearch={props.onSearch}
         onNavigateToSettings={props.onNavigateToSettings}
         onImageError={props.onImageError}
+        onCollapse={props.onCollapse}
       />;
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}

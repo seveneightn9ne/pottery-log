@@ -79,12 +79,23 @@ export default StyleSheet.create({
   },
   lh: { // list header
     //fontWeight: 'bold',
+    paddingLeft: 72,
+    paddingBottom: 8,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingRight: 16,
+  },
+  lhText: {
+    color: GRAY,
     fontSize: 14,
     fontWeight: "400",
     //paddingTop: 5,
-    paddingLeft: 72,
+  },
+  collapse: {
+    fontFamily: 'material-icons',
+    fontSize: 14,
+    fontWeight: "400",
     color: GRAY,
-    paddingBottom: 8,
   },
   listItem: {
     paddingLeft: 16,
