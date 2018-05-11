@@ -2,6 +2,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import {Image} from '../models/Pot.js';
+import ImagePage from './ImagePage.js';
 import styles from '../style.js'
 import ListPage from './ListPage.js';
 import EditPage from './EditPage.js';
@@ -49,6 +50,9 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onNavigateToSettings={props.onNavigateToSettings}
         onImageError={props.onImageError}
         onCollapse={props.onCollapse}
+        onScrollTo={props.onScrollTo}
+        onStartScroll={props.onStartScroll}
+        onEndScroll={props.onEndScroll}
       />;
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}
@@ -62,6 +66,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onAddImage={props.onAddImage}
         onDeleteImage={props.onDeleteImage}
         onSetMainImage={props.onSetMainImage}
+        onExpandImage={props.onExpandImage}
         setStatus={props.setStatus}
         setStatusDate={props.setStatusDate}
         onDelete={props.onDelete} onCopy={props.onCopy}
@@ -73,6 +78,15 @@ function AppView(props: AppViewProps): ?React.Element<*> {
         onExport={props.onExport}
         onImport={props.onImport}
         />;
+    case 'image':
+    console.log("rending imagepage");
+      return <ImagePage image={props.ui.imageId}
+      	pot={props.pots.pots[props.ui.editPotId]}
+      	fontLoaded={props.fontLoaded}
+        onDeleteImage={props.onDeleteImage}
+        onSetMainImage={props.onSetMainImage}
+        onBack={props.onEdit}
+      />;
     default:
       return <View style={styles.container}>
         <Text style={styles.h1}>Unknown Page</Text>

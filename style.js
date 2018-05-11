@@ -11,18 +11,21 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'flex-start',
+    position: 'relative',
     //paddingTop: 20,
   },
   newPotButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     backgroundColor: LIME,
-    marginLeft: 16,
-    marginTop: -24,
     elevation: 6,
+    position: 'absolute',
+    top: 60, left: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    width:48,height:48,
+    borderRadius: 24,
+    //width:36,height:36,
+    //borderRadius: 18,
+    marginRight: 12,
   },
   newPotButtonText: {
     fontFamily: 'material-icons',
@@ -34,18 +37,24 @@ export default StyleSheet.create({
   	height: 50,
   },
   header: {
+      //flex: 1,
+      //position: 'relative',
     backgroundColor: ORANGE,
     flexDirection: 'row',
     justifyContent: 'space-between',
     elevation: 4,
     paddingTop: 20,
+    //marginBottom: 16,
+    //position: 'relative',
+    //zIndex: 1,
+    //height: 56+20,
   },
   h1: {
     color: "#fff",
     fontSize: 20,
     fontWeight: "400",
     padding: 20,
-    paddingLeft: 72,
+    marginLeft: 72,
   },
   search: {
     fontFamily: 'material-icons',
@@ -79,7 +88,7 @@ export default StyleSheet.create({
   },
   lh: { // list header
     //fontWeight: 'bold',
-    paddingLeft: 72,
+    paddingLeft: 16+48+12+10, // Not sure where the 10 comes from
     paddingBottom: 8,
     justifyContent: 'space-between',
     flexDirection: 'row',
@@ -104,23 +113,28 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   liImage: {
+    //width:36,height:36,
+    //borderRadius: 18,
+    marginRight: 12,
     width:48,height:48,
     borderRadius: 24,
   },
   liImagePlaceholder: {
     backgroundColor: 'rgba(0,0,0,.55)',
-    width:36,height:36,
-    borderRadius: 18,
+    //width:36,height:36,
+    //borderRadius: 18,
+    width:48,height:48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
 
-  },
+  },/*
   liImagePlaceholderText: {
     fontFamily: 'material-icons',
     fontSize: 22,
     color: "#fff",
-  },
+  },*/
   lititle: {
     fontSize: 13,
     color: BLACK,
@@ -150,15 +164,44 @@ export default StyleSheet.create({
   },
   imagePicker: {
   	borderStyle: 'dashed',
-  	borderWidth: 1,
-  	borderColor: 'black',
+  	borderWidth: 4,
+        margin: 4,
+  	borderColor: "#CCC",
   	alignItems: 'center',
   	flexDirection: 'column',
     backgroundColor: 'white',
     // The borderRadius thing is a react-native bug with the dashed border
-    borderRadius: 0.5,
-  	//textAlign: 'center',
+    borderRadius: 1,
+    justifyContent: 'center',
   },
+  imagePickerFull: {
+
+  },
+  imagePickerSmall: {
+    marginLeft: 0
+  },
+  imagePickerText: {
+    fontFamily: 'material-icons',
+      fontSize: 72,
+      color: "#CCC",
+  },
+    imagePickerFullText: {
+    },
+    imagePickerSmallText: {
+    },
+
+    imageBar: {
+	flexDirection: 'row',
+	//alignContent: 'space-between',
+	justifyContent: 'space-between',
+	backgroundColor: '#000',
+    elevation: 4,
+    //marginTop: 20,
+    	//height: 56,
+    	position: 'absolute',
+    	top: 20,
+    	left: 0,
+    },
   potDescInput: {
     minHeight: 40,
     paddingHorizontal: 15,

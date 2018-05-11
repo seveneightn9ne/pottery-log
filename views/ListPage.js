@@ -53,6 +53,19 @@ function filterSortedPots(allPots, status, searching, searchTerm) {
 }
 
 export default class ListPage extends React.Component {
+  // TODO(jessk): it doesn't scroll all the way, why?
+  /*componentDidMount() {
+    if (this.sectionList && this.props.ui.y) {
+    	console.log("Will scroll to " + this.props.ui.y);
+	setTimeout(() => {
+	    this.props.onStartScroll();
+	    this.sectionList.getScrollResponder().scrollTo({y: this.props.ui.y, animated: false});
+	    //this.props.onEndScroll();
+	}, 0);
+    } else {
+    	console.log("Skipping list scroll");
+    }
+  }*/
   render() {
     const {height, width} = Dimensions.get('window');
 
@@ -101,18 +114,24 @@ export default class ListPage extends React.Component {
     const sections = Status.ordered().reverse().map(status => {
       return {
         data: filterSortedPots(allPots, status, searching, searchTerm),
-        title: status,
+        title: Status.longterm(status).capitalize(),
       };
     }).filter((section) => section.data.length > 0)
       .map((section) => collapsed(section.title) ? {
         data: [],
-        title: section.title,
+        title: section.title + " (" + section.data.length + ")",
       } : section);
 
+    /* TODO(jessk) - this goes in the SectionList
+     * ref={sectionList => this.sectionList = sectionList}
+     * onScroll={(e) => this.props.onScrollTo(e.nativeEvent.contentOffset.y)}
+     */
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
-      <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
+      {this.props.ui.searching ? null :
+      	      <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />}
         <SectionList
+	  style={{paddingTop: 16}}
           renderItem={({item}) => <PotListItem
             fontLoaded={this.props.fontLoaded}
             key={item.uuid}
@@ -121,10 +140,12 @@ export default class ListPage extends React.Component {
             onError={this.props.onImageError}
           />}
           renderSectionHeader={({section}) =>
-            <TouchableHighlight onPress={() => this.props.onCollapse(section.title)}><View style={styles.lh}>
-            <Text style={styles.lhText}>{Status.longterm(section.title).capitalize()}</Text>
+            <TouchableHighlight
+              onPress={() => this.props.onCollapse(section.title)}
+              underlayColor="#fff"><View style={styles.lh}>
+            <Text style={styles.lhText}>{section.title}</Text>
             {this.props.fontLoaded ?
-              <Text style={[styles.rhText, styles.collapse]}>{collapsed(section.title) ?
+              <Text style={[styles.rhText, styles.collapse]}>{collapsed(section.title)?
                 "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
             </View></TouchableHighlight>}
           sections={sections}

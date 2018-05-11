@@ -19,15 +19,17 @@ type ImageListProps = {
 
 export default class ImageList extends React.Component {
   render() {
-    const images = this.props.images.slice(1).map(name => {
+    console.log(this.props.images);
+    const images = this.props.images.map(name => {
       return (<TouchableOpacity onPress={() => this.props.onClickImage(name)} key={name}
-        onLongPress={() => this.props.onDeleteImage(name)}>
-        <Image3 image={nameToImageState(name)} style={styles.size50} />
+        onLongPress={() => this.props.onDeleteImage(name)}
+        style={{margin: 4, marginLeft: 0}}>
+        <Image3 image={nameToImageState(name)} style={{height: this.props.size, width: this.props.size}} />
       </TouchableOpacity>);
     });
-    return <ScrollView horizontal={false}>
-      <ImagePicker style={styles.size50} onPicked={this.props.onAddImage} />
+    return <ScrollView horizontal={true} style={{paddingLeft: 4}}>
       {images}
+      <ImagePicker onPicked={this.props.onAddImage} style={{height: this.props.size, width: images.length ? 100 - (4*3) : this.props.size + 100 - (4*2)}} full={images.length == 0} />
     </ScrollView>;
   }
 }

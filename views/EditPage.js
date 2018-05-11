@@ -35,19 +35,24 @@ export default class EditPage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     const pot = this.props.pot;
-    const mainImgSize = width - 50;
-    const mainImage = (pot.images3.length) ?
-      <TouchableOpacity onLongPress={() => this.props.onDeleteImage(pot.images3[0])}>
-        <Image3 image={nameToImageState(pot.images3[0])} style={{height: mainImgSize, width: mainImgSize}} />
-      </TouchableOpacity> :
-      <ImagePicker onPicked={(i) => this.props.onAddImage(pot.uuid, i)}
-        style={{height: 150, width: width}} />;
-    const imageList = (pot.images3.length) ?
-      <ImageList images={pot.images3} style={{height: mainImgSize}}
+    const backButton = this.props.fontLoaded ?
+      <TouchableOpacity onPress={this.props.onNavigateToList}>
+        <Text style={styles.searchBack}>arrow_back</Text>
+      </TouchableOpacity> : null;
+    let editButton = this.props.fontLoaded ?
+          <TouchableOpacity onPress={() => {
+	    if (this.titleInput) {
+	      this.titleInput.focus();
+	    }
+          }}>
+	   <Text style={styles.search}>mode_edit</Text>
+          </TouchableOpacity>
+        : null;
+    const mainImgSize = width - 100;
+    const imageList = <ImageList size={mainImgSize} images={pot.images3}
         onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
-        onClickImage={(i) => this.props.onSetMainImage(pot.uuid, i)}
-        onDeleteImage={(i) => this.props.onDeleteImage(i)} /> :
-      null;
+        onClickImage={this.props.onExpandImage}
+        onDeleteImage={(i) => this.props.onDeleteImage(i)} />;
 
     /* syncing */
     const isSyncing = isAnySyncing(pot.images3);
@@ -66,21 +71,19 @@ export default class EditPage extends React.Component {
     );
     const currentNoteText = pot.notes2[pot.status.currentStatus()];
     return <View style={styles.container}>
-      <View style={{flexDirection: 'row'}}>
-        <TouchableHighlight onPress={this.props.onNavigateToList}>
-          <Text style={styles.back}>&lt;</Text>
-        </TouchableHighlight>
-        <TextInput style={[styles.h1, {flex: 1}]}
+      <View style={styles.header}>
+	{backButton}
+        <TextInput style={styles.searchBox}
+	  ref={(e) => this.titleInput = e}
+          underlineColorAndroid='transparent'
+          placeholderTextColor='#FFCCBC'
           onChangeText={(text) => this.props.onChangeTitle(pot.uuid, text)}
           value={pot.title} selectTextOnFocus={true}
         />
+        {editButton}
       </View>
       <KeyboardAwareScrollView style={styles.page} extraHeight={100}>
-
-        <View style={{flexDirection: 'row', backgroundColor: 'black'}}>
           {imageList}
-          {mainImage}
-        </View>
         <View style={{flexDirection: 'row', padding: 10}}>
           <StatusSwitcher status={pot.status} setStatus={this.props.setStatus} />
           <Text style={{

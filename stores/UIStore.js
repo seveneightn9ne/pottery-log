@@ -12,7 +12,7 @@ class UIStore extends ReduceStore<UIState> {
     super(dispatcher);
   }
   getInitialState(): UIState {
-    return {page: 'list', collapsed: []}
+    return {page: 'list', collapsed: [], yInitial: 0, yCurrent: 0, scrollEnabled: true}
   }
 
   // TODO(jessk): Persist collapsed state
@@ -22,25 +22,40 @@ class UIStore extends ReduceStore<UIState> {
     switch (action.type) {
       case 'page-new-pot':
       case 'page-edit-pot':
-        return {page: 'edit-pot', editPotId: action.potId, collapsed};
+        return {...state, page: 'edit-pot', editPotId: action.potId, yInitial: state.yCurrent};
       case 'page-list':
         console.log("Navigate to list");
-        return {page: 'list', collapsed}
+        return {...state, page: 'list'}
       case 'page-settings':
         console.log("Navigate to settings");
-        return {page: 'settings', collapsed}
+        return {...state, page: 'settings', yInitial: state.yCurrent}
       case 'list-search-open':
       	console.log("Opened search");
-        return {page: 'list', searching: true, collapsed};
+        return {...state, page: 'list', searching: true, yCurrent: 0, yInitial: 0};
       case 'list-search-close':
-        return {page: 'list', searching: false, searchTerm: '', collapsed};
+        return {...state, page: 'list', searching: false, searchTerm: ''};
       case 'list-search-term':
-      	return {page: 'list', searching: true, searchTerm: action.text, collapsed};
+      	return {...state, page: 'list', searching: true, searchTerm: action.text};
       case 'list-collapse':
-        if (state.collapsed.indexOf(action.section) != -1) {
-          return {...state, collapsed: collapsed.filter(i => i != action.section)};
+	// for uncollapse, strip the (1) in the section name
+	const parts = action.section.split(" ");
+	const section = parts.splice(0,parts.length-1).join(" ");
+        if (state.collapsed.indexOf(section) != -1) {
+          return {...state, collapsed: collapsed.filter(i => i != section)};
         }
         return {...state, collapsed: [...collapsed, action.section]};
+      case 'list-scroll':
+      	if (state.scrollEnabled) {
+      	  return {...state, yCurrent: action.y};
+	}
+      case 'list-scroll-disable':
+	return {...state, scrollEnabled: false};
+      case 'list-scroll-enable':
+	return {...state, scrollEnabled: true};
+      case 'page-image':
+      	return {...state, page: 'image', imageId: action.imageId};
+      case 'image-delete-from-pot':
+      	return {...state, page: 'edit-pot'};
       case 'reload':
         return this.getInitialState();
 

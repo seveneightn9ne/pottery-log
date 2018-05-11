@@ -29,6 +29,13 @@ BackHandler.addEventListener('hardwareBackPress', function() {
     }
     return false;
   }
+  if (UIStore.getState().page == "image") {
+    dispatcher.dispatch({
+      type: 'page-edit-pot',
+      potId: UIStore.getState().editPotId,
+    });
+    return true;
+  }
   dispatcher.dispatch({
     type: 'page-list',
   });
@@ -114,6 +121,10 @@ function getState(prevState, props) {
       value: [name, ...PotsStore.getState().pots[potId].images3.filter(i => i != name)],
       potId: potId,
     }),
+    onExpandImage: (name) => dispatcher.dispatch({
+      type: 'page-image',
+      imageId: name,
+    }),
     setStatus: (newStatus) => {
       const newFullStatus = currentPot().status.withStatus(newStatus);
       dispatcher.dispatch({
@@ -178,6 +189,11 @@ function getState(prevState, props) {
     onCollapse: (section) => dispatcher.dispatch({
       type: 'list-collapse', section
     }),
+    onScrollTo: (y) => dispatcher.dispatch({
+      type: 'list-scroll', y
+    }),
+    onStartScroll: () => dispatcher.dispatch({type: 'list-scroll-disable'}),
+    onEndScroll: () => dispatcher.dispatch({type: 'list-scroll-enable'}),
   };
 }
 
