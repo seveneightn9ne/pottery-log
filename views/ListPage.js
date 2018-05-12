@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity, SectionList } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity, SectionList, FlatList } from 'react-native';
 import {Pot} from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
@@ -120,25 +120,38 @@ export default class ListPage extends React.Component {
       .map((section) => collapsed(section.title) ? {
         data: [],
         title: section.title + " (" + section.data.length + ")",
-      } : section);
+      } : section)
+      .map((section) => ({
+	  data: [{key: section.title, data: section.data}],
+	  title: section.title,
+      }));
 
     /* TODO(jessk) - this goes in the SectionList
      * ref={sectionList => this.sectionList = sectionList}
      * onScroll={(e) => this.props.onScrollTo(e.nativeEvent.contentOffset.y)}
      */
+    const itemSize = width/2-2;
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
-      {this.props.ui.searching ? null :
-      	      <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />}
+	<NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
         <SectionList
-	  style={{paddingTop: 16}}
-          renderItem={({item}) => <PotListItem
-            fontLoaded={this.props.fontLoaded}
-            key={item.uuid}
-            pot={item}
-            onPress={() => this.props.onClickPot(item.uuid)}
-            onError={this.props.onImageError}
-          />}
+          renderItem={({item}) => <FlatList
+              numColumns={2}
+              data={item.data}
+              keyExtractor={(pot, index) => pot.uuid}
+              getItemLayout={(layoutData, index) => ({
+		length: itemSize,
+		offset: itemSize * index,
+		index,
+	      })}
+              renderItem={({item}) => <PotListItem
+		fontLoaded={this.props.fontLoaded}
+		key={item.uuid}
+		pot={item}
+		onPress={() => this.props.onClickPot(item.uuid)}
+		onError={this.props.onImageError}
+		/>}
+              />}
           renderSectionHeader={({section}) =>
             <TouchableHighlight
               onPress={() => this.props.onCollapse(section.title)}
@@ -149,7 +162,7 @@ export default class ListPage extends React.Component {
                 "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
             </View></TouchableHighlight>}
           sections={sections}
-          keyExtractor={(pot, index) => pot.uuid}
+          keyExtractor={(listdata, index) => listdata.title}
           renderSectionFooter={() => <View style={styles.separator} />}
         />
       {/*<View style={styles.eraseLastSeparator} />*/}

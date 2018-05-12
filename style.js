@@ -6,6 +6,7 @@ const GREEN = "#4caf50";
 const BLACK = "rgba(0,0,0,.87)";
 const GRAY = "rgba(0,0,0,.54)";
 const LIGHT_GRAY = "rgba(0,0,0,.10)";
+const LIGHT_GREEN = "#C8E6C9";
 
 export default StyleSheet.create({
   container: {
@@ -19,14 +20,16 @@ export default StyleSheet.create({
     backgroundColor: ORANGE,
     elevation: 5,
     position: 'absolute',
-    top: 60, left: 16,
+    //top: 60, left: 16,
+    bottom: 16, right: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    width:48,height:48,
-    borderRadius: 24,
+    //width:48,height:48,
+    //borderRadius: 24,
     //width:36,height:36,
     //borderRadius: 18,
-    marginRight: 12,
+    width: 56, height: 56,
+    borderRadius: 28,
   },
   newPotButtonText: {
     fontFamily: 'material-icons',
@@ -54,15 +57,13 @@ export default StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontWeight: "400",
-    padding: 20,
-    marginLeft: 72,
+    padding: 16,
   },
   search: {
     fontFamily: 'material-icons',
     fontSize: 24,
-    padding: 20,
-    paddingRight: 16,
-    paddingTop: 22,
+    padding: 16,
+    marginTop: 4,
     color: "#fff",
     //backgroundColor: "#000",
   },
@@ -70,13 +71,13 @@ export default StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontWeight: "400",
-    padding: 20,
+    padding: 16,
     flex: 1,
   },
   searchBack: {
     fontFamily: 'material-icons',
     fontSize: 24,
-    padding: 20,
+    //padding: 20,
     paddingLeft: 16,
     paddingTop: 22,
     color: "#fff",
@@ -87,69 +88,76 @@ export default StyleSheet.create({
   	fontWeight: 'bold',
   	padding: 10,
   },
+  sectionList: {
+      /*flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'wrap',*/
+      paddingTop: 16,
+      justifyContent: 'space-between',//todo do i need ths
+  },
   lh: { // list header
     //fontWeight: 'bold',
-    paddingLeft: 16+48+12+10, // Not sure where the 10 comes from
-    paddingBottom: 8,
+    padding: 16,//+48+12+10, // Not sure where the 10 comes from
+    //paddingBottom: 8,
     justifyContent: 'space-between',
     flexDirection: 'row',
-    paddingRight: 16,
+    //paddingRight: 16,
   },
   lhText: {
     color: GRAY,
     fontSize: 14,
     fontWeight: "400",
-    //paddingTop: 5,
   },
   collapse: {
     fontFamily: 'material-icons',
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: "400",
     color: GRAY,
   },
   listItem: {
-    paddingLeft: 16,
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  liImage: {
-    //width:36,height:36,
-    //borderRadius: 18,
-    marginRight: 12,
-    width:48,height:48,
-    borderRadius: 24,
+    marginBottom: 4,
+    marginLeft: 4,
+    alignItems: 'baseline',
   },
   liImagePlaceholder: {
-    backgroundColor: 'rgba(0,0,0,.55)',
-    //width:36,height:36,
-    //borderRadius: 18,
-    width:48,height:48,
-    borderRadius: 24,
+    backgroundColor: LIGHT_GREEN,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    paddingBottom: 56,
 
-  },/*
-  liImagePlaceholderText: {
-    fontFamily: 'material-icons',
-    fontSize: 22,
-    color: "#fff",
-  },*/
+  },
+  listItemBar: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    position: 'absolute',
+    bottom: 0, left: 0,
+    flex: 1,
+  },
   lititle: {
-    fontSize: 13,
-    color: BLACK,
+    fontSize: 16,
+    padding: 12,
+    paddingTop: 8,
+    paddingBottom: 0,
+    color: '#fff',
+    fontWeight: '400',
   },
   lisubtitle: {
     fontSize: 13,
-    color: GRAY,
+    color: '#fff',
+    padding: 12,
+    paddingTop: 0,
+    paddingBottom: 8,
+    justifyContent: 'flex-start',
+  },
+  old: {
+    position: 'absolute',
+    top: 12, right: 8,
+    color: '#fff',
+    fontFamily: 'material-icons',
+    fontSize: 16,
   },
   separator: {
     height: 1,
     backgroundColor: LIGHT_GRAY,
-    marginBottom: 16,
-    marginLeft: 72,
-    marginTop: 8,
   },
   back: {
   	fontSize: 36,
