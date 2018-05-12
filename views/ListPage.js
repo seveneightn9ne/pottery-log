@@ -78,7 +78,7 @@ export default class ListPage extends React.Component {
         {backButton}
         <TextInput style={styles.searchBox}
           underlineColorAndroid='transparent'
-          placeholderTextColor='#FFCCBC'
+          placeholderTextColor='#c8e6c9'
           onChangeText={this.props.onSearch}
           autoFocus={true} placeholder={'search'} value={this.props.ui.searchTerm || ''} />
       </View>

@@ -161,7 +161,7 @@ function getState(prevState, props) {
       ]);
     },
     onDeleteImage: (name) => {
-      Alert.alert( 'Delete selected image?', undefined,
+      Alert.alert( 'Delete this image?', undefined,
        [{text: 'Cancel', style: 'cancel'},
         {text: 'Delete', onPress: () => {
           dispatcher.dispatch({
