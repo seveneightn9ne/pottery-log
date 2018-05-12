@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const ORANGE = "#ff5722";
 const LIME = "#cddc39";
+const GREEN = "#4caf50";
 const BLACK = "rgba(0,0,0,.87)";
 const GRAY = "rgba(0,0,0,.54)";
 const LIGHT_GRAY = "rgba(0,0,0,.10)";
@@ -15,8 +16,8 @@ export default StyleSheet.create({
     //paddingTop: 20,
   },
   newPotButton: {
-    backgroundColor: LIME,
-    elevation: 6,
+    backgroundColor: ORANGE,
+    elevation: 5,
     position: 'absolute',
     top: 60, left: 16,
     alignItems: 'center',
@@ -39,7 +40,7 @@ export default StyleSheet.create({
   header: {
       //flex: 1,
       //position: 'relative',
-    backgroundColor: ORANGE,
+    backgroundColor: GREEN,
     flexDirection: 'row',
     justifyContent: 'space-between',
     elevation: 4,
@@ -149,11 +150,6 @@ export default StyleSheet.create({
     marginBottom: 16,
     marginLeft: 72,
     marginTop: 8,
-  },
-  eraseLastSeparator: {
-    backgroundColor: LIME,
-    marginTop: -10,
-    height: 5,
   },
   back: {
   	fontSize: 36,
