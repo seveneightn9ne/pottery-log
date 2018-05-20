@@ -29,7 +29,8 @@ export default class PotListItem extends React.Component {
       	  <Image source={require('../../assets/coffee.png')}
 	    style={{width: 48, height: 48}} />
       </View>;
-    const old = this.props.pot.status.isOld() ? <Text style={styles.old}>alarm</Text> : null;
+    const old = this.props.fontLoaded && this.props.pot.status.isOld() ?
+    	  <Text style={styles.old}>alarm</Text> : null;
     return (<TouchableOpacity onPress={this.props.onPress}>
       <View style={[styles.listItem, size]}>
         {img}

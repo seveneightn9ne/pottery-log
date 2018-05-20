@@ -107,8 +107,17 @@ export default class ListPage extends React.Component {
     const searching = this.props.ui.searching;
     const searchTerm = this.props.ui.searchTerm;
 
+    const stripCount = (sectionTitle) => {
+    	if (sectionTitle.charAt(sectionTitle.length-1) != ")") {
+    	    return sectionTitle;
+	}
+	const parts = sectionTitle.split(" ");
+	const section = parts.splice(0,parts.length-1).join(" ");
+	return section;
+    }
+
     const collapsed = (section) => {
-      return this.props.ui.collapsed.indexOf(section) != -1;
+      return this.props.ui.collapsed.indexOf(stripCount(section)) != -1;
     }
 
     const sections = Status.ordered().reverse().map(status => {
@@ -133,7 +142,6 @@ export default class ListPage extends React.Component {
     const itemSize = width/2-2;
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
-	<NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
         <SectionList
           renderItem={({item}) => <FlatList
               numColumns={2}
@@ -154,17 +162,18 @@ export default class ListPage extends React.Component {
               />}
           renderSectionHeader={({section}) =>
             <TouchableHighlight
-              onPress={() => this.props.onCollapse(section.title)}
+              onPress={() => this.props.onCollapse(stripCount(section.title))}
               underlayColor="#fff"><View style={styles.lh}>
             <Text style={styles.lhText}>{section.title}</Text>
             {this.props.fontLoaded ?
-              <Text style={[styles.rhText, styles.collapse]}>{collapsed(section.title)?
+              <Text style={[styles.rhText, styles.collapse]}>{collapsed(stripCount(section.title))?
                 "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
             </View></TouchableHighlight>}
           sections={sections}
           keyExtractor={(listdata, index) => listdata.title}
           renderSectionFooter={() => <View style={styles.separator} />}
         />
+	<NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
       {/*<View style={styles.eraseLastSeparator} />*/}
     </View>);
   }

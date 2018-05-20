@@ -3,7 +3,7 @@ import React from 'react';
 import Status from '../../models/Status.js';
 import { Text, View, TouchableOpacity } from 'react-native';
 import styles from '../../style.js';
-import Note from './Note.js';
+import {Note, NoteModal} from './Note.js';
 
 type StatusDetailProps = {
   note: string,
@@ -15,22 +15,41 @@ type StatusDetailProps = {
 
 export default class StatusDetail extends React.Component {
   render() {
-    const noteComponent = <Note note={this.props.note} status={this.props.status}
-      potId={this.props.potId} onChangeNote={this.props.onChangeNote} />;
-    return <View style={{margin: 10, marginTop: 0}}>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={[styles.status, styles[this.props.status]]}>
-          {Status.prettify(this.props.status)}</Text>
-        <Text> {Status.dateText(this.props.date)} </Text>
-        <Note note={this.props.note} status={this.props.status}
-          potId={this.props.potId} onChangeNote={this.props.onChangeNote}
-          showNote={false} showAddNote={true}
-        />
+    const noteComponent = <Note fontLoaded={this.props.fontLoaded}
+      textStyle={styles.statusDetailNote}
+      note={this.props.note} status={this.props.status}
+      potId={this.props.potId} onChangeNote={this.props.onChangeNote}
+      showNote={true} showAddNote={false} />;
+    const editButton = this.props.fontLoaded ?
+          <TouchableOpacity onPress={() => {this.modal && this.modal.open()}}>
+	    <Text style={[styles.search, styles.editDetail]}>
+	      {this.props.note ? 'mode_edit' : 'note_add'}
+	    </Text>
+          </TouchableOpacity>
+        : null;
+    const noteModal = <NoteModal note={this.props.note}
+      status={this.props.status}
+      potId={this.props.potId} ref={(e) => this.modal = e}
+      onChangeNote={this.props.onChangeNote} />
+    const timelineStyles = [styles.timeline,];
+    if (this.props.first) timelineStyles.push(styles.timelineFirst);
+    if (this.props.last) timelineStyles.push(styles.timelineLast);
+    if (!this.props.first && this.props.last) timelineStyles.push(styles.timelineLastOnly);
+    if (this.props.first && this.props.last) timelineStyles.push(styles.timelineOnly);
+    return <View style={[styles.statusDetail, {flexDirection: 'row'}]}>
+      {noteModal}
+      <View style={timelineStyles}>
+	<View style={styles.timelineInner} />
       </View>
-      <Note note={this.props.note} status={this.props.status}
-        potId={this.props.potId} onChangeNote={this.props.onChangeNote}
-        showNote={true} showAddNote={false}
-      />
+      <View style={styles.statusDetailInner}>
+	<View style={{flexDirection: 'row'}}>
+	    <Text style={styles.status}>
+	    {Status.prettify(this.props.status)}</Text>
+	    <Text style={styles.statusDetailDate}> {Status.dateText(this.props.date)} </Text>
+	</View>
+	{this.props.note ? noteComponent : null}
+      </View>
+      {editButton}
     </View>;
   }
 }

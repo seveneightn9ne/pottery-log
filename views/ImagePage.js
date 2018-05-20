@@ -13,8 +13,6 @@ export default class ImagePage extends React.Component {
   render() {
     const {height, width} = Dimensions.get('window');
     const isMainImage = this.props.pot.images3[0] == this.props.image;
-    console.log("main image", this.props.pot.images3[0]);
-      console.log("this image", this.props.image);
     const star = isMainImage ? 'star' : 'star_border';
     const backButton = this.props.fontLoaded ?
       <TouchableOpacity onPress={() => this.props.onBack(this.props.pot.uuid)}>
@@ -29,8 +27,7 @@ export default class ImagePage extends React.Component {
       <TouchableOpacity onPress={() => this.props.onDeleteImage(this.props.image)}>
         <Text style={styles.search}>delete</Text>
       </TouchableOpacity> : null;
-    // TODO Star and Delete button
-      return <View style={[styles.container, {
+    return <View style={[styles.container, {
 	justifyContent: 'center',
 	backgroundColor: '#000',
       }]}>

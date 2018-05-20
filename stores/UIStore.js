@@ -21,8 +21,19 @@ class UIStore extends ReduceStore<UIState> {
     const collapsed = [...state.collapsed];
     switch (action.type) {
       case 'page-new-pot':
+        return {...state,
+            page: 'edit-pot',
+            editPotId: action.potId,
+            yInitial: state.yCurrent,
+            new: true,
+        };
       case 'page-edit-pot':
-        return {...state, page: 'edit-pot', editPotId: action.potId, yInitial: state.yCurrent};
+        return {...state,
+            page: 'edit-pot',
+            editPotId: action.potId,
+            yInitial: state.yCurrent,
+            new: false,
+        };
       case 'page-list':
         console.log("Navigate to list");
         return {...state, page: 'list'}
@@ -37,11 +48,10 @@ class UIStore extends ReduceStore<UIState> {
       case 'list-search-term':
       	return {...state, page: 'list', searching: true, searchTerm: action.text};
       case 'list-collapse':
-	// for uncollapse, strip the (1) in the section name
-	const parts = action.section.split(" ");
-	const section = parts.splice(0,parts.length-1).join(" ");
-        if (state.collapsed.indexOf(section) != -1) {
-          return {...state, collapsed: collapsed.filter(i => i != section)};
+      	console.log("toggle collapse on " + action.section);
+      	console.log(state.collapsed);
+        if (state.collapsed.indexOf(action.section) != -1) {
+          return {...state, collapsed: collapsed.filter(i => i != action.section)};
         }
         return {...state, collapsed: [...collapsed, action.section]};
       case 'list-scroll':

@@ -34,6 +34,7 @@ export default class Status {
       case BISQUED: return 'bisquing';
       case GLAZED: return 'glaze firing';
       case PICKEDUP: return 'finished';
+      case NOTSTARTED: return 'not started';
       default: return name;
     }
   }

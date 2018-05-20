@@ -10,9 +10,10 @@ type PotListItemProps = {
 }
 export default class NewPotButton extends React.Component {
   render() {
-    return <View style={styles.newPotButton}>
-    {this.props.fontLoaded ? <TouchableHighlight onPress={this.props.onPress}>
-      <Text style={styles.newPotButtonText}>add</Text></TouchableHighlight>: null}
-    	</View>;
+    console.log("rendering fontLoaded=", this.props.fontLoaded);
+    return <TouchableHighlight onPress={this.props.onPress} style={styles.newPotButton}><View>
+    {this.props.fontLoaded ?
+      <Text style={styles.newPotButtonText}>add</Text>: null}
+    	</View></TouchableHighlight>;
   }
 }

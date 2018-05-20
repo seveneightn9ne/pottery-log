@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
 
 const ORANGE = "#ff5722";
-const LIME = "#cddc39";
+const LIGHT_ORANGE = "#FFCCBC";
 const GREEN = "#4caf50";
 const BLACK = "rgba(0,0,0,.87)";
 const GRAY = "rgba(0,0,0,.54)";
 const LIGHT_GRAY = "rgba(0,0,0,.10)";
 const LIGHT_GREEN = "#C8E6C9";
+const DARK_GREEN = "#388e3c";
 
 export default StyleSheet.create({
   container: {
@@ -20,14 +21,9 @@ export default StyleSheet.create({
     backgroundColor: ORANGE,
     elevation: 5,
     position: 'absolute',
-    //top: 60, left: 16,
     bottom: 16, right: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    //width:48,height:48,
-    //borderRadius: 24,
-    //width:36,height:36,
-    //borderRadius: 18,
     width: 56, height: 56,
     borderRadius: 28,
   },
@@ -49,7 +45,7 @@ export default StyleSheet.create({
     elevation: 4,
     paddingTop: 20,
     //marginBottom: 16,
-    //position: 'relative',
+    //position: 'relative'
     //zIndex: 1,
     //height: 56+20,
   },
@@ -169,8 +165,6 @@ export default StyleSheet.create({
   imagePicker: {
   	borderStyle: 'dashed',
   	borderWidth: 4,
-        margin: 4,
-	marginLeft: 0,
       borderColor: "#CCC",
   	alignItems: 'center',
   	flexDirection: 'column',
@@ -200,75 +194,156 @@ export default StyleSheet.create({
 	//alignContent: 'space-between',
 	justifyContent: 'space-between',
 	backgroundColor: '#000',
-    elevation: 4,
-    //marginTop: 20,
-    	//height: 56,
+	elevation: 4,
     	position: 'absolute',
     	top: 20,
     	left: 0,
+    },
+    statusSwitcher: {
+	flexDirection: 'row',
+	alignItems: 'center',
+	flex: 1,
+	backgroundColor: "#fff",
+	paddingRight: 16,
+    },
+    addMainNote: {
+	color: "#000000de",
+	fontFamily: 'material-icons',
+	fontSize: 24,
+	marginLeft: 16,
+    },
+    statusArrow: {
+	marginLeft: 8,
+    },
+    statusArrowText: {
+	fontSize: 28,
+	color: "#000000de",
+	fontFamily: 'material-icons',
+    },
+    mainStatus: {
+	fontSize: 20,
+	fontWeight: '400',
+	//paddingTop: 12,
+	paddingLeft: 16,
+	marginTop: -4,
+	//paddingBottom: 1,
+	flex: 1,
+    },
+    mainNote: {
+	padding: 4,
+	paddingLeft: 16,
+    },
+    mainNoteText: {
+	fontSize: 14,
+	color: '#00000099',
+	alignSelf: 'center',
+    },
+    noteEdit: {
+	fontFamily: 'material-icons',
+	fontSize: 16,
+	fontWeight: '400',
+	color: '#1e1e1e',
+	alignSelf: 'center',
+	color: "#000000de",
+	padding: 8,
+    },
+    chipOuter: {
+	height: 32,
+	borderRadius: 16,
+	backgroundColor: "#ebebeb",
+    },
+    chipInner: {
+	flexDirection: 'row',
+	alignItems: 'center',
+    },
+    chipArrow: {
+	padding: 8,
+    },
+    chipArrowText: {
+	fontFamily: 'material-icons',
+	fontSize: 16,
+	fontWeight: '400',
+	color: '#1e1e1e',
+	//paddingTop: 8, paddingBottom: 8,
+    },
+    chipText: {
+	color: '#1e1e1e',
+	fontSize: 14,
+    },
+    statusDetail: {
+//	backgroundColor: '#00000010',
+	//backgroundColor: LIGHT_GREEN,
+    },
+  detailPadding: {
+    //backgroundColor: '#00000010',
+    //backgroundColor: LIGHT_GREEN,
+    height: 16,
+  },
+    statusDetailInner: {
+	padding: 16, paddingBottom: 0,
+	flex: 1,
+    },
+    status: {
+	fontWeight: '400',
+	fontSize: 16,
+	alignSelf: 'baseline',
+    },
+    statusDetailNote: {
+	fontSize: 14,
+	color: '#00000099',
+    },
+    statusDetailDate: {
+	//backgroundColor: '#00000022',
+	//borderRadius: 12,
+	color: "#00000099",
+	fontSize: 16,
+	paddingLeft: 2,
+	//paddingBottom: 1,
+	//padding: 1,
+	//paddingLeft: 4, paddingRight: 4,
+	//marginLeft: 8,
+	fontWeight: '300',
+	//alignSelf: 'baseline',
+    },
+    editDetail: {
+	fontSize: 16,
+	color: '#000000de',
+	padding: 16,
+	marginRight: 4,
+	alignSelf: 'center',
+    },
+    timeline: {
+	backgroundColor: ORANGE,
+	marginLeft: 16,
+	paddingTop: 20,
+    },
+    timelineInner: {
+	backgroundColor: LIGHT_ORANGE,
+	height: 8, width: 8,
+	borderRadius: 4,
+	margin: 2,
+    },
+    timelineFirst: {
+	marginTop: 20,
+	paddingTop: 0,
+	borderTopLeftRadius: 6,
+	borderTopRightRadius: 6,
+    },
+    timelineLast: {
+	borderBottomLeftRadius: 6,
+	borderBottomRightRadius: 6,
+    },
+    timelineLastOnly: {
+	height: 32,
+    },
+    timelineOnly: {
+	height: 12,
     },
   potDescInput: {
     minHeight: 40,
     paddingHorizontal: 15,
     fontSize: 16,
     backgroundColor: '#eee',
-  },
-  ssLeft: {
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
-    borderWidth: 1,
-    borderRightWidth: 0,
-    padding: 5,
-  },
-  ssMiddle: {
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-    padding: 5,
-  },
-  ssRight: {
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    padding: 5,
-  },
-  bisqued: {
-    backgroundColor: '#edc495',
-    borderColor: '#ce995c',
-  },
-  trimmed: {
-    backgroundColor: '#95beed',
-    borderColor: '#4e90db',
-  },
-  thrown: {
-    backgroundColor: '#9f95ed',
-    borderColor: '#6252d8',
-  },
-  glazed: {
-    backgroundColor: '#ed95e4',
-    borderColor: '#d145c3',
-  },
-  pickedup: {
-    backgroundColor: '#a1ed95',
-    borderColor: '#4ecc3b',
-  },
-  notstarted: {
-    backgroundColor: '#ed9595',
-    borderColor: '#e03535',
-  },
-  status: {
-    borderRadius: 5,
-    borderWidth: 1,
-    padding: 1,
-    paddingLeft: 3,
-    paddingRight: 3,
-  },
-  statusT: {
-    color: '#666',
-  },
-  note: {
-    //padding: 10,
   },
   noteBlankText: {
     fontSize: 16,
@@ -278,5 +353,49 @@ export default StyleSheet.create({
   settingsText: {
   	fontSize: 16,
     textAlign: 'center',
-  }
+  },
+  noteModal: {
+      width: 280,
+      padding: 24,
+      backgroundColor: 'white',
+      borderRadius: 8,
+      elevation: 24,
+  },
+  modalHeader: {
+    fontSize: 20,
+    color: "#000000de",
+    fontWeight: '400',
+    marginBottom: 20,
+  },
+  modalInput: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "#00000099",
+  },
+  button3: {
+    backgroundColor: 'white',
+    elevation: 0,
+    color: DARK_GREEN,
+    fontSize: 14,
+  },
+  modalButton: {
+      alignSelf: 'flex-end',
+  },
+  bgGreen: {
+      //backgroundColor: LIGHT_GREEN,
+  },
+  bottomBar: {
+      backgroundColor: '#ffffff',
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      padding: 4,
+      paddingRight: 8,
+  },
+  bottomBarWithContent: {
+      elevation: 8,
+  },
+  bbb: { // bottom bar button
+    padding: 8,
+    marginLeft: 8,
+  },
 });

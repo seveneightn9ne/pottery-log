@@ -19,14 +19,17 @@ type DatePickerProps = {
 class ImplAndroid extends React.Component {
 
   render() {
-    return <TouchableOpacity
-      style={[styles.ssLeft, styles.ssRight, {
-        backgroundColor: '#ddd',
-        borderColor: '#999',
-      }]}
+    return <View style={[styles.chipOuter, styles.chipInner]}><TouchableOpacity
       onPress={this.pickDateAndroid}>
-      <Text>{Status.dateText(this.props.value)} 📅</Text>
-    </TouchableOpacity>
+      <View style={styles.chipInner}>
+	{this.props.fontLoaded ?
+	    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text>: null}
+        <Text style={styles.chipText}>
+      	  {Status.dateText(this.props.value)}
+        </Text>
+        <View style={styles.chipArrow} />
+      </View>
+	  </TouchableOpacity></View>
   }
 
   pickDateAndroid = async () => {

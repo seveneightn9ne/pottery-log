@@ -43,8 +43,6 @@ BackHandler.addEventListener('hardwareBackPress', function() {
 });
 
 function getState(prevState, props) {
-    console.log("AppContainer Props");
-    console.log(props);
   return {
     pots: PotsStore.getState(),
     ui: UIStore.getState(),
