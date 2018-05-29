@@ -2,7 +2,7 @@
 import React from 'react';
 import {Pot} from '../../models/Pot.js';
 import Image3 from './Image3.js';
-import { Text, View, TouchableHighlight, Image } from 'react-native';
+import { Dimensions, Text, View, TouchableOpacity, Image } from 'react-native';
 import styles from '../../style.js';
 import dispatcher from '../../AppDispatcher.js';
 import {nameToImageState} from '../../stores/ImageStore.js';
@@ -19,23 +19,30 @@ export default class PotListItem extends React.Component {
   }
 
   render() {
+    const {height, width} = Dimensions.get('window');
     const imgstate = this.props.pot.images3.length ?
       nameToImageState(this.props.pot.images3[0]) : null;
+    const size = {width: width/2-6, height: width/2-6};
     const img = this.props.pot.images3.length ?
-      <Image3 image={imgstate} style={styles.size50} /> : null;
-    const noteStar = this.props.pot.notes2.isEmpty() ? null : <Text>*</Text>
-    return (<TouchableHighlight onPress={this.props.onPress}>
-      <View style={styles.listItem}>
+      <Image3 image={imgstate} style={[styles.liImage, size]} /> :
+      <View style={[styles.liImagePlaceholder, size]}>
+      	  <Image source={require('../../assets/coffee.png')}
+	    style={{width: 48, height: 48}} />
+      </View>;
+    const old = this.props.fontLoaded && this.props.pot.status.isOld() ?
+    	  <Text style={styles.old}>alarm</Text> : null;
+    return (<TouchableOpacity onPress={this.props.onPress}>
+      <View style={[styles.listItem, size]}>
         {img}
-        <View style={[styles.listItemChild, {paddingLeft: 10, flexDirection: 'column'}]}>
+        <View style={[styles.listItemBar, {width: size.width}]}>
           <Text style={styles.lititle}>{this.props.pot.title}</Text>
-          <View style={{flexDirection: 'row'}}>
+	{old}
+	  <Text style={styles.lisubtitle}>
             {this.props.pot.status.text()}
-            {noteStar}
-          </View>
+	  </Text>
         </View>
       </View>
-    </TouchableHighlight>);
+    </TouchableOpacity>);
   }
 
 

@@ -11,14 +11,18 @@ import styles from '../../style.js';
 
 type ImagePickerProps = {
   onPicked: (localUri) => void,
+  full: boolean,
 };
 
 export default class ImagePicker extends React.Component {
 
   render() {
+    const style = this.props.full ? styles.imagePickerFull : styles.imagePickerSmall;
+    const textStyle = this.props.full ? styles.imagePickerFullText : styles.imagePickerSmallText;
+    const text = this.props.full ? "add_a_photo" : "add";
     return <TouchableOpacity onPress={this.popup}>
-        <View style={[styles.imagePicker, this.props.style]}>
-          <Text style={{textAlign: 'center', flex: 1}}>Add Image</Text>
+        <View style={[style, styles.imagePicker, this.props.style]}>
+          <Text style={[textStyle, styles.imagePickerText]}>{text}</Text>
         </View>
       </TouchableOpacity>;
   }

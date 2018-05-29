@@ -1,6 +1,4 @@
 // @flow
-import React from 'react';
-import {Text} from 'react-native';
 import Status from './Status.js';
 import Notes from './Notes.js';
 

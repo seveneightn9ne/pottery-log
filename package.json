@@ -4,7 +4,7 @@
   "private": false,
   "devDependencies": {
     "babel-polyfill": "^6.23.0",
-    "flow-bin": "^0.42.0",
+    "flow-bin": "^0.73.0",
     "react-native-scripts": "0.0.22"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
@@ -22,6 +22,7 @@
     "flux": "^3.1.2",
     "react": "16.0.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-24.0.0.tar.gz",
+    "react-native-button": "^2.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.4.0"
   }
 }
