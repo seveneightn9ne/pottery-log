@@ -17,6 +17,7 @@ export class ExpandingTextInput extends Component {
           this.setState({height: event.nativeEvent.contentSize.height});
         }}
         style={[this.props.style, {height: this.state.height}]}
+        onEndEditing={this.props.onSubmit}
       />
     );
   }

@@ -43,7 +43,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           pots: {...state.pots, [pot.uuid]: pot}
         };
         this.persist(newState, pot);
-        setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
+        setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 0);
         return newState;
       }
       case 'pot-edit-field': {
@@ -114,7 +114,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
 }
 
-async function loadInitial(dispatcher): void {
+async function loadInitial(dispatcher): Promise<void> {
   const potIdsStr = await AsyncStorage.getItem('@Pots');
   const potIds = JSON.parse(potIdsStr) || [];
   const promises = [];
@@ -128,13 +128,13 @@ async function loadInitial(dispatcher): void {
   });
 }
 
-async function loadPot(uuid: string): Pot {
+async function loadPot(uuid: string): Promise<Pot> {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
   //console.log("Loading pot from storage: " + loadedJson);
   if (loadedJson != null) {
     const loaded = JSON.parse(loadedJson);
     // Add all fields, for version compatibility
-    pot = {...loaded};
+    const pot = {...loaded};
     pot.status = new Status(loaded.status);
     pot.notes2 = new Notes(loaded.notes2);
 

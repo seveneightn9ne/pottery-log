@@ -14,6 +14,7 @@ type StatusDetailProps = {
 };
 
 export default class StatusDetail extends React.Component {
+  modal: NoteModal;
   render() {
     const noteComponent = <Note fontLoaded={this.props.fontLoaded}
       textStyle={styles.statusDetailNote}

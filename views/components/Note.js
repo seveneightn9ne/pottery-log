@@ -36,7 +36,8 @@ export class NoteModal extends React.Component {
           <ExpandingTextInput value={this.props.note} multiline={true} numberOfLines={4}
             style={styles.modalInput}
             onChangeText={(t) => this.props.onChangeNote(this.props.potId, this.props.status, t)}
-            autoFocus={true} />
+            autoFocus={true}
+            onSubmit={() => this.close()} />
           <Button onPress={() => this.close()} style={[styles.button3, styles.modalButton]}>
           DONE</Button>
         </View>
@@ -61,7 +62,7 @@ class ShowNote extends React.Component {
       <View style={{flexDirection: 'row'}}>
         <Text style={[this.props.style, {flex: 1}]}>{this.props.note}</Text>
         {this.props.fontLoaded && this.props.showAddNote ?
-      	  <Text style={[styles.noteEdit, this.props.style]}>mode_edit</Text>
+      	  <Text style={[this.props.style, styles.noteEdit]}>mode_edit</Text>
       	  : null}
     </View></TouchableOpacity>;
   }

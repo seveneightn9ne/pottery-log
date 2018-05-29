@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity, SectionList, FlatList } from 'react-native';
-import {Pot} from '../models/Pot.js';
+import { Pot } from '../models/Pot.js';
 import Status from '../models/Status.js';
 import styles from '../style.js'
 import NewPotListItem from './components/NewPotListItem.js';
 import NewPotButton from './components/NewPotButton.js';
 import PotListItem from './components/PotListItem.js';
-import {shouldShowSettings} from '../export.js';
+import { shouldShowSettings } from '../export.js';
 
 type ListPageProps = {
   pots: Object, // PotStoreState
@@ -18,7 +18,7 @@ type ListPageProps = {
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
   onNavigateToSettings: () => void,
-  onImageError: (name, uri) => void,
+  onImageError: (name: string, uri: string) => void,
 };
 
 function filterSortedPots(allPots, status, searching, searchTerm) {
@@ -26,7 +26,7 @@ function filterSortedPots(allPots, status, searching, searchTerm) {
     .filter(pot => pot.status.currentStatus() == status)
     .filter(pot => {
       // Filter for search
-      if (!searching || !searchTerm) {return true;}
+      if (!searching || !searchTerm) { return true; }
       if (pot.title.includes(searchTerm)) return true;
       if (pot.notes2.includes(searchTerm)) return true;
       return false;
@@ -67,7 +67,8 @@ export default class ListPage extends React.Component {
     }
   }*/
   render() {
-    const {height, width} = Dimensions.get('window');
+    const { height, width } = Dimensions.get('window');
+    const potsLoaded = this.props.pots.hasLoaded;
 
     const backButton = this.props.fontLoaded ?
       <TouchableHighlight onPress={this.props.onCloseSearch}>
@@ -85,17 +86,17 @@ export default class ListPage extends React.Component {
     );
 
     let showSettings = shouldShowSettings();
-    let searchButton = this.props.fontLoaded ?
-          <TouchableHighlight onPress={this.props.onOpenSearch}>
-	   <Text style={styles.search}>search</Text>
-          </TouchableHighlight>
-        : null;
+    let searchButton = this.props.fontLoaded && potsLoaded ?
+      <TouchableHighlight onPress={this.props.onOpenSearch}>
+        <Text style={styles.search}>search</Text>
+      </TouchableHighlight>
+      : null;
 
     const topWhenNotSearching = (
       <View style={styles.header}>
         <Text style={styles.h1}>Pottery Log</Text>
-        <View style={{flexDirection: 'row'}}>
-	  {searchButton}
+        <View style={{ flexDirection: 'row' }}>
+          {searchButton}
           {showSettings && <TouchableHighlight onPress={this.props.onNavigateToSettings}>
             <Text style={styles.h1}>⚙</Text>
           </TouchableHighlight>}
@@ -103,17 +104,34 @@ export default class ListPage extends React.Component {
       </View>
     );
 
+    const newPotButton = <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
+
+    if (!potsLoaded) {
+      return <View style={styles.container}>
+        {topWhenNotSearching}
+        <Text style={styles.listMessage}>Loading...</Text>
+      </View>
+    }
+
+    if (this.props.pots.potIds.length == 0) {
+      return <View style={styles.container}>
+        {topWhenNotSearching}
+        <Text style={styles.listMessage}>You don't have any pots yet.</Text>
+        {newPotButton}
+      </View>
+    }
+
     const allPots = this.props.pots.potIds.map(id => this.props.pots.pots[id]);
     const searching = this.props.ui.searching;
     const searchTerm = this.props.ui.searchTerm;
 
     const stripCount = (sectionTitle) => {
-    	if (sectionTitle.charAt(sectionTitle.length-1) != ")") {
-    	    return sectionTitle;
-	}
-	const parts = sectionTitle.split(" ");
-	const section = parts.splice(0,parts.length-1).join(" ");
-	return section;
+      if (sectionTitle.charAt(sectionTitle.length - 1) != ")") {
+        return sectionTitle;
+      }
+      const parts = sectionTitle.split(" ");
+      const section = parts.splice(0, parts.length - 1).join(" ");
+      return section;
     }
 
     const collapsed = (section) => {
@@ -131,49 +149,49 @@ export default class ListPage extends React.Component {
         title: section.title + " (" + section.data.length + ")",
       } : section)
       .map((section) => ({
-	  data: [{key: section.title, data: section.data}],
-	  title: section.title,
+        data: [{ key: section.title, data: section.data }],
+        title: section.title,
       }));
 
     /* TODO(jessk) - this goes in the SectionList
      * ref={sectionList => this.sectionList = sectionList}
      * onScroll={(e) => this.props.onScrollTo(e.nativeEvent.contentOffset.y)}
      */
-    const itemSize = width/2-2;
+    const itemSize = width / 2 - 2;
     return (<View style={styles.container}>
       {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
-        <SectionList
-          renderItem={({item}) => <FlatList
-              numColumns={2}
-              data={item.data}
-              keyExtractor={(pot, index) => pot.uuid}
-              getItemLayout={(layoutData, index) => ({
-		length: itemSize,
-		offset: itemSize * index,
-		index,
-	      })}
-              renderItem={({item}) => <PotListItem
-		fontLoaded={this.props.fontLoaded}
-		key={item.uuid}
-		pot={item}
-		onPress={() => this.props.onClickPot(item.uuid)}
-		onError={this.props.onImageError}
-		/>}
-              />}
-          renderSectionHeader={({section}) =>
-            <TouchableHighlight
-              onPress={() => this.props.onCollapse(stripCount(section.title))}
-              underlayColor="#fff"><View style={styles.lh}>
-            <Text style={styles.lhText}>{section.title}</Text>
-            {this.props.fontLoaded ?
-              <Text style={[styles.rhText, styles.collapse]}>{collapsed(stripCount(section.title))?
-                "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
+      <SectionList
+        renderItem={({ item }) => <FlatList
+          numColumns={2}
+          data={item.data}
+          keyExtractor={(pot, index) => pot.uuid}
+          getItemLayout={(layoutData, index) => ({
+            length: itemSize,
+            offset: itemSize * index,
+            index,
+          })}
+          renderItem={({ item }) => <PotListItem
+            fontLoaded={this.props.fontLoaded}
+            key={item.uuid}
+            pot={item}
+            onPress={() => this.props.onClickPot(item.uuid)}
+            onError={this.props.onImageError}
+          />}
+        />}
+        renderSectionHeader={({ section }) =>
+          <TouchableHighlight
+            onPress={() => this.props.onCollapse(stripCount(section.title))}
+            underlayColor="#fff"><View style={styles.lh}>
+              <Text style={styles.lhText}>{section.title}</Text>
+              {this.props.fontLoaded ?
+                <Text style={[styles.rhText, styles.collapse]}>{collapsed(stripCount(section.title)) ?
+                  "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
             </View></TouchableHighlight>}
-          sections={sections}
-          keyExtractor={(listdata, index) => listdata.title}
-          renderSectionFooter={() => <View style={styles.separator} />}
-        />
-	<NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
+        sections={sections}
+        keyExtractor={(listdata, index) => listdata.title}
+        renderSectionFooter={() => <View style={styles.separator} />}
+      />
+      {newPotButton}
       {/*<View style={styles.eraseLastSeparator} />*/}
     </View>);
   }
