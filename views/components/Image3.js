@@ -116,6 +116,7 @@ export default class Image3 extends React.Component {
         tries: this.defaultTries(nextProps)
       };
     }
+    return null;
   }
 
   // Keep track of the image prop in the state to use in getDerivedStateFromProps

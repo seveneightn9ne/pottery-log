@@ -35,10 +35,13 @@ export default class ImagePicker extends React.Component {
   }
 
   pickImageFromCamera = async () => {
+    await Expo.Permissions.askAsync(Expo.Permissions.CAMERA);
+    await Expo.Permissions.askAsync(Expo.Permissions.CAMERA_ROLL);
     await this.pickImage(Expo.ImagePicker.launchCameraAsync);
   }
 
   pickImageFromLibrary = async () => {
+    await Expo.Permissions.askAsync(Expo.Permissions.CAMERA_ROLL);
     await this.pickImage(Expo.ImagePicker.launchImageLibraryAsync);
   }
 
