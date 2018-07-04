@@ -16,7 +16,11 @@ export default class Image3 extends React.Component {
   state: any;
   constructor(props) {
     super(props);
-    this.state = {failed: false, tries: this.defaultTries(props)};
+    this.state = {
+      failed: false, 
+      tries: this.defaultTries(props),
+      image: props.image,
+    };
   }
 
   // 0 tries for local because iOS doesn't reload the image unless
@@ -101,15 +105,21 @@ export default class Image3 extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  static getDerivedStateFromProps(nextProps, state) {
     // Reset state when props change.
-    if (nextProps.image.localUri != this.props.image.localUri
-        || nextProps.image.remoteUri != this.props.image.remoteUri) {
-      //console.log("Props changed for image " + this.uri());
-      this.setState({
+    if (nextProps.image.localUri != state.image.localUri
+      || nextProps.image.remoteUri != state.image.remoteUri) {
+    //console.log("Props changed for image " + this.uri());
+      return {
+        ...state,
         failed: false,
-        tries: this.defaultTries(nextProps),
-      });
+        tries: this.defaultTries(nextProps)
+      };
     }
+  }
+
+  // Keep track of the image prop in the state to use in getDerivedStateFromProps
+  componentDidMount() {
+    this.setState({image: this.props.image});
   }
 }
