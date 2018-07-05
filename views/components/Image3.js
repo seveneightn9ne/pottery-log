@@ -18,7 +18,7 @@ export default class Image3 extends React.Component {
     super(props);
     this.state = {
       failed: false, 
-      tries: this.defaultTries(props),
+      tries: Image3.defaultTries(props),
       image: props.image,
     };
   }
@@ -26,7 +26,7 @@ export default class Image3 extends React.Component {
   // 0 tries for local because iOS doesn't reload the image unless
   // the URI changed, so in order to load remote we need to try that
   // on the first failure.
-  defaultTries(props) {
+  static defaultTries(props) {
     if (props.image.localUri) {
       return 0;
     } else {
@@ -113,7 +113,7 @@ export default class Image3 extends React.Component {
       return {
         ...state,
         failed: false,
-        tries: this.defaultTries(nextProps)
+        tries: Image3.defaultTries(nextProps)
       };
     }
     return null;
