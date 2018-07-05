@@ -7,8 +7,11 @@ import * as ImageUploader from '../ImageUploader.js';
 
 interface ImageState {
   name: string,
-  localUri: string,
-  remoteUri: string,
+  // localUri and remoteUri are deprecated
+  // they will be converted to a fileUri
+  localUri: ?string,
+  remoteUri: ?string,
+  fileUri: ?string,
   pots: string[],
 }
 
@@ -250,7 +253,7 @@ export function nameToUri(name: string): string {
     console.log("That image named " + name + " is not in the image store.");
     return "";
   }
-  return i.localUri || i.remoteUri;
+  return i.fileUri || i.localUri || i.remoteUri;
 }
 
 export function nameToImageState(name: string) {

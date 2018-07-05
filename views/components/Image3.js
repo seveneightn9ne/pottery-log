@@ -82,6 +82,7 @@ export default class Image3 extends React.Component {
   }
 
   onError(e) {
+    //console.log("Failed to load " + this.uri());
     if (this.state.tries > 0) {
       //console.log("Decrementing tries for " + this.uri() + " to " + (this.state.tries-1));
       this.setState({tries: this.state.tries-1, failed: false});
