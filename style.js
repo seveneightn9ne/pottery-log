@@ -255,6 +255,9 @@ export default StyleSheet.create({
         borderLeftWidth: 12,
         borderColor: ORANGE,
     },
+    mainNoteNoBar: {
+        borderColor: "#ffffff",
+    },
     mainNoteText: {
         fontSize: 14,
         color: '#00000099',

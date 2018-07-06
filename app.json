@@ -12,6 +12,7 @@
     },
     "ios": {
       "bundleIdentifier": "org.rnplay.exp"
-    }
+    },
+    "primaryColor": "#4caf50"
   }
 }

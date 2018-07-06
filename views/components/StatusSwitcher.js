@@ -22,8 +22,12 @@ export default class StatusDetail extends React.Component<StatusSwitcherProps> {
     const noteModal = <NoteModal note={this.props.note} status={this.props.status.currentStatus()}
       potId={this.props.potId} ref={(e) => this.modal = e}
       onChangeNote={this.props.onChangeNote} />
+    let mainNoteStyle = styles.mainNote;
+    if (!this.props.status.hasTimeline()) {
+      mainNoteStyle = [styles.mainNote, styles.mainNoteNoBar];
+    }
     const mainNote = this.props.note ?
-      <Note style={styles.mainNote} textStyle={styles.mainNoteText}
+      <Note style={mainNoteStyle} textStyle={styles.mainNoteText}
         fontLoaded={this.props.fontLoaded}
         status={this.props.status.currentStatus()} potId={this.props.potId}
         note={this.props.note}

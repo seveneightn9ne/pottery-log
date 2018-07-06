@@ -148,7 +148,6 @@ export default class Status {
     return 'unknown';
   }
 
-
   withStatus(name: string, date: Date): Status {
     //const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
     //console.log("I see current status is " + JSON.stringify(pot.status));
@@ -187,5 +186,9 @@ export default class Status {
         Status.prettify(Status.ordered()[prevI]) :
         Status.ordered()[prevI];
     }
+  }
+
+  hasTimeline(): bool {
+    return this.currentStatus() != "thrown" && this.currentStatus() != "notstarted"
   }
 }
