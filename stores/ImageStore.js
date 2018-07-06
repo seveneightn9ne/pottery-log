@@ -7,8 +7,11 @@ import * as ImageUploader from '../ImageUploader.js';
 
 interface ImageState {
   name: string,
-  localUri: string,
-  remoteUri: string,
+  // localUri and remoteUri are deprecated
+  // they will be converted to a fileUri
+  localUri: ?string,
+  remoteUri: ?string,
+  fileUri: ?string,
   pots: string[],
 }
 
@@ -55,12 +58,13 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, pots: im.pots.filter(p => p != action.potId)},
         }};
         if (newState.images[action.imageName].pots.length == 0) {
-          //delete newState.images[action.imageName];
           if (im.remoteUri) {
             ImageUploader.remove(im.remoteUri);
-          } else {
-            delete newState.images[action.imageName];
           }
+          if (im.fileUri) {
+            this.deleteFile(im.fileUri);
+          }
+          delete newState.images[action.imageName];
         }
         this.persist(newState);
         return newState;
@@ -72,7 +76,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             {...im, remoteUri: action.remoteUri},
         }};
         if (newState.images[action.name].pots.length == 0) {
-          //delete newState.images[action.name];
+          delete newState.images[action.name];
           ImageUploader.remove(action.remoteUri);
         }
         this.persist(newState);
@@ -86,21 +90,14 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           const newI = {...oldI, pots: oldI.pots.filter((p) => p != action.potId)};
           newState.images[action.imageNames[i]] = newI;
           if (newI.pots.length == 0) {
-            //delete newState.images[newI.name];
             if (newI.remoteUri) {
               ImageUploader.remove(newI.remoteUri);
-            } else {
-              delete newState.images[newI.name];
             }
+            if (newI.fileUri) {
+              this.deleteFile(newI.fileUri);
+            }
+            delete newState.images[newI.name];
           }
-        }
-        this.persist(newState);
-        return newState;
-      }
-      case 'image-delete-succeeded': {
-        const newState = {...state};
-        if (newState.images[action.imageName]) {
-          delete newState.images[action.imageName];
         }
         this.persist(newState);
         return newState;
@@ -114,12 +111,13 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           newState.images[imageName] = action.images[imageName];
           const image = action.images[imageName];
           if (image.pots && image.pots.length == 0) {
-            //delete newState.images[imageName]
             if (image.remoteUri) {
               ImageUploader.remove(image.remoteUri);
-            } else {
-              delete newState.images[imageName];
+            } 
+            if (image.fileUri) {
+              this.deleteFile(image.fileUri);
             }
+            delete newState.images[imageName];
           }
         }
         this.persist(newState);
@@ -132,7 +130,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           localUri: action.localUri,
           pots: [action.potId],
         }}};
-        ImageUploader.upload(action.localUri);
+        this.saveToFile(action.localUri);
         this.persist(newState);
         return newState;
       }
@@ -165,14 +163,6 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
               pots: [action.potId]
             }
           }
-          if (!remoteUri) {
-            try {
-              ImageUploader.upload(localUri);
-            } catch (e) {
-              //console.error(e);
-              console.log("Oh that doesn't work.");
-            }
-          }
         }
         //this.persist(newState);
         console.log("Migrated images (omitted)"); //, newState);
@@ -180,8 +170,13 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       }
       case 'loaded': { // Pots loaded
         const newState = {images: {...state.images}};
+        const modified = false;
         for (let imageName in state.images) {
           const newImage = {...state.images[imageName]};
+          if (newImage.pots == undefined) {
+            modified = true;
+            newImage.pots = [];
+          }
           const newPots = [];
           for (let i=0; i < newImage.pots.length; i++) {
             if (action.potIds.indexOf(newImage.pots[i]) >= 0 &&
@@ -189,19 +184,24 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
               newPots.push(newImage.pots[i]);
             }
           }
+          // this might modify the state but we won't mark it modified
           newImage.pots = newPots;
           if (newPots.length == 0) {
             console.log("Uh, an unused image: " + imageName);
-            //delete newState.images[imageName];
             if (newImage.remoteUri) {
               ImageUploader.remove(newImage.remoteUri);
-            } else {
-              delete newState.images[imageName];
             }
+            if (newImage.fileUri) {
+              this.deleteFile(newImage.fileUri);
+            }
+            delete newState.images[imageName];
+            modified = true;
           }
           newState.images[imageName] = newImage;
         }
-        //this.persist(newState);
+        if (modified) {
+          this.persist(newState);
+        }
         return newState;
       }
       case 'reload': {
@@ -226,9 +226,57 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         // and removing it from its pot(s)
         return state;
       }
+      case 'image-loaded': {
+        // Convert to a fileUri if needed
+        const i = state.images[action.name];
+        if (i.fileUri) {
+          return state;
+        }
+        if (i.localUri) {
+          this.saveToFile(i.localUri);
+        } else if (i.remoteUri) {
+          this.saveToFile(i.remoteUri, true);
+        }
+        return state;
+      }
+      case 'image-file-created': {
+        const newImage = {...state.images[action.name],
+          fileUri: action.fileUri};
+        if (newImage.remoteUri) {
+          ImageUploader.remove(newImage.remoteUri);
+          delete newImage.remoteUri;
+        }
+        delete newImage.localUri;
+        const newState = {images: {...state.images,
+          [action.name]: newImage}};
+        if (newState.images[action.name].pots.length == 0) {
+          delete newState.images[action.name];
+          this.deleteFile(action.fileUri);
+        }
+        this.persist(newState);
+        return newState;
+      }
       default:
         return state;
     }
+  }
+
+  saveToFile(uri: string, isRemote = false) {
+    const name = nameFromUri(uri);
+    const fileUri = Expo.FileSystem.documentDirectory +  name;
+    const afterCopy = () => dispatcher.dispatch({
+      type: 'image-file-created',
+      name, fileUri,
+    });
+    if (isRemote) {
+      Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy);
+    } else {
+      Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy);
+    }
+  }
+
+  deleteFile(uri: string) {
+    Expo.FileSystem.deleteAsync(uri, {idempotent: true});
   }
 
   persist(state: ImageStoreState) {
@@ -250,7 +298,7 @@ export function nameToUri(name: string): string {
     console.log("That image named " + name + " is not in the image store.");
     return "";
   }
-  return i.localUri || i.remoteUri;
+  return i.fileUri || i.localUri || i.remoteUri;
 }
 
 export function nameToImageState(name: string) {
@@ -267,7 +315,7 @@ export function isAnySyncing(imageNames: string[]): boolean {
   for (let i=0; i<imageNames.length; i++) {
     const image = state.images[imageNames[i]];
     if (image === undefined) continue;
-    if (!image.remoteUri) return true;
+    if (!image.fileUri) return true;
     if (image.pots.length == 0) return true;
   }
   return false;
