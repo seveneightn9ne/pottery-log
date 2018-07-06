@@ -27,7 +27,9 @@ export default class Image3 extends React.Component {
   // the URI changed, so in order to load remote we need to try that
   // on the first failure.
   static defaultTries(props) {
-    if (props.image.localUri) {
+    if (props.image.fileUri) {
+      return 3;
+    } else if (props.image.localUri) {
       return 0;
     } else {
       return 3;
@@ -35,7 +37,7 @@ export default class Image3 extends React.Component {
   }
 
   uri() {
-    return this.props.image.localUri || this.props.image.remoteUri;
+    return this.props.image.fileUri || this.props.image.localUri || this.props.image.remoteUri;
   }
 
   // This is for debugging
@@ -74,7 +76,12 @@ export default class Image3 extends React.Component {
   }
 
   onLoad() {
-    //console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
+    console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
+    dispatcher.dispatch({
+      type: 'image-loaded',
+      name: this.props.image.name,
+    });
+    this.setState({failed: false})
   }
 
   onLoadEnd() {
@@ -88,15 +95,17 @@ export default class Image3 extends React.Component {
       this.setState({tries: this.state.tries-1, failed: false});
       return;
     }
-    if (this.props.image.localUri) {
+    if (this.props.image.fileUri) {
+      // The fileUri failed 3 times. It's gone.
+      this.setState({failed: true, tries: this.state.tries});
+    } else if (this.props.image.localUri) {
       // The localUri failed 3 times. It's gone.
       dispatcher.dispatch({
         type: 'image-error-local',
         name: this.props.image.name,
       });
-      this.setState({failed: true,  tries: this.state.tries});
-    }
-    if (this.props.image.remoteUri) {
+      this.setState({failed: true, tries: this.state.tries});
+    } else if (this.props.image.remoteUri) {
       // Remote image failed, what can you do?
       dispatcher.dispatch({
         type: 'image-error-remote',
@@ -109,7 +118,8 @@ export default class Image3 extends React.Component {
   static getDerivedStateFromProps(nextProps, state) {
     // Reset state when props change.
     if (nextProps.image.localUri != state.image.localUri
-      || nextProps.image.remoteUri != state.image.remoteUri) {
+      || nextProps.image.remoteUri != state.image.remoteUri
+      || nextProps.image.fileUri != state.image.fileUri) {
     //console.log("Props changed for image " + this.uri());
       return {
         ...state,
