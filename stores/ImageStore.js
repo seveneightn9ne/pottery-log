@@ -103,6 +103,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         return newState;
       }
       case 'image-state-loaded': {
+        // PotsStore also listens for this event, to do the corresponding deletions from the pots
         const newState = {images: {...state.images}}
         for (let imageName in action.images) {
           if (state.images[imageName]) {
@@ -110,6 +111,11 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           }
           newState.images[imageName] = action.images[imageName];
           const image = action.images[imageName];
+          if (!image.remoteUri && !image.fileUri && !image.localUri) {
+            // the cached image was deleted before we could move it somewhere permanent :'(
+            // If any pots refer to this image then the pot store must handle that
+            delete newState.images[imageName];
+          }
           if (image.pots && image.pots.length == 0) {
             if (image.remoteUri) {
               ImageUploader.remove(image.remoteUri);

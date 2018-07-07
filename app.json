@@ -8,7 +8,7 @@
     "privacy": "public",
     "android": {
       "package": "com.jesskenney.pottery_log",
-      "versionCode": 3
+      "versionCode": 4
     },
     "ios": {
       "bundleIdentifier": "org.rnplay.exp"

@@ -26,7 +26,11 @@ class PotsStore extends ReduceStore<PotsStoreState> {
   reduce(state: PotsStoreState, action: Object): PotsStoreState {
     switch (action.type) {
       case 'loaded': {
-        return {pots: action.pots, potIds: action.potIds, hasLoaded: true};
+        const newState = {pots: action.pots, potIds: action.potIds, hasLoaded: true};
+        if (state.imagesLoaded) {
+          return this.deleteBrokenImages(newState, {images: state.imagesLoaded});
+        }
+        return newState;
       }
       case 'new': {
         //dispatcher.waitFor(['loaded']);
@@ -97,6 +101,15 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;
       }
+      case 'image-store-loaded': {
+        if (state.hasLoaded) {
+          return this.deleteBrokenImages(state, {images: action.images});
+        } else {
+          return {...state,
+            imagesLoaded: action.images,
+          };
+        }
+      }
       case 'reload': {
         return this.getInitialState();
       }
@@ -110,6 +123,27 @@ class PotsStore extends ReduceStore<PotsStoreState> {
       StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot));
     }
     StorageWriter.put('@Pots', JSON.stringify(state.potIds));
+  }
+
+  deleteBrokenImages(state: PotsStoreState, imageState: ImageStoreState): PotsStoreState {
+    // Modify the PotsStoreState to not refer to any images that are nonexistent or broken.
+    newState = {...state};
+    state.potIds.forEach(potid => {
+      const pot = {...state.pots[potId]};
+      pot.images3 = pot.images3.filter(imageName => {
+        const image = imageState.images[imageName];
+        if (!image) {
+          console.log("Forgetting a gone image");
+          return false;
+        }
+        if (!image.localUri && !image.remoteUri && !image.fileUri) {
+          console.log("Forgetting a broken image");
+          return false;
+        }
+        return true;
+      })
+      newState.pots[potId] = pot;
+    });
   }
 
 }
