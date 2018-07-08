@@ -101,7 +101,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
         return newState;
       }
-      case 'image-store-loaded': {
+      case 'image-state-loaded': {
         if (state.hasLoaded) {
           return this.deleteBrokenImages(state, {images: action.images});
         } else {
@@ -128,7 +128,8 @@ class PotsStore extends ReduceStore<PotsStoreState> {
   deleteBrokenImages(state: PotsStoreState, imageState: ImageStoreState): PotsStoreState {
     // Modify the PotsStoreState to not refer to any images that are nonexistent or broken.
     const newState = {...state};
-    state.potIds.forEach(potid => {
+    newState.pots = {};
+    state.potIds.forEach(potId => {
       const pot = {...state.pots[potId]};
       const newImages3 = pot.images3.filter(imageName => {
         const image = imageState.images[imageName];
@@ -142,9 +143,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         }
         return true;
       });
+      newState.pots[potId] = pot;
       if (newImages3.length != pot.images3.length) {
         pot.images3 = newImages3;
-        newState.pots[potId] = pot;
         this.persist(newState, pot);
       }
     });
