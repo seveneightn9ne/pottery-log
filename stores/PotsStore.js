@@ -26,9 +26,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
   reduce(state: PotsStoreState, action: Object): PotsStoreState {
     switch (action.type) {
       case 'loaded': {
-        const newState = {pots: action.pots, potIds: action.potIds, hasLoaded: true};
+        let newState = {pots: action.pots, potIds: action.potIds, hasLoaded: true};
         if (state.imagesLoaded) {
-          return this.deleteBrokenImages(newState, {images: state.imagesLoaded});
+          newState = this.deleteBrokenImages(newState, {images: state.imagesLoaded});
         }
         return newState;
       }
@@ -127,10 +127,10 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
   deleteBrokenImages(state: PotsStoreState, imageState: ImageStoreState): PotsStoreState {
     // Modify the PotsStoreState to not refer to any images that are nonexistent or broken.
-    newState = {...state};
+    const newState = {...state};
     state.potIds.forEach(potid => {
       const pot = {...state.pots[potId]};
-      pot.images3 = pot.images3.filter(imageName => {
+      const newImages3 = pot.images3.filter(imageName => {
         const image = imageState.images[imageName];
         if (!image) {
           console.log("Forgetting a gone image");
@@ -141,9 +141,14 @@ class PotsStore extends ReduceStore<PotsStoreState> {
           return false;
         }
         return true;
-      })
-      newState.pots[potId] = pot;
+      });
+      if (newImages3.length != pot.images3.length) {
+        pot.images3 = newImages3;
+        newState.pots[potId] = pot;
+        this.persist(newState, pot);
+      }
     });
+    return newState;
   }
 
 }
