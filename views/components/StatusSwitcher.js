@@ -9,6 +9,7 @@ import { Note, NoteModal } from './Note.js';
 type StatusSwitcherProps = {
   status: Status,
   setStatus: (newStatus: string) => void,
+  onPickDate: (newDate: Date) => void,
 };
 
 export default class StatusDetail extends React.Component<StatusSwitcherProps> {
@@ -40,7 +41,7 @@ export default class StatusDetail extends React.Component<StatusSwitcherProps> {
         </Text>
         <DatePicker value={this.props.date}
           fontLoaded={this.props.fontLoaded}
-          onPickDate={this.props.setStatusDate} />
+          onPickDate={this.props.onPickDate} />
         {editButton}
       </View>
       <View style={styles.statusArrows}>
