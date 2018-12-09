@@ -2,6 +2,8 @@
 import Expo from 'expo';
 import { AsyncStorage } from 'react-native';
 import dispatcher from './AppDispatcher.js';
+import * as uploader from './uploader.js';
+import {ImageStore, nameFromUri} from './stores/ImageStore.js';
 
 function shouldShowSettings() {
   let m = {
@@ -11,7 +13,7 @@ function shouldShowSettings() {
   return (m[Expo.Constants.deviceId] === true)
 }
 
-async function storageExport() {
+async function getExportMetadata() {
   let allKeys = await AsyncStorage.getAllKeys();
   let pairs = await AsyncStorage.multiGet(allKeys);
   let snapshot = {};
@@ -37,4 +39,26 @@ async function storageImport(fileUri: string) {
   return;
 }
 
-export { storageExport, shouldShowSettings, storageImport };
+async function startExport() {
+  const metadata = await getExportMetadata();
+  uploader.startExport(metadata);
+  //const {images} = ImageStore.getState();
+  //return images;
+}
+
+async function exportImage(imageState) {
+  if (!imageState.fileUri) {
+    const uri = imageState.remoteUri || imageState.localUri;
+    const isRemote = uri == imageState.remoteUri;
+    ImageStore.saveToFile(imageState.remoteUri, isRemote);
+    return false;
+  }
+  uploader.exportImage(imageState.fileUri);
+  return true;
+}
+
+async function finishExport() {
+  return uploader.finishExport();
+}
+
+export { storageImport, startExport, exportImage, finishExport };

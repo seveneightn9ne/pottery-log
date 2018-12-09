@@ -3,7 +3,7 @@ import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher.js';
 import {StorageWriter} from './sync.js';
 import { AsyncStorage } from 'react-native';
-import * as ImageUploader from '../ImageUploader.js';
+import * as ImageUploader from '../uploader.js';
 
 interface ImageState {
   name: string,
@@ -124,6 +124,11 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
               this.deleteFile(image.fileUri);
             }
             delete newState.images[imageName];
+          }
+          if (!image.fileUri && image.remoteUri) {
+            this.saveToFile(image.remoteUri, true /* isRemote */);
+          } else if (!image.fileUri && image.localUri) {
+            this.saveToFile(image.localUri);
           }
         }
         this.persist(newState);
@@ -277,7 +282,10 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
     if (isRemote) {
       Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy);
     } else {
-      Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy);
+      Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
+        // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
+        console.error(reason);
+      });
     }
   }
 

@@ -6,12 +6,14 @@ import AppView from './views/AppView.js';
 import {Container} from 'flux/utils';
 import {Alert, BackHandler} from 'react-native';
 import {ImageStore, nameFromUri} from './stores/ImageStore.js';
+import ExportStore from './stores/ExportStore.js';
 
 function getStores() {
   return [
     PotsStore,
     UIStore,
     ImageStore,
+    ExportStore,
   ];
 }
 
@@ -36,6 +38,14 @@ BackHandler.addEventListener('hardwareBackPress', function() {
     });
     return true;
   }
+  if (ExportStore.getState().exporting) {
+    Alert.alert('Cancel this export?', undefined,
+       [{text: 'Stay here', style: 'cancel'},
+        {text: 'Cancel', onPress: () => 
+          dispatcher.dispatch({type: 'page-list'})},
+      ]);
+    return true;
+  }
   dispatcher.dispatch({
     type: 'page-list',
   });
@@ -47,6 +57,7 @@ function getState(prevState, props) {
     pots: PotsStore.getState(),
     ui: UIStore.getState(),
     images: ImageStore.getState(),
+    exports: ExportStore.getState(),
     fontLoaded: props.fontLoaded,
 
     onNew: () => dispatcher.dispatch({
@@ -89,16 +100,10 @@ function getState(prevState, props) {
     }),
     onSearch: (text: string) => {
       console.log("search", text);
-      if (text.toLowerCase() === "secretsettings") {
-        dispatcher.dispatch({
-          type: 'page-settings',
-        })
-      } else {
-        dispatcher.dispatch({
-          type: 'list-search-term',
-          text,
-        })
-      }
+      dispatcher.dispatch({
+        type: 'list-search-term',
+        text,
+      });
     },
     onAddImage: (potId, localUri) => {
       dispatcher.dispatch({

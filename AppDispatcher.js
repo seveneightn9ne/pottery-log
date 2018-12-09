@@ -1,9 +1,8 @@
 // @flow
 import ReactNative from 'react-native';
 import {Dispatcher} from 'flux';
-import {storageExport, storageImport} from './export.js'
 
-const msDispatcher = new Dispatcher();
+const dispatcher = new Dispatcher();
 
 function logDispatch(action) {
   switch (action.type) {
@@ -20,30 +19,5 @@ function logDispatch(action) {
   }
 }
 
-function exportMiddleware(action) {
-  switch (action.type) {
-  case 'export-start':
-    storageExport().then((snapshot) => {
-      console.log("exported", snapshot);
-      let shareArg = {
-        title: "pottery log backup",
-        message: JSON.stringify(snapshot),
-      };
-      ReactNative.Share.share(shareArg)
-    });
-    break;
-  case 'import-start':
-    console.log("Hit the middleware");
-    storageImport(action.data).then(() => {
-      msDispatcher.dispatch({
-        type: 'reload',
-      });
-    });
-    break;
-  }
-}
-
-msDispatcher.register(logDispatch);
-msDispatcher.register(exportMiddleware);
-
-export default msDispatcher;
+dispatcher.register(logDispatch);
+export default dispatcher;

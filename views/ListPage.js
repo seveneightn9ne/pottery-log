@@ -7,7 +7,6 @@ import styles from '../style.js'
 import NewPotListItem from './components/NewPotListItem.js';
 import NewPotButton from './components/NewPotButton.js';
 import PotListItem from './components/PotListItem.js';
-import { shouldShowSettings } from '../export.js';
 
 type ListPageProps = {
   pots: Object, // PotStoreState
@@ -85,7 +84,6 @@ export default class ListPage extends React.Component {
       </View>
     );
 
-    let showSettings = shouldShowSettings();
     let searchButton = this.props.fontLoaded && potsLoaded ?
       <TouchableHighlight onPress={this.props.onOpenSearch}>
         <Text style={styles.search}>search</Text>
@@ -97,9 +95,9 @@ export default class ListPage extends React.Component {
         <Text style={styles.h1}>Pottery Log</Text>
         <View style={{ flexDirection: 'row' }}>
           {searchButton}
-          {showSettings && <TouchableHighlight onPress={this.props.onNavigateToSettings}>
+          <TouchableHighlight onPress={this.props.onNavigateToSettings}>
             <Text style={styles.h1}>⚙</Text>
-          </TouchableHighlight>}
+          </TouchableHighlight>
         </View>
       </View>
     );
