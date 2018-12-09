@@ -38,7 +38,7 @@ BackHandler.addEventListener('hardwareBackPress', function() {
     });
     return true;
   }
-  if (ExportStore.getState().exporting) {
+  if (ExportStore.getState().exporting && !ExportStore.getState().exportUri) {
     Alert.alert('Cancel this export?', undefined,
        [{text: 'Stay here', style: 'cancel'},
         {text: 'Cancel', onPress: () => 
@@ -84,13 +84,6 @@ function getState(prevState, props) {
     }),
     onNavigateToSettings: () => dispatcher.dispatch({
       type: 'page-settings',
-    }),
-    onExport: () => dispatcher.dispatch({
-      type: 'export-start',
-    }),
-    onImport: (data: string) => dispatcher.dispatch({
-      type: 'import-start',
-      data: data,
     }),
     onOpenSearch: () => dispatcher.dispatch({
       type: 'list-search-open',
@@ -197,6 +190,9 @@ function getState(prevState, props) {
     }),
     onStartScroll: () => dispatcher.dispatch({type: 'list-scroll-disable'}),
     onEndScroll: () => dispatcher.dispatch({type: 'list-scroll-enable'}),
+
+    onStartExport: () => dispatcher.dispatch({type: 'export-initiate'}),
+    onStartImport: () => dispatcher.dispatch({type: 'import-initiate'}),
   };
 }
 

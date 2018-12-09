@@ -68,7 +68,12 @@ export default class Status {
   constructor(status: Status | Object) { // Or status with strings instead of dates.
     //console.log("Loading status.");
     if (typeof(status) == "string") {
-      status = JSON.parse(status);
+      try {
+        status = JSON.parse(status);
+      } catch (e) {
+        console.log("Status failed to parse: " + status);
+        console.error(e);
+      }
     }
     if (status) {
       //console.log("With existing status: " + JSON.stringify(status));

@@ -12,6 +12,7 @@ type AppViewProps = {
   pots: Object, // PotStoreState
   ui: Object, // UIState
   images: Object, // ImageStoreState
+  exports: Object, // ExportState
 
   fontLoaded: bool,
 
@@ -73,13 +74,13 @@ function AppView(props: AppViewProps): ?React.Element<*> {
       />;
     case 'settings':
       return <SettingsPage
+        exports={props.exports}
         fontLoaded={props.fontLoaded}
         onNavigateToList={props.onNavigateToList}
-        onExport={props.onExport}
-        onImport={props.onImport}
+        onStartExport={props.onStartExport}
+        onStartImport={props.onStartImport}
         />;
     case 'image':
-    console.log("rending imagepage");
       return <ImagePage image={props.ui.imageId}
       	pot={props.pots.pots[props.ui.editPotId]}
       	fontLoaded={props.fontLoaded}

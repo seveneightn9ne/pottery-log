@@ -1,16 +1,12 @@
 # Material
 - Save scroll position
 - Loading screen
-- Loading icon on images
-- Swipe forward to progress
-- Swipe backward to delete
 
 # New features in Expo SDK
 - https://docs.expo.io/versions/latest/sdk/imagemanipulator.html
 - limit imagePicker to images https://docs.expo.io/versions/latest/sdk/imagepicker.html#mediatypes-string--choose-what-type-of-media-to-pick-usage-imagepickermediatypeoptionstype-where-type-is-one-of-images-videos-all
 
 # Bug fixes
-- "Notstarted" header -> "Not started"
 - Remove the screen on lock
 - [iOS] images are square, put them in a square frame
 
@@ -22,7 +18,6 @@
 # Features
 - Make a settings / sidebar pullout thing
   - Check with Miles about how the iOS UI should be
-  - Allow export & import
   - Page to keep track of notes about wheels at the studio
     - How could this possibly be useful to other users? Can it be a hidden feature?
     - "Configure Your Studio" -> user sets N for a 2xN grid of wheels. Studios are usually 2xN. Ours isn't but can approximate.
@@ -30,17 +25,12 @@
   - Feedback / Developer info / donate (servers cost money yo)?
 - Add multiple images from library at once
 - Don't show the * unless the current state has a comment
-- Left bar black stuff is ugly
 
 # Technical / meta
 - Use the Expo fork of react-native, if it provides benefits
 - [iOS] Publish to iOS store
-- [server] Delete images from s3 when the user deletes the image or the pot
-- [server] Enforce limits for uploads per user per week and/or global limits in s3
 
 # User Education / UX
-- Users don't know how to delete images
-- It's ugly
 
 Further ideas: https://paper.dropbox.com/doc/Pottery-App-Feedback-DtrncauSVsyrfMrBF0Ira
 

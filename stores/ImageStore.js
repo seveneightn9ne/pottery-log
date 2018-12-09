@@ -38,11 +38,16 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       console.log("There was no ImageStore to load.");
       return;
     }
-    const parsed = JSON.parse(json);
-    dispatcher.dispatch({
-      type: 'image-state-loaded',
-      images: parsed.images || {},
-    });
+    try {
+      const parsed = JSON.parse(json);
+      dispatcher.dispatch({
+        type: 'image-state-loaded',
+        images: parsed.images || {},
+      });
+    } catch (e) {
+      console.log("Failed to parse: " + json);
+      console.error(e);
+    }
   }
 
   reduce(state: ImageStoreState, action: Object): ImageStoreState {
@@ -266,6 +271,9 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         }
         this.persist(newState);
         return newState;
+      }
+      case 'imported-metadata': {
+        return this.getInitialState();
       }
       default:
         return state;

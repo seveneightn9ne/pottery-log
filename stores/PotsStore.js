@@ -113,6 +113,9 @@ class PotsStore extends ReduceStore<PotsStoreState> {
       case 'reload': {
         return this.getInitialState();
       }
+      case 'imported-metadata': {
+        return this.getInitialState();
+      }
       default:
         return state;
     }
@@ -156,7 +159,14 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
 async function loadInitial(dispatcher): Promise<void> {
   const potIdsStr = await AsyncStorage.getItem('@Pots');
-  const potIds = JSON.parse(potIdsStr) || [];
+  let potIDs;
+  try {
+    potIds = JSON.parse(potIdsStr) || [];
+  } catch (error) {
+    console.log("Pot load failed to parse: " + potIdsStr);
+    console.error(error);
+    potIds = [];
+  }
   const promises = [];
   for (let i = 0; i < potIds.length; i++) {
     promises.push(loadPot(potIds[i]));
@@ -172,7 +182,14 @@ async function loadPot(uuid: string): Promise<Pot> {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
   //console.log("Loading pot from storage: " + loadedJson);
   if (loadedJson != null) {
-    const loaded = JSON.parse(loadedJson);
+    let loaded;
+    try {
+      loaded = JSON.parse(loadedJson);
+    } catch (error) {
+      console.log("Pot failed to parse: " + loadedJson);
+      console.error(error);
+      loaded = {};
+    }
     // Add all fields, for version compatibility
     const pot = {...loaded};
     pot.status = new Status(loaded.status);

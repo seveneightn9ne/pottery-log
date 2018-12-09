@@ -86,18 +86,22 @@ export default class ListPage extends React.Component {
 
     let searchButton = this.props.fontLoaded && potsLoaded ?
       <TouchableHighlight onPress={this.props.onOpenSearch}>
-        <Text style={styles.search}>search</Text>
+        <Text style={[styles.search, {paddingRight: 8}]}>search</Text>
+      </TouchableHighlight>
+      : null;
+    
+    let settingsButton = this.props.fontLoaded && potsLoaded ?
+      <TouchableHighlight onPress={this.props.onNavigateToSettings}>
+        <Text style={[styles.search, {paddingLeft: 8}]}>settings</Text>
       </TouchableHighlight>
       : null;
 
     const topWhenNotSearching = (
       <View style={styles.header}>
-        <Text style={styles.h1}>Pottery Log</Text>
+        <Text style={[styles.h1, {flex: 1}]}>Pottery Log</Text>
         <View style={{ flexDirection: 'row' }}>
           {searchButton}
-          <TouchableHighlight onPress={this.props.onNavigateToSettings}>
-            <Text style={styles.h1}>⚙</Text>
-          </TouchableHighlight>
+          {settingsButton}
         </View>
       </View>
     );

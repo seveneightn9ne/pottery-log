@@ -4,66 +4,6 @@ import dispatcher from './AppDispatcher.js';
 import {nameFromUri} from './stores/ImageStore.js';
 import * as _ from 'lodash';
 
-/*export async function upload(localUri: string) {
-  let apiUrl = 'https://jesskenney.com/pottery-log-images/upload';
-
-  let fileName = nameFromUri(localUri);
-  let fileNameParts = fileName.split('.');
-  let fileType = fileNameParts[fileNameParts.length - 1];
-  if (fileType == "jpg") {
-    fileType = "jpeg";
-  }
-
-  let formData = new FormData();
-  // $FlowFixMe
-  formData.append('image', {
-    uri: localUri,
-    name: fileName,
-    type: `image/${fileType}`,
-  });
-  formData.append('deviceId', Expo.Constants.deviceId);
-
-  let options = {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-
-  console.log("Will upload " + localUri);
-
-  fetch(apiUrl, options).then((response) => {
-    if (response.ok) {
-      response.json().then(r => {
-        if (r.status == "ok") {
-          console.log("Uploaded image available at " + r.uri);
-          dispatcher.dispatch({
-            type: 'image-remote-uri',
-            name: fileName,
-            remoteUri: r.uri,
-          });
-        } else {
-          console.log("ERROR: Upload response", r);
-        }
-      }).catch (err => {
-        console.log("ERROR couldn't parse response");
-        console.log(response);
-        throw err;
-      });
-    } else {
-      console.log("upload ERROR: Response " + response.status + " : " + response.statusText);
-    }
-  }).catch((reason) => {
-    console.log("upload threw", reason);
-    dispatcher.dispatch({
-      type: 'image-remote-failed',
-      name: fileName,
-    });
-  });
-};*/
-
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';
 const EXPORT_START = apiPrefix + 'export';
@@ -88,11 +28,11 @@ async function post(path, kvs, onSuccess, onError) {
   };
 
   let error = undefined;
-  for (tries = 0; tries < max_tries; tries++) {
+  for (tries = 0; tries < 3; tries++) {
     try {
       const response = await fetch(path, options);
       if (response.ok) {
-        const r = response.json();
+        const r = await response.json();
         if (r.status == "ok") {
           return onSuccess(r);
         } else if (r.status == "error") {
@@ -102,6 +42,8 @@ async function post(path, kvs, onSuccess, onError) {
         error = response.statusText;
       }
     } catch (reason) {
+      console.log("Error accessing " + path);
+      console.error(reason);
       error = reason;
     }
   }
@@ -125,16 +67,16 @@ export async function remove(uri: string) {
   }), (e) => {throw e});
 };
 
-export async function startExport(metadata: any) {
+export async function startExport(id: number, metadata: any) {
   return post(
     EXPORT_START,
     { metadata: JSON.stringify(metadata),
       deviceId: Expo.Constants.deviceId, },
-    () => dispatcher.dispatch({type: 'export-started'}),
-    (e) => dispatcher.dispatch({type: 'export-failure', error: e}));
+    () => dispatcher.dispatch({type: 'export-started', id}),
+    (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
 };
 
-export async function exportImage(uri: string) {
+export async function exportImage(id: number, uri: string) {
   return post(EXPORT_IMAGE, {
     deviceId: Expo.Constants.deviceId,
     image: {
@@ -143,12 +85,24 @@ export async function exportImage(uri: string) {
       type: mimeFromUri(uri),
     },
   },
-  () => dispatcher.dispatch({type: 'export-image', uri}),
-  (e) => dispatcher.dispatch({type: 'export-failure', error: e}));
+  () => dispatcher.dispatch({type: 'export-image', id, uri}),
+  (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
 }
 
-export async function finishExport() {
+export async function finishExport(id: number) {
   return post(EXPORT_FINISH, {deviceId: Expo.Constants.deviceId}, 
-    (res) => dispatcher.dispatch({type: 'export-finished', uri: res.uri}),
-    (e) => dispatcher.dispatch({type: 'export-failure', error: e}));
+    (res) => dispatcher.dispatch({type: 'export-finished', id, uri: res.uri}),
+    (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
+}
+
+export async function startImport(uri: string) {
+  return post(IMPORT, {
+    deviceId: Expo.Constants.deviceId,
+    import: {
+      uri,
+      name: nameFromUri(uri),
+      type: 'application/zip',
+    }
+  }, (res) => dispatcher.dispatch({type: 'import-started', metadata: res.metadata, imageMap: res.image_map}),
+  (e) => dispatcher.dispatch({type: 'import-failure', error: e}));
 }

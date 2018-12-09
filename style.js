@@ -379,6 +379,7 @@ export default StyleSheet.create({
     settingsText: {
         fontSize: 16,
         textAlign: 'center',
+        padding: 20,
     },
     noteModal: {
         width: 280,
@@ -423,5 +424,9 @@ export default StyleSheet.create({
     bbb: { // bottom bar button
         padding: 8,
         marginLeft: 8,
+    },
+    anchor: {
+        textDecorationLine: 'underline',
+        color: '#0000FF',
     },
 });

@@ -1,6 +1,6 @@
 // @flow
 import Expo from 'expo';
-import { AsyncStorage } from 'react-native';
+import { Alert, AsyncStorage } from 'react-native';
 import dispatcher from './AppDispatcher.js';
 import * as uploader from './uploader.js';
 import {ImageStore, nameFromUri} from './stores/ImageStore.js';
@@ -23,42 +23,56 @@ async function getExportMetadata() {
   return snapshot;
 }
 
-async function storageImport(fileUri: string) {
-  console.log("Start storageImport");
-  const {uri} = await Expo.FileSystem.downloadAsync(
-      fileUri, Expo.FileSystem.cacheDirectory + 'import.json');
-  console.log("Saved import file locally");
-  const dataStr = await Expo.FileSystem.readAsStringAsync(uri);
-  console.log("Got the import data (" + dataStr.length + " bytes)");
-  data = JSON.parse(dataStr);
-  console.log("Parsed imported data");
-  await AsyncStorage.clear();
-  const kvpairs = Object.keys(data).map((k) => [k, data[k]]);
-  await AsyncStorage.multiSet(kvpairs);
-  console.log("Import finished");
-  return;
-}
-
-async function startExport() {
+async function startExport(id: number) {
   const metadata = await getExportMetadata();
-  uploader.startExport(metadata);
-  //const {images} = ImageStore.getState();
-  //return images;
+  uploader.startExport(id, metadata);
 }
 
-async function exportImage(imageState) {
+async function exportImage(id: number, imageState) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri == imageState.remoteUri;
     ImageStore.saveToFile(imageState.remoteUri, isRemote);
     return false;
   }
-  uploader.exportImage(imageState.fileUri);
+  uploader.exportImage(id, imageState.fileUri);
   return true;
 }
 
-async function finishExport() {
-  return uploader.finishExport();
+async function finishExport(id: number) {
+  return uploader.finishExport(id);
 }
 
-export { storageImport, startExport, exportImage, finishExport };
+async function startImport() {
+  const docResult = await Expo.DocumentPicker.getDocumentAsync();
+  if (docResult.type == 'success') {
+    return uploader.startImport(docResult.uri);
+  } else if (docResult.type == 'cancel') {
+    dispatcher.dispatch({type: 'import-cancel'});
+  }
+}
+
+async function importMetadata(metadata: string) {
+  try {
+    const kvs = JSON.parse(metadata);
+
+    Alert.alert('Ready to import. This will erase any existing data. Are you sure?', undefined,
+       [{text: 'Nevermind', style: 'cancel', onPress: () => 
+          dispatcher.dispatch({type: 'import-cancel'})},
+        {text: 'Continue', onPress: async () => {
+          await AsyncStorage.clear();
+          const kvpairs = Object.keys(kvs).map((k) => [k, kvs[k]]);
+          await AsyncStorage.multiSet(kvpairs);
+          dispatcher.dispatch({type: 'imported-metadata'});
+        }},
+      ]);
+  } catch (error) {
+    setTimeout(() => dispatcher.dispatch({type: 'import-failure', error}), 0);
+  }
+}
+
+function importImage(remoteUri: string) {
+  ImageStore.saveToFile(remoteUri, true /* isRemote */);
+}
+
+export { startExport, exportImage, finishExport, startImport, importMetadata, importImage };

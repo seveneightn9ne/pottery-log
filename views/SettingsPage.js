@@ -1,7 +1,7 @@
 // @flow
 import Expo from 'expo';
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Modal, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Modal, Image, Dimensions, Picker, Button, TouchableOpacity, Linking } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ExpandingTextInput } from './components/ExpandingTextInput.js'
 import {Pot, Image as PotImage} from '../models/Pot.js';
@@ -12,57 +12,14 @@ import ImageList from './components/ImageList.js';
 import DatePicker from './components/DatePicker.js';
 import StatusDetail from './components/StatusDetail.js';
 import StatusSwitcher from './components/StatusSwitcher.js';
+import Anchor from './components/Anchor.js';
 
 type SettingsPageProps = {
   onNavigateToList: () => void,
-  onExport: () => void,
-  onImport: (data: string) => void,
+  onStartExport: () => void,
+  onStartImport: () => void,
+  exports: ExportState,
 };
-
-function valid(d) {
-  try {
-    JSON.parse(d);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-class ImportModal extends React.Component {
-
-  async doPicker() {
-    result = await Expo.DocumentPicker.getDocumentAsync({});
-    console.log("DocumentPicker finished");
-    if (result.type == 'success') {
-      console.log("You picked a file " + result.uri);
-      //data = await Expo.FileSystem.readAsStringAsync(result.uri);
-      //console.log("Got the data, " + data.length + " bytes");
-      this.props.doImport(result.uri);
-    } else {
-      console.log("DocumentPicker finished with result " + result.type);
-      console.log(result);
-    }
-  }
-
-  render() {
-    return <Modal animationType={"slide"} transparent={true}
-      visible={this.props.modalOpen}
-      onRequestClose={this.props.closeModal}>
-      <View style={{margin: 30, padding: 10, backgroundColor: 'white', borderWidth: 1}}>
-        <View>
-          <Text style={styles.h2}>App JSON</Text>
-          <ExpandingTextInput value={this.props.data} multiline={true} numberOfLines={4}
-            style={{fontSize: 16, marginBottom: 20}}
-            onChangeText={(t) => this.props.onChangeData(t)}
-            autoFocus={true} />
-          <Button title="Import" onPress={this.props.doImport} disabled={!valid(this.props.data)} />
-	  <Button title="Pick File" onPress={this.doPicker} />
-	  </View>
-      </View>
-    </Modal>
-  }
-}
-
 
 export default class SettingsPage extends React.Component {
   constructor(props: SettingsPageProps) {
@@ -83,20 +40,44 @@ export default class SettingsPage extends React.Component {
       console.log(result);
     }
   }
+
+  onBack() {
+    if (this.props.exports.exporting && !this.props.exports.exportUri) {
+      Alert.alert('Cancel this export?', undefined,
+        [{text: 'Stay here', style: 'cancel'},
+        {text: 'Cancel', onPress: this.props.onNavigateToList},
+      ]);
+    } else {
+      this.props.onNavigateToList();
+    }
+  }
   render() {
-    closeModal = () => {this.setState({modalOpen: false})};
-    openModal = () => {this.setState({modalOpen: true})};
-    onChangeData = (d) => {this.setState({data: d})};
+
+    const backButton = this.props.fontLoaded ?
+      <TouchableOpacity onPress={() => this.onBack()}>
+        <Text style={styles.searchBack}>arrow_back</Text>
+      </TouchableOpacity> : null;
+
+    const exporting = this.props.exports.exportUri ? 
+      <Text style={styles.settingsText}>The export is available at <Anchor href={this.props.exports.exportUri} />. This link will be active for one day, so save the file somewhere safe.</Text> :
+      this.props.exports.exporting || this.props.exports.importing ? 
+      <View style={{flexDirection: 'row', paddingLeft: 20}}>
+        <ActivityIndicator size="small" />
+        <Text style={styles.settingsText}>{this.props.exports.statusMessage}</Text>
+      </View> :
+      <View style={{padding: 20, paddingTop: 0}}>
+        <Text style={styles.settingsText}>Exporting will save your Pottery Log data so you can move your data to a new phone.</Text>
+        <Button title="Export" onPress={this.props.onStartExport} />
+        <View style={{height: 20}} />
+        <Button title="Import" onPress={this.props.onStartImport} />
+      </View>;
+    
     return <View style={styles.container}>
-      <ImportModal data={this.state.data} modalOpen={this.state.modalOpen}
-        closeModal={closeModal} onChangeData={onChangeData}
-        doImport={this.props.onImport} />
-      <Text style={styles.h1}>Settings</Text>
-      <Text style={styles.settingsText}>Device ID:</Text>
-      <Text style={styles.settingsText}>{Expo.Constants.deviceId}</Text>
-      <Button title="Export" onPress={this.props.onExport} />
-      <Button title="Import" onPress={() => this.doPicker()} />
-      <Button title="Back" onPress={this.props.onNavigateToList} />
+      <View style={styles.header}>
+        {backButton}
+        <Text style={[styles.h1, {flex: 1}]}>Settings</Text>
+      </View>
+      {exporting}
     </View>
   }
 }
