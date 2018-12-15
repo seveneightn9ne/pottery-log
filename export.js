@@ -71,13 +71,13 @@ async function importMetadata(metadata: string) {
   }
 }
 
-function importImage(remoteUri: string) {
+function importImage(remoteUri: string, isRetry = false) {
   //console.log("importImage");
-  ImageStore.saveToFile(remoteUri, true /* isRemote */);
+  ImageStore.saveToFile(remoteUri, true /* isRemote */, !!isRetry);
   setTimeout(() => dispatcher.dispatch({
     type: 'image-timeout',
     uri: remoteUri,
-  }), 5000);
+  }), 30000);
 }
 
 export { startExport, exportImage, finishExport, startImport, importMetadata, importImage };

@@ -19,26 +19,13 @@ type SettingsPageProps = {
   onStartExport: () => void,
   onStartImport: () => void,
   exports: ExportState,
+  imports: ImportState,
 };
 
 export default class SettingsPage extends React.Component {
   constructor(props: SettingsPageProps) {
     super(props);
     this.state = { modalOpen: false, data: '' };
-  }
-  async doPicker() {
-    result = await Expo.DocumentPicker.getDocumentAsync({});
-    console.log("DocumentPicker finished");
-    if (result.type == 'success') {
-      console.log("You picked a file " + result.uri);
-      //data = await Expo.FileSystem.readAsStringAsync(result.uri);
-      //console.log("Got the data, " + data.length + " bytes");
-      console.log(this.props);
-      this.props.onImport(result.uri);
-    } else {
-      console.log("DocumentPicker finished with result " + result.type);
-      console.log(result);
-    }
   }
 
   onBack() {
@@ -65,10 +52,11 @@ export default class SettingsPage extends React.Component {
         <Text style={styles.settingsText}><Anchor href={this.props.exports.exportUri} /></Text>
         <Text style={styles.settingsText}>This link will be active for one day, so save the file somewhere safe.</Text>
       </View>;
-    } else if (this.props.exports.exporting || this.props.exports.importing) {
+    } else if (this.props.exports.exporting || this.props.imports.importing) {
+      const status = this.props.exports.exporting ? this.props.exports.statusMessage : this.props.imports.statusMessage;
       body = <View style={{flexDirection: 'row', paddingLeft: 20}}>
         <ActivityIndicator size="small" />
-        <Text style={styles.settingsText}>{this.props.exports.statusMessage}</Text>
+        <Text style={styles.settingsText}>{status}</Text>
       </View>;
     } else {
       body = <View style={{padding: 20, paddingTop: 0}}>

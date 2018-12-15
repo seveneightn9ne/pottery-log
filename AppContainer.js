@@ -7,6 +7,7 @@ import {Container} from 'flux/utils';
 import {Alert, BackHandler} from 'react-native';
 import {ImageStore, nameFromUri} from './stores/ImageStore.js';
 import ExportStore from './stores/ExportStore.js';
+import ImportStore from './stores/ImportStore.js';
 
 function getStores() {
   return [
@@ -14,6 +15,7 @@ function getStores() {
     UIStore,
     ImageStore,
     ExportStore,
+    ImportStore,
   ];
 }
 
@@ -58,6 +60,7 @@ function getState(prevState, props) {
     ui: UIStore.getState(),
     images: ImageStore.getState(),
     exports: ExportStore.getState(),
+    imports: ImportStore.getState(),
     fontLoaded: props.fontLoaded,
 
     onNew: () => dispatcher.dispatch({

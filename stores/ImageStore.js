@@ -294,7 +294,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
     }
   }
 
-  saveToFile(uri: string, isRemote = false) {
+  saveToFile(uri: string, isRemote = false, isRetry = false) {
     //console.log("Will save " + uri);
     onError = () => {
       /*if (uri) {
@@ -309,27 +309,31 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       setTimeout(onError, 0);
       return;
     }
-    const name = nameFromUri(uri);
-    const fileUri = Expo.FileSystem.documentDirectory +  name;
-    const afterCopy = () => {
-      //console.log("saveToFile SUCCESS on " + name);
-      dispatcher.dispatch({
-        type: 'image-file-created',
-        name, fileUri,
-      });
-    };
-    if (isRemote) {
-      //console.log("saveToFile starting " + name);
-      Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
-    } else {
-      //console.log("Will copyAsync");
-      Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
-        // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
-        console.warn(reason);
-        onError();
-      });
-    }
-    //console.log("Save of " + uri + " initiated.");
+    let name = nameFromUri(uri);
+    let random = Math.floor((Math.random() * 1000000) + 1);
+    let dir = Expo.FileSystem.documentDirectory + random;
+    Expo.FileSystem.makeDirectoryAsync(dir, {intermediates: true}).then(() => {
+      const fileUri = dir + '/' + name;
+      const afterCopy = () => {
+        //console.log("saveToFile SUCCESS on " + name);
+        dispatcher.dispatch({
+          type: 'image-file-created',
+          name, fileUri,
+        });
+      };
+      if (isRemote) {
+        //console.log("saveToFile starting " + name);
+        Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
+      } else {
+        //console.log("Will copyAsync");
+        Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
+          // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
+          console.warn(reason);
+          onError();
+        });
+      }
+      //console.log("Save of " + uri + " initiated.");
+    });
   }
 
   deleteFile(uri: string) {

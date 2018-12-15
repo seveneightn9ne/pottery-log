@@ -13,6 +13,7 @@ type AppViewProps = {
   ui: Object, // UIState
   images: Object, // ImageStoreState
   exports: Object, // ExportState
+  imports: Object, // ImportState
 
   fontLoaded: bool,
 
@@ -75,6 +76,7 @@ function AppView(props: AppViewProps): ?React.Element<*> {
     case 'settings':
       return <SettingsPage
         exports={props.exports}
+        imports={props.imports}
         fontLoaded={props.fontLoaded}
         onNavigateToList={props.onNavigateToList}
         onStartExport={props.onStartExport}
