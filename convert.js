@@ -12,6 +12,6 @@ getStdin().then((text) => {
     }
     console.log(JSON.stringify(obj2));
   } catch (e) {
-    console.error(e);
+    console.warn(e);
   }
 })

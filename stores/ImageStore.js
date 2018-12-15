@@ -23,14 +23,14 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(): ImageStoreState {
-    this._loadInitial();
+  getInitialState(isImport: ?boolean): ImageStoreState {
+    this._loadInitial(!!isImport);
     return {
       images: {},
     };
   }
 
-  async _loadInitial() {
+  async _loadInitial(isImport: ?boolean) {
     console.log("Loading ImageStore");
     const json = await AsyncStorage.getItem("@ImageStore");
 
@@ -43,10 +43,11 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       dispatcher.dispatch({
         type: 'image-state-loaded',
         images: parsed.images || {},
+        isImport: !!isImport,
       });
     } catch (e) {
       console.log("Failed to parse: " + json);
-      console.error(e);
+      console.warn(e);
     }
   }
 
@@ -109,13 +110,13 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       }
       case 'image-state-loaded': {
         // PotsStore also listens for this event, to do the corresponding deletions from the pots
-        const newState = {images: {...state.images}}
-        for (let imageName in action.images) {
-          if (state.images[imageName]) {
-            console.log("Woah there, you want to load on top of this guy. Ok");
-          }
-          newState.images[imageName] = action.images[imageName];
-          const image = action.images[imageName];
+        const newState = {images: {...action.images}};
+        if (action.isImport) {
+          // Can skip persist if we aren't processing them.
+          return newState;
+        }
+        for (let imageName in newState.images) {
+          const image = newState.images[imageName];
           if (!image.remoteUri && !image.fileUri && !image.localUri) {
             // the cached image was deleted before we could move it somewhere permanent :'(
             // If any pots refer to this image then the pot store must handle that
@@ -185,6 +186,9 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         return newState;
       }
       case 'loaded': { // Pots loaded
+        if (action.isImport) {
+          return state;
+        }
         const newState = {images: {...state.images}};
         const modified = false;
         for (let imageName in state.images) {
@@ -245,6 +249,9 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       case 'image-loaded': {
         // Convert to a fileUri if needed
         const i = state.images[action.name];
+        if (!i) {
+          return;
+        }
         if (i.fileUri) {
           return state;
         }
@@ -256,6 +263,10 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         return state;
       }
       case 'image-file-created': {
+        if (state.images[action.name] == undefined) {
+          console.warn("Image file created, but no image exists for it! This is quite bad, probably.");
+          return state;
+        }
         const newImage = {...state.images[action.name],
           fileUri: action.fileUri};
         if (newImage.remoteUri) {
@@ -265,15 +276,18 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         delete newImage.localUri;
         const newState = {images: {...state.images,
           [action.name]: newImage}};
-        if (newState.images[action.name].pots.length == 0) {
+
+        // I don't think we really need to handle this here.
+        // Maybe a checkRep or general cleanup function instead?
+        /*if (newImage.pots.length == 0) {
           delete newState.images[action.name];
           this.deleteFile(action.fileUri);
-        }
+        }*/
         this.persist(newState);
         return newState;
       }
       case 'imported-metadata': {
-        return this.getInitialState();
+        return this.getInitialState(true /* isImport */);
       }
       default:
         return state;
@@ -281,20 +295,41 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   }
 
   saveToFile(uri: string, isRemote = false) {
+    //console.log("Will save " + uri);
+    onError = () => {
+      /*if (uri) {
+        console.log("saveToFile FAILED on " + nameFromUri(uri));
+      } else {
+        console.log("saveToFile FAILED on " + uri);
+      }*/
+      dispatcher.dispatch({type: 'image-file-failed', uri});
+    };
+    if (!uri) {
+      console.warn("No URI passed to saveToFile");
+      setTimeout(onError, 0);
+      return;
+    }
     const name = nameFromUri(uri);
     const fileUri = Expo.FileSystem.documentDirectory +  name;
-    const afterCopy = () => dispatcher.dispatch({
-      type: 'image-file-created',
-      name, fileUri,
-    });
+    const afterCopy = () => {
+      //console.log("saveToFile SUCCESS on " + name);
+      dispatcher.dispatch({
+        type: 'image-file-created',
+        name, fileUri,
+      });
+    };
     if (isRemote) {
-      Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy);
+      //console.log("saveToFile starting " + name);
+      Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
     } else {
+      //console.log("Will copyAsync");
       Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
         // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
-        console.error(reason);
+        console.warn(reason);
+        onError();
       });
     }
+    //console.log("Save of " + uri + " initiated.");
   }
 
   deleteFile(uri: string) {
@@ -302,7 +337,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   }
 
   persist(state: ImageStoreState) {
-    console.log("Persisting ImageStore");
+    //console.log("Persisting ImageStore");
     StorageWriter.put('@ImageStore', JSON.stringify(state));
   }
 }

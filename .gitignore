@@ -4,3 +4,5 @@ node_modules/
 npm-debug.*
 assets/*.apk
 exp
+app.json
+expo-cli

@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "sdkVersion": "28.0.0",
+    "name": "Pottery Log",
+    "icon": "./assets/launcher_512.png",
+    "slug": "pottery-log",
+    "version": "2.0.24",
+    "privacy": "public",
+    "android": {
+      "package": "com.jesskenney.pottery_log",
+      "versionCode": 5
+    },
+    "ios": {
+      "bundleIdentifier": "org.rnplay.exp"
+    },
+    "primaryColor": "#4caf50",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "jess-kenney",
+            "project": "pottery-log",
+            "authToken": "[redacted]"
+          }
+        }
+      ]
+    }
+  }
+}

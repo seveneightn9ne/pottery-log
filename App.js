@@ -3,6 +3,10 @@ import React from 'react';
 import AppContainer from './AppContainer.js';
 import {AsyncStorage} from 'react-native';
 import {Font} from 'expo';
+import Sentry from 'sentry-expo';
+// import { SentrySeverity, SentryLog } from 'react-native-sentry';
+Sentry.config('https://bad3ce09a6404191b1a0b181bdb36263@sentry.io/1341402').install();
+
 export default class App extends React.Component<any, {fontLoaded: boolean}> {
   constructor(props) {
     super(props);

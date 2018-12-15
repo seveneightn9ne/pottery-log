@@ -28,7 +28,7 @@ async function startExport(id: number) {
   uploader.startExport(id, metadata);
 }
 
-async function exportImage(id: number, imageState) {
+function exportImage(id: number, imageState) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri == imageState.remoteUri;
@@ -72,7 +72,12 @@ async function importMetadata(metadata: string) {
 }
 
 function importImage(remoteUri: string) {
+  //console.log("importImage");
   ImageStore.saveToFile(remoteUri, true /* isRemote */);
+  setTimeout(() => dispatcher.dispatch({
+    type: 'image-timeout',
+    uri: remoteUri,
+  }), 5000);
 }
 
 export { startExport, exportImage, finishExport, startImport, importMetadata, importImage };

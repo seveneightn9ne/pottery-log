@@ -72,7 +72,7 @@ export default class Status {
         status = JSON.parse(status);
       } catch (e) {
         console.log("Status failed to parse: " + status);
-        console.error(e);
+        console.warn(e);
       }
     }
     if (status) {

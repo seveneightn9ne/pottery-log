@@ -18,8 +18,8 @@ class PotsStore extends ReduceStore<PotsStoreState> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(): PotsStoreState {
-    loadInitial(dispatcher);
+  getInitialState(isImport: ?boolean): PotsStoreState {
+    loadInitial(dispatcher, !!isImport);
     return {pots: {}, potIds: [], hasLoaded: false}
   }
 
@@ -27,7 +27,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
     switch (action.type) {
       case 'loaded': {
         let newState = {pots: action.pots, potIds: action.potIds, hasLoaded: true};
-        if (state.imagesLoaded) {
+        if (state.imagesLoaded && !action.isImport) {
           newState = this.deleteBrokenImages(newState, {images: state.imagesLoaded});
         }
         return newState;
@@ -102,7 +102,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         return newState;
       }
       case 'image-state-loaded': {
-        if (state.hasLoaded) {
+        if (state.hasLoaded && !action.isImport) {
           return this.deleteBrokenImages(state, {images: action.images});
         } else {
           return {...state,
@@ -114,7 +114,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
         return this.getInitialState();
       }
       case 'imported-metadata': {
-        return this.getInitialState();
+        return this.getInitialState(true /* isImport */);
       }
       default:
         return state;
@@ -157,14 +157,14 @@ class PotsStore extends ReduceStore<PotsStoreState> {
 
 }
 
-async function loadInitial(dispatcher): Promise<void> {
+async function loadInitial(dispatcher, isImport: boolean): Promise<void> {
   const potIdsStr = await AsyncStorage.getItem('@Pots');
   let potIDs;
   try {
     potIds = JSON.parse(potIdsStr) || [];
   } catch (error) {
     console.log("Pot load failed to parse: " + potIdsStr);
-    console.error(error);
+    console.warn(error);
     potIds = [];
   }
   const promises = [];
@@ -174,7 +174,7 @@ async function loadInitial(dispatcher): Promise<void> {
   Promise.all(promises).then((pots) => {
     const potsById = {};
     pots.forEach(p => potsById[p.uuid] = p);
-    dispatcher.dispatch({type: 'loaded', pots: potsById, potIds: potIds});
+    dispatcher.dispatch({type: 'loaded', pots: potsById, potIds: potIds, isImport: !!isImport});
   });
 }
 
@@ -187,7 +187,7 @@ async function loadPot(uuid: string): Promise<Pot> {
       loaded = JSON.parse(loadedJson);
     } catch (error) {
       console.log("Pot failed to parse: " + loadedJson);
-      console.error(error);
+      console.warn(error);
       loaded = {};
     }
     // Add all fields, for version compatibility

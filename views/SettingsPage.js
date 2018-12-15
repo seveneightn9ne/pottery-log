@@ -58,26 +58,33 @@ export default class SettingsPage extends React.Component {
         <Text style={styles.searchBack}>arrow_back</Text>
       </TouchableOpacity> : null;
 
-    const exporting = this.props.exports.exportUri ? 
-      <Text style={styles.settingsText}>The export is available at <Anchor href={this.props.exports.exportUri} />. This link will be active for one day, so save the file somewhere safe.</Text> :
-      this.props.exports.exporting || this.props.exports.importing ? 
-      <View style={{flexDirection: 'row', paddingLeft: 20}}>
+    let body;
+    if (this.props.exports.exportUri) {
+      body = <View>
+        <Text style={styles.settingsText}>The export is available at:</Text>
+        <Text style={styles.settingsText}><Anchor href={this.props.exports.exportUri} /></Text>
+        <Text style={styles.settingsText}>This link will be active for one day, so save the file somewhere safe.</Text>
+      </View>;
+    } else if (this.props.exports.exporting || this.props.exports.importing) {
+      body = <View style={{flexDirection: 'row', paddingLeft: 20}}>
         <ActivityIndicator size="small" />
         <Text style={styles.settingsText}>{this.props.exports.statusMessage}</Text>
-      </View> :
-      <View style={{padding: 20, paddingTop: 0}}>
+      </View>;
+    } else {
+      body = <View style={{padding: 20, paddingTop: 0}}>
         <Text style={styles.settingsText}>Exporting will save your Pottery Log data so you can move your data to a new phone.</Text>
         <Button title="Export" onPress={this.props.onStartExport} />
         <View style={{height: 20}} />
         <Button title="Import" onPress={this.props.onStartImport} />
       </View>;
+    }
     
     return <View style={styles.container}>
       <View style={styles.header}>
         {backButton}
         <Text style={[styles.h1, {flex: 1}]}>Settings</Text>
       </View>
-      {exporting}
+      {body}
     </View>
   }
 }

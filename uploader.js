@@ -43,7 +43,7 @@ async function post(path, kvs, onSuccess, onError) {
       }
     } catch (reason) {
       console.log("Error accessing " + path);
-      console.error(reason);
+      console.warn(reason);
       error = reason;
     }
   }

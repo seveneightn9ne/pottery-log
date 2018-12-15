@@ -43,9 +43,9 @@ export class Sync {
 export const StorageWriter = new Sync(async (action) => {
 	switch (action.type) {
 		case 'put':
-			console.log("AsyncStorage set " + action.key + "...");
+			//console.log("AsyncStorage set " + action.key + "...");
 			await AsyncStorage.setItem(action.key, action.value);
-			console.log("AsyncStorage set done.");
+			//console.log("AsyncStorage set done.");
 			return;
 		case 'delete':
 			await AsyncStorage.removeItem(action.key);

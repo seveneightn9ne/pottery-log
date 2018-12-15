@@ -76,7 +76,7 @@ export default class Image3 extends React.Component {
   }
 
   onLoad() {
-    console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
+    //console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
     dispatcher.dispatch({
       type: 'image-loaded',
       name: this.props.image.name,
