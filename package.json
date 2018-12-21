@@ -3,8 +3,13 @@
   "version": "2.0.24",
   "private": false,
   "devDependencies": {
+    "@types/expo": "^31.0.3",
+    "@types/react": "^16.7.17",
+    "@types/react-native": "^0.57.19",
     "flow-bin": "^0.73.0",
-    "react-native-scripts": "^1.14.0"
+    "react-native-scripts": "^1.14.0",
+    "react-native-typescript-transformer": "^1.2.11",
+    "typescript": "^3.2.2"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
@@ -12,7 +17,9 @@
     "eject": "react-native-scripts eject",
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
-    "test": "node node_modules/jest/bin/jest.js --watch"
+    "test": "node node_modules/jest/bin/jest.js --watch",
+    "lint": "tslint src/**/*.ts",
+    "validate": "npm run lint --scripts-prepend-node-path && tsc --noEmit"
   },
   "dependencies": {
     "@babel/core": "^7.0.0-0",
@@ -26,6 +33,7 @@
     "react-native-button": "^2.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.4.0",
     "sentry-expo": "~1.9.0",
+    "tslib": "^1.9.3",
     "whatwg-fetch": "^2.0.4"
   },
   "updates": {

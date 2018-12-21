@@ -3,20 +3,12 @@ import Expo from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
 import dispatcher from './AppDispatcher.js';
 import * as uploader from './uploader.js';
-import {ImageStore, nameFromUri} from './stores/ImageStore.js';
-
-function shouldShowSettings() {
-  let m = {
-    "72B2295B-5DEC-4AB2-A007-F6C1A4045B3E": true,
-    "1b6e8899-adab-419d-9cb9-ff454c8d86ee": true,
-  };
-  return (m[Expo.Constants.deviceId] === true)
-}
+import {ImageStore, ImageState} from './stores/ImageStore.js';
 
 async function getExportMetadata() {
   let allKeys = await AsyncStorage.getAllKeys();
   let pairs = await AsyncStorage.multiGet(allKeys);
-  let snapshot = {};
+  let snapshot: {[key: string]: string} = {};
   pairs.forEach((pair) => {
     snapshot[pair[0]] = pair[1];
   });
@@ -28,7 +20,7 @@ async function startExport(id: number) {
   uploader.startExport(id, metadata);
 }
 
-function exportImage(id: number, imageState) {
+function exportImage(id: number, imageState: ImageState) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri == imageState.remoteUri;

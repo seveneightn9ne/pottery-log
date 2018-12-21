@@ -1,7 +1,7 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher.js';
-import { startImport, importImage, importMetadata } from '../export.js';
+import { startImport, importImage, importMetadata } from '../export.ts';
 import { ImageStore, nameFromUri } from './ImageStore.js';
 import { Linking } from 'react-native';
 import * as _ from 'lodash';

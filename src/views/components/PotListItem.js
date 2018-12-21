@@ -26,7 +26,7 @@ export default class PotListItem extends React.Component {
     const img = this.props.pot.images3.length ?
       <Image3 image={imgstate} style={[styles.liImage, size]} /> :
       <View style={[styles.liImagePlaceholder, size]}>
-      	  <Image source={require('../../assets/coffee.png')}
+      	  <Image source={require('../../../assets/coffee.png')}
 	    style={{width: 48, height: 48}} />
       </View>;
     const old = this.props.fontLoaded && this.props.pot.status.isOld() ?
