@@ -1,12 +1,12 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import {Pot} from '../models/Pot.js';
-import Status from '../models/Status.js';
-import Notes from '../models/Notes.js';
-import dispatcher from '../AppDispatcher.js';
-import {StorageWriter} from './sync.js';
+import {Pot} from '../models/Pot';
+import Status from '../models/Status';
+import Notes from '../models/Notes';
+import dispatcher from '../AppDispatcher';
+import {StorageWriter} from './sync';
 import { AsyncStorage } from 'react-native';
-import {nameFromUri} from './ImageStore.js';
+import {nameFromUri} from './ImageStore';
 
 interface PotsStoreState {
   potIds: string[];
@@ -18,7 +18,7 @@ class PotsStore extends ReduceStore<PotsStoreState> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(isImport: ?boolean): PotsStoreState {
+  getInitialState(isImport?: boolean): PotsStoreState {
     loadInitial(dispatcher, !!isImport);
     return {pots: {}, potIds: [], hasLoaded: false}
   }

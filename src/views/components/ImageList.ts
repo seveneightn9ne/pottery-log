@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import styles from '../../style.js';
-import ImagePicker from './ImagePicker.js';
-import Image3 from './Image3.js';
-import {nameToImageState} from '../../stores/ImageStore.js';
+import styles from '../../style';
+import ImagePicker from './ImagePicker';
+import Image3 from './Image3';
+import {nameToImageState} from '../../stores/ImageStore';
 
 type ImageListProps = {
   images: string[],

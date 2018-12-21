@@ -1,5 +1,5 @@
 // @flow
-import Status from './Status.js';
+import Status from './Status';
 
 export default class Notes {
   // Immutable! Functions return copies.

@@ -933,6 +933,14 @@
   resolved "https://registry.yarnpkg.com/@types/fbemitter/-/fbemitter-2.0.32.tgz#8ed204da0f54e9c8eaec31b1eec91e25132d082c"
   integrity sha1-jtIE2g9U6cjq7DGx7skeJRMtCCw=
 
+"@types/flux@^3.1.8":
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/@types/flux/-/flux-3.1.8.tgz#987fbf0220d98aa23276c9635a8ef1e505f7c4a4"
+  integrity sha512-U7DS78cK1svrisTa920BM2AEsWnfgnxQmVn+1kju1XgjcDN/iU1Uiyy0pQNaG8s9P1X5Lj3pMaIfVuCjXAlSCA==
+  dependencies:
+    "@types/fbemitter" "*"
+    "@types/react" "*"
+
 "@types/glob@*":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"

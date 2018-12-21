@@ -2,17 +2,17 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ExpandingTextInput } from './components/ExpandingTextInput.js'
-import { Pot } from '../models/Pot.js';
-import Status from '../models/Status.js';
-import styles from '../style.js'
-import ImagePicker from './components/ImagePicker.js';
-import ImageList from './components/ImageList.js';
-import Image3 from './components/Image3.js';
-import StatusDetail from './components/StatusDetail.js';
-import StatusSwitcher from './components/StatusSwitcher.js';
-import { Note } from './components/Note.js';
-import { nameToImageState, isAnySyncing } from '../stores/ImageStore.js';
+import { ExpandingTextInput } from './components/ExpandingTextInput'
+import { Pot } from '../models/Pot';
+import Status from '../models/Status';
+import styles from '../style'
+import ImagePicker from './components/ImagePicker';
+import ImageList from './components/ImageList';
+import Image3 from './components/Image3';
+import StatusDetail from './components/StatusDetail';
+import StatusSwitcher from './components/StatusSwitcher';
+import { Note } from './components/Note';
+import { nameToImageState, isAnySyncing } from '../stores/ImageStore';
 import Button from 'react-native-button';
 
 type EditPageProps = {

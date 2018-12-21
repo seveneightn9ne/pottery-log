@@ -1,7 +1,7 @@
 // @flow
 import Expo from 'expo';
-import dispatcher from './AppDispatcher.js';
-import {nameFromUri} from './stores/ImageStore.js';
+import dispatcher from './AppDispatcher';
+import {nameFromUri} from './stores/ImageStore';
 import * as _ from 'lodash';
 
 // Routes

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import {Text, View} from 'react-native';
-import styles from '../style.js';
+import styles from '../style';
 
 const NOTSTARTED = 'notstarted';
 const THROWN = 'thrown';
@@ -113,7 +113,7 @@ export default class Status {
     return JSON.stringify(this.toObj());
   }
 
-  static dateText(date): ?string {
+  static dateText(date): string | undefined  {
     if (date) {
       const dateStringLong = date.toDateString();
       const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
@@ -126,11 +126,11 @@ export default class Status {
     return this[this.currentStatus()];
   }
 
-  dateText(): ?string {
+  dateText(): string | undefined {
     return Status.dateText(this.date());
   }
 
-  isOld(): bool {
+  isOld(): boolean {
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
@@ -141,7 +141,7 @@ export default class Status {
     return this.currentStatus(true /** pretty */) + " on " + this.dateText();
   }
 
-  currentStatus(pretty: bool = false): string {
+  currentStatus(pretty: boolean = false): string {
    const statuses = Status.ordered();
     for (let i=0; i < statuses.length; i++) {
       // $FlowFixMe
@@ -173,7 +173,7 @@ export default class Status {
     return new Status(newFullStatus);
   }
 
-  next(pretty: bool = false): ?string {
+  next(pretty: boolean = false): string | undefined {
     const currentI = Status.ordered().indexOf(this.currentStatus());
     const nextI = currentI - 1;
     if (nextI >= 0) {
@@ -183,7 +183,7 @@ export default class Status {
     }
   }
 
-  prev(pretty: bool = false): ?string {
+  prev(pretty: boolean = false): string | undefined {
     const currentI = Status.ordered().indexOf(this.currentStatus());
     const prevI = currentI + 1;
     if (prevI < Status.ordered().length) {
@@ -193,7 +193,7 @@ export default class Status {
     }
   }
 
-  hasTimeline(): bool {
+  hasTimeline(): boolean {
     return this.currentStatus() != "thrown" && this.currentStatus() != "notstarted"
   }
 }

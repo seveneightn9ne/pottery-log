@@ -3,16 +3,16 @@ import Expo from 'expo';
 import React from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Modal, Image, Dimensions, Picker, Button, TouchableOpacity, Linking } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ExpandingTextInput } from './components/ExpandingTextInput.js'
-import {Pot, Image as PotImage} from '../models/Pot.js';
-import Status from '../models/Status.js';
-import styles from '../style.js'
-import ImagePicker from './components/ImagePicker.js';
-import ImageList from './components/ImageList.js';
-import DatePicker from './components/DatePicker.js';
-import StatusDetail from './components/StatusDetail.js';
-import StatusSwitcher from './components/StatusSwitcher.js';
-import Anchor from './components/Anchor.js';
+import { ExpandingTextInput } from './components/ExpandingTextInput'
+import {Pot, Image as PotImage} from '../models/Pot';
+import Status from '../models/Status';
+import styles from '../style'
+import ImagePicker from './components/ImagePicker';
+import ImageList from './components/ImageList';
+import DatePicker from './components/DatePicker';
+import StatusDetail from './components/StatusDetail';
+import StatusSwitcher from './components/StatusSwitcher';
+import Anchor from './components/Anchor';
 
 type SettingsPageProps = {
   onNavigateToList: () => void,

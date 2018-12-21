@@ -1,12 +1,11 @@
 // @flow
 import React from 'react';
 import {Text, View} from 'react-native';
-import {Image} from '../models/Pot.js';
-import ImagePage from './ImagePage.js';
-import styles from '../style.js'
-import ListPage from './ListPage.js';
-import EditPage from './EditPage.js';
-import SettingsPage from './SettingsPage.js';
+import ImagePage from './ImagePage';
+import styles from '../style';
+import ListPage from './ListPage';
+import EditPage from './EditPage';
+import SettingsPage from './SettingsPage';
 
 type AppViewProps = {
   pots: Object, // PotStoreState
@@ -15,7 +14,7 @@ type AppViewProps = {
   exports: Object, // ExportState
   imports: Object, // ImportState
 
-  fontLoaded: bool,
+  fontLoaded: boolean,
 
   onNew: () => void,
   onChangeTitle: (text: string) => void,
@@ -39,7 +38,7 @@ type AppViewProps = {
   onImageError: (name ,uri) => void,
 };
 
-function AppView(props: AppViewProps): ?React.Element<*> {
+function AppView(props: AppViewProps): React.ReactNode {
   switch (props.ui.page) {
     case 'list':
       return <ListPage pots={props.pots} ui={props.ui}

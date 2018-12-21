@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import {Pot} from '../../models/Pot.js';
-import styles from '../../style.js';
+import {Pot} from '../../models/Pot';
+import styles from '../../style';
 import { Text, View, TouchableHighlight } from 'react-native';
 
 type PotListItemProps = {

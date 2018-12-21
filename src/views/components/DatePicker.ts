@@ -8,8 +8,8 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import styles from '../../style.js';
-import Status from '../../models/Status.js';
+import styles from '../../style';
+import Status from '../../models/Status';
 
 type DatePickerProps = {
   value: Date,

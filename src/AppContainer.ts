@@ -1,13 +1,13 @@
 // @flow
-import dispatcher from './AppDispatcher.js';
-import PotsStore from './stores/PotsStore.js';
-import UIStore from './stores/UIStore.js';
-import AppView from './views/AppView.js';
+import dispatcher from './AppDispatcher';
+import PotsStore from './stores/PotsStore';
+import UIStore from './stores/UIStore';
+import AppView from './views/AppView';
 import {Container} from 'flux/utils';
 import {Alert, BackHandler} from 'react-native';
-import {ImageStore, nameFromUri} from './stores/ImageStore.js';
-import ExportStore from './stores/ExportStore.js';
-import ImportStore from './stores/ImportStore.js';
+import {ImageStore, nameFromUri} from './stores/ImageStore';
+import ExportStore from './stores/ExportStore';
+import ImportStore from './stores/ImportStore';
 
 function getStores() {
   return [

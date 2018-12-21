@@ -1,10 +1,10 @@
 // @flow
 import Button from 'react-native-button';
 import React from 'react';
-import Status from '../../models/Status.js';
+import Status from '../../models/Status';
 import { Text, View, TouchableOpacity, Modal, TextInput } from 'react-native';
-import styles from '../../style.js';
-import { ExpandingTextInput } from './ExpandingTextInput.js'
+import styles from '../../style';
+import { ExpandingTextInput } from './ExpandingTextInput'
 
 type NoteProps = {
   potId: string,

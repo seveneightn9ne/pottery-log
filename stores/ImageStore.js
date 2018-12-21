@@ -1,17 +1,17 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import dispatcher from '../AppDispatcher.js';
-import {StorageWriter} from './sync.js';
+import dispatcher from '../AppDispatcher';
+import {StorageWriter} from './sync';
 import { AsyncStorage } from 'react-native';
-import * as ImageUploader from '../uploader.js';
+import * as ImageUploader from '../uploader';
 
 interface ImageState {
   name: string,
   // localUri and remoteUri are deprecated
   // they will be converted to a fileUri
-  localUri: ?string,
-  remoteUri: ?string,
-  fileUri: ?string,
+  localUri?: string,
+  remoteUri?: string,
+  fileUri?: string,
   pots: string[],
 }
 
@@ -23,14 +23,14 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(isImport: ?boolean): ImageStoreState {
+  getInitialState(isImport?: boolean): ImageStoreState {
     this._loadInitial(!!isImport);
     return {
       images: {},
     };
   }
 
-  async _loadInitial(isImport: ?boolean) {
+  async _loadInitial(isImport?: boolean) {
     console.log("Loading ImageStore");
     const json = await AsyncStorage.getItem("@ImageStore");
 

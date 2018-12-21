@@ -1,6 +1,6 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
-import dispatcher from '../AppDispatcher.js';
+import dispatcher from '../AppDispatcher';
 
 interface UIState {
   page: string,

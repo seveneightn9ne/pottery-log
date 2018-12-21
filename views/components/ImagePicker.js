@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import Expo from 'expo';
-import styles from '../../style.js';
+import styles from '../../style';
 
 type ImagePickerProps = {
   onPicked: (localUri) => void,

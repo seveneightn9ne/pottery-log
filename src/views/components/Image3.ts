@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image} from 'react-native';
-import dispatcher from '../../AppDispatcher.js';
+import dispatcher from '../../AppDispatcher';
 
 type Image3Props = {
   image: ImageState,

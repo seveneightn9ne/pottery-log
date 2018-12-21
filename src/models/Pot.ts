@@ -1,6 +1,6 @@
 // @flow
-import Status from './Status.js';
-import Notes from './Notes.js';
+import Status from './Status';
+import Notes from './Notes';
 
 export interface Pot {
   title: string,

@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Image, Dimensions, Picker, Button, TouchableOpacity } from 'react-native';
-import styles from '../style.js'
-import Image3 from './components/Image3.js';
-import {nameToImageState} from '../stores/ImageStore.js';
+import styles from '../style'
+import Image3 from './components/Image3';
+import {nameToImageState} from '../stores/ImageStore';
 
 type ImagePageProps = {
   image: string,

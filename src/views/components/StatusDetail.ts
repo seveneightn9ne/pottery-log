@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
-import Status from '../../models/Status.js';
+import Status from '../../models/Status';
 import { Text, View, TouchableOpacity } from 'react-native';
-import styles from '../../style.js';
-import {Note, NoteModal} from './Note.js';
+import styles from '../../style';
+import {Note, NoteModal} from './Note';
 
 type StatusDetailProps = {
   note: string,
