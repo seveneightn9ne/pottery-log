@@ -26,7 +26,8 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-button": "^2.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.4.0",
-    "sentry-expo": "~1.9.0"
+    "sentry-expo": "~1.9.0",
+    "whatwg-fetch": "^2.0.4"
   },
   "updates": {
     "fallbackToCacheTimeout": 0
