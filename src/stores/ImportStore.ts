@@ -1,20 +1,20 @@
-// @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher';
 import { startImport, importImage, importMetadata } from '../export';
-import { ImageStore, nameFromUri } from './ImageStore';
-import { Linking } from 'react-native';
-import * as _ from 'lodash';
+import { nameFromUri } from './ImageStore';
+import _ from 'lodash';
+import { Action } from '../action';
 
+type ImageMapState = {[name: string]: {uri: string; started?: true}};
 interface ImportState {
   importing: boolean,
   totalImages?: number,
   statusMessage?: string,
-  imageMap?: any, // {[k: string]: string}
+  imageMap?: ImageMapState,
   imagesImported?: number,
 }
 
-class ImportStore extends ReduceStore<ImportState> {
+class ImportStore extends ReduceStore<ImportState, Action> {
   constructor() {
     super(dispatcher);
   }
@@ -40,7 +40,7 @@ class ImportStore extends ReduceStore<ImportState> {
    *     -> retry saveToFile
    */
 
-  reduce(state: ImportState, action: Object): ImportState {
+  reduce(state: ImportState, action: Action): ImportState {
     if (action.type == 'import-initiate') {
         startImport();
         return {
@@ -54,7 +54,7 @@ class ImportStore extends ReduceStore<ImportState> {
     switch (action.type) {
         case 'import-started': {
             importMetadata(action.metadata);
-            const imageMap = {};
+            const imageMap: ImageMapState = {};
             _.forOwn(action.imageMap, (uri, name) => {
                 imageMap[name] = {uri};
             });
@@ -68,7 +68,7 @@ class ImportStore extends ReduceStore<ImportState> {
         case 'imported-metadata': {
             let numImages = 0;
             let started = 0;
-            const imageMap = {...state.imageMap};
+            const imageMap: ImageMapState = {...state.imageMap};
             _.forOwn(state.imageMap, (data, name) => {
                 //console.log("will import " + remoteUri);
                 if (started < 3) {
@@ -91,6 +91,10 @@ class ImportStore extends ReduceStore<ImportState> {
             };
         }
         case 'image-file-created': {
+            if (!state.imageMap || state.imagesImported == undefined) {
+                // Not even started importing images yet
+                return state;
+            }
             if (!state.imageMap[action.name]) {
                 console.log("Skipping image that's already imported.");
                 return state;
@@ -117,12 +121,15 @@ class ImportStore extends ReduceStore<ImportState> {
             if (!hasStartedOne) {
                 console.log("All the images have been scheduled.", newState.imageMap);
             }
-            newState.imagesImported += 1;
+            newState.imagesImported = (state.imagesImported || 0) + 1;
             newState.statusMessage = `Importing images (${newState.imagesImported}/${newState.totalImages})...`;
             //console.log(newState.statusMessage);
             return newState;
         }
         case 'image-file-failed': {
+            if (!state.imageMap) {
+                return state;
+            }
             const name = nameFromUri(action.uri);
             if (state.imageMap[name]) {
                 console.log("RETRYING IMAGE " + name);
@@ -131,6 +138,9 @@ class ImportStore extends ReduceStore<ImportState> {
             return state;
         }
         case 'image-timeout': {
+            if (!state.imageMap) {
+                return state;
+            }
             const name = nameFromUri(action.uri);
             if (name in state.imageMap) {
                 // It must be restarted.

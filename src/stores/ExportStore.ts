@@ -1,10 +1,10 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher';
-import {startExport, exportImage, finishExport, saveExport } from '../export.ts';
-import { ImageStore, nameFromUri } from './ImageStore';
-import { Linking } from 'react-native';
-import * as _ from 'lodash';
+import {startExport, exportImage, finishExport, saveExport } from '../export';
+import { ImageStore } from './ImageStore';
+import _ from 'lodash';
+import { Action } from '../action';
 
 interface ExportState {
   exporting: boolean,
@@ -17,7 +17,7 @@ interface ExportState {
   exportUri?: string,
 }
 
-class ExportStore extends ReduceStore<ExportState> {
+class ExportStore extends ReduceStore<ExportState, Action> {
   constructor() {
     super(dispatcher);
   }
