@@ -1,7 +1,7 @@
 // @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher';
-import { startImport, importImage, importMetadata } from '../export.ts';
+import { startImport, importImage, importMetadata } from '../export';
 import { ImageStore, nameFromUri } from './ImageStore';
 import { Linking } from 'react-native';
 import * as _ from 'lodash';
@@ -10,7 +10,7 @@ interface ImportState {
   importing: boolean,
   totalImages?: number,
   statusMessage?: string,
-  imageMap: ?any, // {[k: string]: string}
+  imageMap?: any, // {[k: string]: string}
   imagesImported?: number,
 }
 
@@ -23,7 +23,7 @@ class ImportStore extends ReduceStore<ImportState> {
   }
 
   /**
-   * Import flow: 
+   * Import flow:
    * Button press
    * -> 'import-initiate'
    * -> choose a file

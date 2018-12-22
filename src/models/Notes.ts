@@ -1,35 +1,35 @@
-// @flow
-import Status from './Status';
+import Status, {StatusString} from './Status';
+
+type BareNotes = {
+  [key in StatusString]: string | undefined;
+};
 
 export default class Notes {
   // Immutable! Functions return copies.
 
-  constructor(notes: Notes | Object) { // Or status with strings instead of dates.
-    if (typeof(notes) == "string") {
-      try {
-        notes = JSON.parse(notes);
-      } catch (err) {
-        return;
-      }
+  notes: BareNotes;
+
+  static empty(): BareNotes {
+    return {
+      notstarted: undefined,
+      thrown: undefined,
+      bisqued: undefined,
+      trimmed: undefined,
+      glazed: undefined,
+      pickedup: undefined,
+    };
+  }
+
+  constructor(notes?: BareNotes) {
+    if (!notes) {
+      notes = Notes.empty();
     }
-    Status.ordered().forEach(s => {
-      // $FlowFixMe
-      if (notes != undefined && notes[s] != undefined) {
-        // $FlowFixMe
-        this[s] = notes[s];
-      }
-    });
+
+    this.notes = {...notes};
   }
 
   toObj() {
-    const obj = {}
-    Status.ordered().forEach(s => {
-      // $FlowFixMe
-      if (this[s]) {
-        obj[s] = this[s];
-      }
-    });
-    return obj;
+    return {...this.notes};
   }
 
   toJSON(): string {
@@ -39,28 +39,31 @@ export default class Notes {
   isEmpty(): boolean {
     let empty = true;
     Status.ordered().forEach(s => {
-      // $FlowFixMe
-      if (this[s]) {
+      if (this.notes[s]) {
         empty = false;
       }
     });
     return empty;
   }
 
-  withNoteForStatus(status: string, note: string): Notes {
+  withNoteForStatus(status: StatusString, note: string): Notes {
     return new Notes({...this.toObj(), [status]: note});
   }
 
   forStatus(status: Status): string {
-    // $FlowFixMe
-    return this[status.currentStatus()];
+    const currentStatus = status.currentStatus();
+    if (!currentStatus) {
+      return "";
+    }
+    return this.notes[currentStatus] || "";
   }
 
+  // Used for searching
   includes(text: string): boolean {
     let contains = false;
     Status.ordered().forEach(s => {
-      // $FlowFixMe
-      if (this[s] && this[s].includes(text)) {
+      const note = this.notes[s];
+      if (note && note.includes(text)) {
         contains = true;
       }
     });

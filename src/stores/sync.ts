@@ -1,4 +1,3 @@
-// @flow
 import { AsyncStorage } from 'react-native';
 
 // Coprocessor for decoupling and serializing async functions.
@@ -6,58 +5,81 @@ import { AsyncStorage } from 'react-native';
 // - f(item):
 //     Async function which processes an item.
 //     Executions of f will never overlap in time.
-export class Sync {
-	constructor(f) {
+export class Sync<A> {
+	private queue: A[];
+	private running: boolean;
+	private f: (a: A) => Promise<void>;
+	constructor(f: (a: A) => Promise<void>) {
 		this.queue = [];
 		this.running = false;
 		this.f = f;
 	}
 
 	// Push an item. (sync)
-	push(item) {
+	push(item: A) {
 		this.queue.push(item);
-		this._kick();
+		this.kick();
 	}
 
-	_kick() {
+	private kick() {
 		if (this.running) {
 			return;
 		}
 		this.running = true;
-		this._loop();
+		this.loop();
 	}
 
-	_loop() {
-		if (this.queue.length == 0) {
+	private loop() {
+		const item = this.queue.shift();
+
+		if (item == undefined) {
 			this.running = false;
 			return;
 		}
 
-		const item = this.queue.shift();
 		this.f(item).then(
-			() => this._loop()
+			() => this.loop()
 		);
 	}
 }
 
-export const StorageWriter = new Sync(async (action) => {
-	switch (action.type) {
-		case 'put':
-			//console.log("AsyncStorage set " + action.key + "...");
-			await AsyncStorage.setItem(action.key, action.value);
-			//console.log("AsyncStorage set done.");
-			return;
-		case 'delete':
-			await AsyncStorage.removeItem(action.key);
-			return;
-		default:
-			console.log("StorageWriter received unknown action ", action);
-			return;
+type SWAction = Put | Delete;
+interface Put {
+	type: 'put';
+	key: string;
+	value: string;
+}
+interface Delete {
+	type: 'delete';
+	key: string;
+}
+
+class _StorageWriter extends Sync<SWAction> {
+	constructor() {
+		super(async (action) => {
+			switch (action.type) {
+				case 'put':
+					//console.log("AsyncStorage set " + action.key + "...");
+					await AsyncStorage.setItem(action.key, action.value);
+					//console.log("AsyncStorage set done.");
+					return;
+				case 'delete':
+					await AsyncStorage.removeItem(action.key);
+					return;
+				default:
+					console.log("StorageWriter received unknown action ", action);
+					return;
+			}
+		})
 	}
-});
-StorageWriter.put = function(key: string, value: string) {
-	this.push({type: 'put', key, value});
+
+	put(key: string, value: string) {
+		this.push({type: 'put', key, value});
+	}
+
+	delete(key: string) {
+		this.push({type: 'delete', key});
+	}
 }
-StorageWriter.delete = function(key: string) {
-	this.push({type: 'delete', key});
-}
+
+export const StorageWriter = new _StorageWriter();

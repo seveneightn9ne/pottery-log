@@ -4,22 +4,14 @@ import dispatcher from '../AppDispatcher';
 import {StorageWriter} from './sync';
 import { AsyncStorage } from 'react-native';
 import * as ImageUploader from '../uploader';
-
-interface ImageState {
-  name: string,
-  // localUri and remoteUri are deprecated
-  // they will be converted to a fileUri
-  localUri?: string,
-  remoteUri?: string,
-  fileUri?: string,
-  pots: string[],
-}
+import { ImageState, Action } from '../action';
+import { FileSystem } from 'expo';
 
 interface ImageStoreState {
   images: {[name: string]: ImageState},
 }
 
-class _ImageStore extends ReduceStore<ImageStoreState> {
+class _ImageStore extends ReduceStore<ImageStoreState, Action> {
   constructor() {
     super(dispatcher);
   }
@@ -51,7 +43,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
     }
   }
 
-  reduce(state: ImageStoreState, action: Object): ImageStoreState {
+  reduce(state: ImageStoreState, action: Action): ImageStoreState {
     switch (action.type) {
       case 'image-delete-from-pot': {
         const im = state.images[action.imageName];
@@ -71,19 +63,6 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
             this.deleteFile(im.fileUri);
           }
           delete newState.images[action.imageName];
-        }
-        this.persist(newState);
-        return newState;
-      }
-      case 'image-remote-uri': {
-        const im = state.images[action.name];
-        const newState = {images: {...state.images,
-          [action.name]:
-            {...im, remoteUri: action.remoteUri},
-        }};
-        if (newState.images[action.name].pots.length == 0) {
-          delete newState.images[action.name];
-          ImageUploader.remove(action.remoteUri);
         }
         this.persist(newState);
         return newState;
@@ -125,7 +104,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           if (image.pots && image.pots.length == 0) {
             if (image.remoteUri) {
               ImageUploader.remove(image.remoteUri);
-            } 
+            }
             if (image.fileUri) {
               this.deleteFile(image.fileUri);
             }
@@ -190,7 +169,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
           return state;
         }
         const newState = {images: {...state.images}};
-        const modified = false;
+        let modified = false;
         for (let imageName in state.images) {
           const newImage = {...state.images[imageName]};
           if (newImage.pots == undefined) {
@@ -241,7 +220,6 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
         return newState;
       }
       case 'image-remote-failed': {
-        const i = state.images[action.name];
         // TODO(jessk) handle... by deleting the image
         // and removing it from its pot(s)
         return state;
@@ -249,10 +227,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       case 'image-loaded': {
         // Convert to a fileUri if needed
         const i = state.images[action.name];
-        if (!i) {
-          return;
-        }
-        if (i.fileUri) {
+        if (!i || i.fileUri) {
           return state;
         }
         if (i.localUri) {
@@ -296,7 +271,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
 
   saveToFile(uri: string, isRemote = false, isRetry = false) {
     //console.log("Will save " + uri);
-    onError = () => {
+    const onError = () => {
       /*if (uri) {
         console.log("saveToFile FAILED on " + nameFromUri(uri));
       } else {
@@ -311,8 +286,8 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
     }
     let name = nameFromUri(uri);
     let random = Math.floor((Math.random() * 1000000) + 1);
-    let dir = Expo.FileSystem.documentDirectory + random;
-    Expo.FileSystem.makeDirectoryAsync(dir, {intermediates: true}).then(() => {
+    let dir = FileSystem.documentDirectory + random;
+    FileSystem.makeDirectoryAsync(dir, {intermediates: true}).then(() => {
       const fileUri = dir + '/' + name;
       const afterCopy = () => {
         //console.log("saveToFile SUCCESS on " + name);
@@ -323,10 +298,10 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
       };
       if (isRemote) {
         //console.log("saveToFile starting " + name);
-        Expo.FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
+        FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
       } else {
         //console.log("Will copyAsync");
-        Expo.FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
+        FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch(reason => {
           // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
           console.warn(reason);
           onError();
@@ -337,7 +312,7 @@ class _ImageStore extends ReduceStore<ImageStoreState> {
   }
 
   deleteFile(uri: string) {
-    Expo.FileSystem.deleteAsync(uri, {idempotent: true});
+    FileSystem.deleteAsync(uri, {idempotent: true});
   }
 
   persist(state: ImageStoreState) {
@@ -359,7 +334,7 @@ export function nameToUri(name: string): string {
     console.log("That image named " + name + " is not in the image store.");
     return "";
   }
-  return i.fileUri || i.localUri || i.remoteUri;
+  return i.fileUri || i.localUri || i.remoteUri || "";
 }
 
 export function nameToImageState(name: string) {
@@ -371,6 +346,9 @@ export function nameToImageState(name: string) {
   return i;
 }
 
+/**
+ * @deprecated
+ */
 export function isAnySyncing(imageNames: string[]): boolean {
   const state = ImageStore.getState();
   for (let i=0; i<imageNames.length; i++) {

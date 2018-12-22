@@ -1,10 +1,9 @@
-// @flow
-import ReactNative from 'react-native';
 import {Dispatcher} from 'flux';
+import * as types from './action';
 
-const dispatcher = new Dispatcher();
+const dispatcher = new Dispatcher<types.Action>();
 
-function logDispatch(action) {
+function logDispatch(action: types.Action) {
   switch (action.type) {
     case 'loaded':
       console.log('Action: loaded (body omitted)');
