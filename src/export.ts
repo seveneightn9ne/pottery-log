@@ -1,15 +1,15 @@
 // @flow
 import Expo from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
-import dispatcher from './AppDispatcher';
-import * as uploader from './uploader';
-import {ImageStore} from './stores/ImageStore';
 import {ImageState} from './action';
+import dispatcher from './AppDispatcher';
+import {ImageStore} from './stores/ImageStore';
+import * as uploader from './uploader';
 
 async function getExportMetadata() {
-  let allKeys = await AsyncStorage.getAllKeys();
-  let pairs = await AsyncStorage.multiGet(allKeys);
-  let snapshot: {[key: string]: string} = {};
+  const allKeys = await AsyncStorage.getAllKeys();
+  const pairs = await AsyncStorage.multiGet(allKeys);
+  const snapshot: {[key: string]: string} = {};
   pairs.forEach((pair) => {
     snapshot[pair[0]] = pair[1];
   });
@@ -24,7 +24,7 @@ async function startExport(id: number) {
 function exportImage(id: number, imageState: ImageState) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
-    const isRemote = uri == imageState.remoteUri;
+    const isRemote = uri === imageState.remoteUri;
     if (uri) {
       ImageStore.saveToFile(uri, isRemote);
     }
@@ -40,9 +40,9 @@ async function finishExport(id: number) {
 
 async function startImport() {
   const docResult = await Expo.DocumentPicker.getDocumentAsync();
-  if (docResult.type == 'success') {
+  if (docResult.type === 'success') {
     return uploader.startImport(docResult.uri);
-  } else if (docResult.type == 'cancel') {
+  } else if (docResult.type === 'cancel') {
     dispatcher.dispatch({type: 'import-cancel'});
   }
 }
@@ -67,7 +67,7 @@ async function importMetadata(metadata: string) {
 }
 
 function importImage(remoteUri: string, isRetry = false) {
-  //console.log("importImage");
+  // console.log("importImage");
   ImageStore.saveToFile(remoteUri, true /* isRemote */, !!isRetry);
   setTimeout(() => dispatcher.dispatch({
     type: 'image-timeout',

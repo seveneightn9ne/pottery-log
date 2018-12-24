@@ -1,25 +1,25 @@
+import { ImagePicker as ExpoImagePicker, Permissions } from 'expo';
 import React from 'react';
 import {
   Alert,
   Text,
   TouchableOpacity,
   View,
-  ViewStyle
+  ViewStyle,
 } from 'react-native';
-import { ImagePicker as ExpoImagePicker, Permissions } from 'expo';
 import styles from '../../style';
 
-type ImagePickerProps = {
+interface ImagePickerProps {
   onPicked: (localUri: string) => void,
   full: boolean,
   style: ViewStyle
-};
+}
 
 export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
-  render() {
+  public render() {
     const style = this.props.full ? styles.imagePickerFull : styles.imagePickerSmall;
     const textStyle = this.props.full ? styles.imagePickerFullText : styles.imagePickerSmallText;
-    const text = this.props.full ? "add_a_photo" : "add";
+    const text = this.props.full ? 'add_a_photo' : 'add';
     return <TouchableOpacity onPress={this.popup}>
         <View style={[style, styles.imagePicker, this.props.style]}>
           <Text style={[textStyle, styles.imagePickerText]}>{text}</Text>
@@ -27,14 +27,14 @@ export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
       </TouchableOpacity>;
   }
 
-  popup = () => {
-    Alert.alert( 'Add Image', 'Choose a source', [
+  public popup = () => {
+    Alert.alert('Add Image', 'Choose a source', [
       {text: 'Camera', onPress: this.pickImageFromCamera},
       {text: 'Image Library', onPress: this.pickImageFromLibrary}]);
 
   }
 
-  pickImageFromCamera = async () => {
+  public pickImageFromCamera = async () => {
     try {
       await Permissions.askAsync(Permissions.CAMERA);
       await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -45,7 +45,7 @@ export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
     await this.pickImage(ExpoImagePicker.launchCameraAsync);
   }
 
-  pickImageFromLibrary = async () => {
+  public pickImageFromLibrary = async () => {
     try {
       await Permissions.askAsync(Permissions.CAMERA_ROLL);
     } catch (e) {
@@ -55,10 +55,10 @@ export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
     await this.pickImage(ExpoImagePicker.launchImageLibraryAsync);
   }
 
-  pickImage = async (picker: (options?: ExpoImagePicker.CameraOptions & ExpoImagePicker.ImageLibraryOptions) => Promise<ExpoImagePicker.ImageResult>) => {
-    let result = await picker({
+  public pickImage = async (picker: (options?: ExpoImagePicker.CameraOptions & ExpoImagePicker.ImageLibraryOptions) => Promise<ExpoImagePicker.ImageResult>) => {
+    const result = await picker({
       allowsEditing: true,
-      aspect: [4,4],
+      aspect: [4, 4],
     });
 
     if (!result.cancelled) {

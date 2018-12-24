@@ -1,13 +1,12 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = "#ff5722";
-const LIGHT_ORANGE = "#FFCCBC";
-const GREEN = "#4caf50";
-const BLACK = "rgba(0,0,0,.87)";
-const GRAY = "rgba(0,0,0,.54)";
-const LIGHT_GRAY = "rgba(0,0,0,.10)";
-const LIGHT_GREEN = "#C8E6C9";
-const DARK_GREEN = "#388e3c";
+const ORANGE = '#ff5722';
+const LIGHT_ORANGE = '#FFCCBC';
+const GREEN = '#4caf50';
+const GRAY = 'rgba(0,0,0,.54)';
+const LIGHT_GRAY = 'rgba(0,0,0,.10)';
+const LIGHT_GREEN = '#C8E6C9';
+const DARK_GREEN = '#388e3c';
 
 export default StyleSheet.create({
     container: {
@@ -15,7 +14,7 @@ export default StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'flex-start',
         position: 'relative',
-        //paddingTop: 20,
+        // paddingTop: 20,
     },
     newPotButton: {
         backgroundColor: ORANGE,
@@ -30,29 +29,29 @@ export default StyleSheet.create({
     newPotButtonText: {
         fontFamily: 'material-icons',
         fontSize: 24,
-        color: "#fff",
+        color: '#fff',
     },
     size50: {
         width: 50,
         height: 50,
     },
     header: {
-        //flex: 1,
-        //position: 'relative',
+        // flex: 1,
+        // position: 'relative',
         backgroundColor: GREEN,
         flexDirection: 'row',
         justifyContent: 'space-between',
         elevation: 4,
         paddingTop: 20,
-        //marginBottom: 16,
-        //position: 'relative'
-        //zIndex: 1,
-        height: 56+20,
+        // marginBottom: 16,
+        // position: 'relative'
+        // zIndex: 1,
+        height: 56 + 20,
     },
     h1: {
-        color: "#fff",
+        color: '#fff',
         fontSize: 20,
-        fontWeight: "400",
+        fontWeight: '400',
         padding: 16,
         paddingBottom: 0,
     },
@@ -62,24 +61,24 @@ export default StyleSheet.create({
         padding: 16,
         paddingBottom: 0,
         marginTop: 2,
-        color: "#fff",
-        //backgroundColor: "#000",
+        color: '#fff',
+        // backgroundColor: "#000",
     },
     searchBox: {
-        color: "#fff",
+        color: '#fff',
         fontSize: 20,
-        fontWeight: "400",
+        fontWeight: '400',
         padding: 16,
         flex: 1,
     },
     searchBack: {
         fontFamily: 'material-icons',
         fontSize: 24,
-        //padding: 20,
+        // padding: 20,
         paddingLeft: 16,
         paddingTop: 16,
-        color: "#fff",
-        //backgroundColor: "#000",
+        color: '#fff',
+        // backgroundColor: "#000",
     },
     listMessage: {
         alignSelf: 'center',
@@ -97,25 +96,25 @@ export default StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',*/
         paddingTop: 16,
-        justifyContent: 'space-between',//todo do i need ths
+        justifyContent: 'space-between', // todo do i need ths
     },
     lh: { // list header
-        //fontWeight: 'bold',
-        padding: 16,//+48+12+10, // Not sure where the 10 comes from
-        //paddingBottom: 8,
+        // fontWeight: 'bold',
+        padding: 16, // +48+12+10, // Not sure where the 10 comes from
+        // paddingBottom: 8,
         justifyContent: 'space-between',
         flexDirection: 'row',
-        //paddingRight: 16,
+        // paddingRight: 16,
     },
     lhText: {
         color: GRAY,
         fontSize: 14,
-        fontWeight: "400",
+        fontWeight: '400',
     },
     collapse: {
         fontFamily: 'material-icons',
         fontSize: 20,
-        fontWeight: "400",
+        fontWeight: '400',
         color: GRAY,
     },
     listItem: {
@@ -173,7 +172,7 @@ export default StyleSheet.create({
     imagePicker: {
         borderStyle: 'dashed',
         borderWidth: 4,
-        borderColor: "#CCC",
+        borderColor: '#CCC',
         alignItems: 'center',
         flexDirection: 'column',
         backgroundColor: 'white',
@@ -185,12 +184,12 @@ export default StyleSheet.create({
 
     },
     imagePickerSmall: {
-        marginLeft: 0
+        marginLeft: 0,
     },
     imagePickerText: {
         fontFamily: 'material-icons',
         fontSize: 72,
-        color: "#CCC",
+        color: '#CCC',
     },
     imagePickerFullText: {
     },
@@ -199,7 +198,7 @@ export default StyleSheet.create({
 
     imageBar: {
         flexDirection: 'row',
-        //alignContent: 'space-between',
+        // alignContent: 'space-between',
         justifyContent: 'space-between',
         backgroundColor: '#000',
         elevation: 4,
@@ -211,12 +210,12 @@ export default StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: '#fff',
         paddingRight: 16,
         height: 28 * 2 - 8,
     },
     addMainNote: {
-        color: "#000000de",
+        color: '#000000de',
         fontFamily: 'material-icons',
         fontSize: 24,
         marginLeft: 16,
@@ -232,19 +231,19 @@ export default StyleSheet.create({
     },
     statusArrow: {},
     statusArrowText: {
-        //borderRadius: 14,
+        // borderRadius: 14,
         fontSize: 28,
-        //color: "#000000de",
+        // color: "#000000de",
         color: '#fff',
         fontFamily: 'material-icons',
     },
     mainStatus: {
         fontSize: 20,
         fontWeight: '400',
-        //paddingTop: 12,
+        // paddingTop: 12,
         paddingLeft: 16 + 28 + 8,
         marginTop: 8,
-        //paddingBottom: 1,
+        // paddingBottom: 1,
         flex: 1,
     },
     mainNote: {
@@ -256,7 +255,7 @@ export default StyleSheet.create({
         borderColor: ORANGE,
     },
     mainNoteNoBar: {
-        borderColor: "#ffffff",
+        borderColor: '#ffffff',
     },
     mainNoteText: {
         fontSize: 14,
@@ -275,7 +274,7 @@ export default StyleSheet.create({
         height: 32,
         marginTop: 8,
         borderRadius: 16,
-        backgroundColor: "#ebebeb",
+        backgroundColor: '#ebebeb',
     },
     chipInner: {
         flexDirection: 'row',
@@ -289,19 +288,19 @@ export default StyleSheet.create({
         fontSize: 16,
         fontWeight: '400',
         color: '#1e1e1e',
-        //paddingTop: 8, paddingBottom: 8,
+        // paddingTop: 8, paddingBottom: 8,
     },
     chipText: {
         color: '#1e1e1e',
         fontSize: 14,
     },
     statusDetail: {
-        //	backgroundColor: '#00000010',
-        //backgroundColor: LIGHT_GREEN,
+        // 	backgroundColor: '#00000010',
+        // backgroundColor: LIGHT_GREEN,
     },
     detailPadding: {
-        //backgroundColor: '#00000010',
-        //backgroundColor: LIGHT_GREEN,
+        // backgroundColor: '#00000010',
+        // backgroundColor: LIGHT_GREEN,
         height: 16,
     },
     statusDetailInner: {
@@ -318,17 +317,17 @@ export default StyleSheet.create({
         color: '#00000099',
     },
     statusDetailDate: {
-        //backgroundColor: '#00000022',
-        //borderRadius: 12,
-        color: "#00000099",
+        // backgroundColor: '#00000022',
+        // borderRadius: 12,
+        color: '#00000099',
         fontSize: 16,
         paddingLeft: 2,
-        //paddingBottom: 1,
-        //padding: 1,
-        //paddingLeft: 4, paddingRight: 4,
-        //marginLeft: 8,
+        // paddingBottom: 1,
+        // padding: 1,
+        // paddingLeft: 4, paddingRight: 4,
+        // marginLeft: 8,
         fontWeight: '300',
-        //alignSelf: 'baseline',
+        // alignSelf: 'baseline',
     },
     editDetail: {
         fontSize: 16,
@@ -362,7 +361,7 @@ export default StyleSheet.create({
         height: 34,
     },
     timelineOnly: {
-        //height: 12,
+        // height: 12,
         height: 34,
     },
     potDescInput: {
@@ -390,14 +389,14 @@ export default StyleSheet.create({
     },
     modalHeader: {
         fontSize: 20,
-        color: "#000000de",
+        color: '#000000de',
         fontWeight: '400',
         marginBottom: 20,
     },
     modalInput: {
         fontSize: 16,
         marginBottom: 20,
-        color: "#00000099",
+        color: '#00000099',
     },
     button3: {
         backgroundColor: 'white',
@@ -409,7 +408,7 @@ export default StyleSheet.create({
         alignSelf: 'flex-end',
     },
     bgGreen: {
-        //backgroundColor: LIGHT_GREEN,
+        // backgroundColor: LIGHT_GREEN,
     },
     bottomBar: {
         backgroundColor: '#ffffff',

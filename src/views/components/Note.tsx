@@ -1,30 +1,30 @@
-import Button from 'react-native-button';
 import React from 'react';
-import Status, { StatusString, capitalize } from '../../models/Status';
-import { Text, View, TouchableOpacity, Modal, TextStyle, ViewStyle } from 'react-native';
+import { Modal, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import Button from 'react-native-button';
+import Status, { capitalize, StatusString } from '../../models/Status';
 import styles from '../../style';
-import { ExpandingTextInput } from './ExpandingTextInput'
+import { ExpandingTextInput } from './ExpandingTextInput';
 
-type NoteModalProps = {
-  potId: string,
-  note: string,
-  status: StatusString,
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void,
-};
+interface NoteModalProps {
+  potId: string;
+  note: string;
+  status: StatusString;
+  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+}
 
 export class NoteModal extends React.Component<NoteModalProps, {open: boolean}> {
   constructor(props: NoteModalProps) {
     super(props);
     this.state = {open: false};
   }
-  open() {
+  public open() {
     this.setState({open: true});
   }
-  close() {
+  public close() {
     this.setState({open: false});
   }
-  render() {
-    return <Modal animationType={"slide"} transparent={true}
+  public render() {
+    return <Modal animationType={'slide'} transparent={true}
       visible={this.state.open}
       onRequestClose={() => this.close()}>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -41,29 +41,29 @@ export class NoteModal extends React.Component<NoteModalProps, {open: boolean}> 
           DONE</Button>
         </View>
       </View>
-    </Modal>
+    </Modal>;
   }
 }
 
 interface AddNoteProps {
-  onPress: () => void,
-  status: StatusString,
+  onPress: () => void;
+  status: StatusString;
 }
 
 function AddNote(props: AddNoteProps): JSX.Element {
   return <TouchableOpacity onPress={props.onPress}>
     <Text style={styles.noteBlankText}>
-      {"+ " + Status.progressive(props.status) + " note"}
+      {'+ ' + Status.progressive(props.status) + ' note'}
     </Text>
-  </TouchableOpacity>
+  </TouchableOpacity>;
 }
 
 interface ShowNoteProps {
-  onPress: () => void,
-  note: string,
-  fontLoaded: boolean,
-  style: TextStyle,
-  showAddNote: boolean,
+  onPress: () => void;
+  note: string;
+  fontLoaded: boolean;
+  style: TextStyle;
+  showAddNote: boolean;
 }
 
 function ShowNote(props: ShowNoteProps) {
@@ -85,7 +85,7 @@ interface NoteProps {
   textStyle: TextStyle;
   style?: ViewStyle | ViewStyle[];
   note: string;
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void,
+  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
 }
 export class Note extends React.Component<NoteProps, {}> {
   private modal: React.RefObject<NoteModal>;
@@ -93,12 +93,12 @@ export class Note extends React.Component<NoteProps, {}> {
     super(props);
     this.modal = React.createRef();
   }
-  render() {
-    const openModal = () => {this.modal.current && this.modal.current.open()}
-    const addNote = <AddNote onPress={openModal} status={this.props.status} />
+  public render() {
+    const openModal = () => {this.modal.current && this.modal.current.open();};
+    const addNote = <AddNote onPress={openModal} status={this.props.status} />;
     const showNote = <ShowNote fontLoaded={this.props.fontLoaded}
       showAddNote={this.props.showAddNote}
-      style={this.props.textStyle} onPress={openModal} note={this.props.note} />
+      style={this.props.textStyle} onPress={openModal} note={this.props.note} />;
     return <View style={this.props.style}>
       <NoteModal note={this.props.note} status={this.props.status} potId={this.props.potId}
 	      ref={this.modal} onChangeNote={this.props.onChangeNote} />

@@ -1,48 +1,48 @@
 // @flow
 import React from 'react';
 import {Text, View} from 'react-native';
-import ImagePage from './ImagePage';
-import styles from '../style';
-import ListPage from './ListPage';
-import EditPage from './EditPage';
-import SettingsPage from './SettingsPage';
 import { StatusString } from '../models/Status';
-import { UIState } from '../stores/UIStore';
-import { PotsStoreState } from '../stores/PotsStore';
-import { ImageStoreState } from '../stores/ImageStore';
 import { ExportState } from '../stores/ExportStore';
+import { ImageStoreState } from '../stores/ImageStore';
 import { ImportState } from '../stores/ImportStore';
+import { PotsStoreState } from '../stores/PotsStore';
+import { UIState } from '../stores/UIStore';
+import styles from '../style';
+import EditPage from './EditPage';
+import ImagePage from './ImagePage';
+import ListPage from './ListPage';
+import SettingsPage from './SettingsPage';
 
-export type AppViewProps = {
-  pots: PotsStoreState,
-  ui: UIState,
-  images: ImageStoreState,
-  exports: ExportState,
-  imports: ImportState,
+export interface AppViewProps {
+  pots: PotsStoreState;
+  ui: UIState;
+  images: ImageStoreState;
+  exports: ExportState;
+  imports: ImportState;
 
-  fontLoaded: boolean,
+  fontLoaded: boolean;
 
-  onNew: () => void,
-  onChangeTitle: (potId: string, text: string) => void,
-  onChangeNote: (potId: string, status: StatusString, text: string) => void,
-  onEdit: (potId: string) => void,
-  onNavigateToList: () => void,
-  onNavigateToSettings: () => void,
-  onAddImage: (potId: string, localUri: string) => void,
-  onSetMainImage: (potId: string, name: string) => void,
-  onDeleteImage: (name: string) => void,
-  onExpandImage: (name: string) => void,
-  setStatus: (newStatus: StatusString) => void,
-  setStatusDate: (date: Date) => void,
-  onDelete: () => void,
-  onCopy: () => void,
-  onOpenSearch: () => void,
-  onCloseSearch: () => void,
-  onSearch: (search: string) => void,
-  onStartExport: () => void,
-  onStartImport: () => void,
-  onCollapse: (section: string) => void,
-};
+  onNew: () => void;
+  onChangeTitle: (potId: string, text: string) => void;
+  onChangeNote: (potId: string, status: StatusString, text: string) => void;
+  onEdit: (potId: string) => void;
+  onNavigateToList: () => void;
+  onNavigateToSettings: () => void;
+  onAddImage: (potId: string, localUri: string) => void;
+  onSetMainImage: (potId: string, name: string) => void;
+  onDeleteImage: (name: string) => void;
+  onExpandImage: (name: string) => void;
+  setStatus: (newStatus: StatusString) => void;
+  setStatusDate: (date: Date) => void;
+  onDelete: () => void;
+  onCopy: () => void;
+  onOpenSearch: () => void;
+  onCloseSearch: () => void;
+  onSearch: (search: string) => void;
+  onStartExport: () => void;
+  onStartImport: () => void;
+  onCollapse: (section: string) => void;
+}
 
 function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
   switch (props.ui.page) {
@@ -92,7 +92,7 @@ function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
     default:
       return <View style={styles.container}>
         <Text style={styles.h1}>Unknown Page</Text>
-      </View>
+      </View>;
   }
 }
 

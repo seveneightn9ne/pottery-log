@@ -1,21 +1,21 @@
 import React from 'react';
-import { Text, View, Dimensions, TouchableOpacity } from 'react-native';
-import styles from '../style'
-import Image3 from './components/Image3';
-import {nameToImageState} from '../stores/ImageStore';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import {Pot} from '../models/Pot';
+import {nameToImageState} from '../stores/ImageStore';
+import styles from '../style';
+import Image3 from './components/Image3';
 
-type ImagePageProps = {
-  image: string,
-  pot: Pot,
-  fontLoaded: boolean,
-  onBack: (potId: string) => void,
-  onSetMainImage: (potId: string, image: string) => void,
-  onDeleteImage: (image: string) => void,
-};
+interface ImagePageProps {
+  image: string;
+  pot: Pot;
+  fontLoaded: boolean;
+  onBack: (potId: string) => void;
+  onSetMainImage: (potId: string, image: string) => void;
+  onDeleteImage: (image: string) => void;
+}
 
 export default class ImagePage extends React.Component<ImagePageProps> {
-  render() {
+  public render() {
     const {width} = Dimensions.get('window');
     const isMainImage = this.props.pot.images3[0] == this.props.image;
     const star = isMainImage ? 'star' : 'star_border';
@@ -44,7 +44,7 @@ export default class ImagePage extends React.Component<ImagePageProps> {
           {deleteButton}
         </View>
       </View>
-      <Image3 image={imageState} key={Image3.key(imageState)} style={{width: width, height: width}} />
+      <Image3 image={imageState} key={Image3.key(imageState)} style={{width, height: width}} />
     </View>;
   }
 }

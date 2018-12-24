@@ -1,13 +1,13 @@
+import {Container} from 'flux/utils';
+import {Alert, BackHandler} from 'react-native';
 import dispatcher from './AppDispatcher';
+import { StatusString } from './models/Status';
+import ExportStore from './stores/ExportStore';
+import {ImageStore, nameFromUri} from './stores/ImageStore';
+import ImportStore from './stores/ImportStore';
 import PotsStore from './stores/PotsStore';
 import UIStore from './stores/UIStore';
 import AppView, { AppViewProps } from './views/AppView';
-import {Container} from 'flux/utils';
-import {Alert, BackHandler} from 'react-native';
-import {ImageStore, nameFromUri} from './stores/ImageStore';
-import ExportStore from './stores/ExportStore';
-import ImportStore from './stores/ImportStore';
-import { StatusString } from './models/Status';
 
 function getStores() {
   return [
@@ -22,14 +22,14 @@ function getStores() {
 function currentPot() {
   const uiState = UIStore.getState();
   if (!('editPotId' in uiState)) {
-    throw Error("currentPot called without a pot on page: " + uiState.page);
+    throw Error('currentPot called without a pot on page: ' + uiState.page);
   }
   return PotsStore.getState().pots[uiState.editPotId];
 }
 
-BackHandler.addEventListener('hardwareBackPress', function() {
+BackHandler.addEventListener('hardwareBackPress', () => {
   const uiState = UIStore.getState();
-  if (uiState.page == "list") {
+  if (uiState.page === 'list') {
     if ('searching' in uiState) {
       dispatcher.dispatch({
         type: 'list-search-close',
@@ -38,7 +38,7 @@ BackHandler.addEventListener('hardwareBackPress', function() {
     }
     return false;
   }
-  if (uiState.page == "image") {
+  if (uiState.page === 'image') {
     dispatcher.dispatch({
       type: 'page-edit-pot',
       potId: uiState.editPotId,
@@ -74,19 +74,19 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
     }),
     onEdit: (potId: string) => dispatcher.dispatch({
       type: 'page-edit-pot',
-      potId: potId,
+      potId,
     }),
     onChangeTitle: (potId: string, newTitle: string) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'title',
       value: newTitle,
-      potId: potId,
+      potId,
     }),
     onChangeNote: (potId: string, statusText: StatusString, noteText: string) => dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'notes2',
         value: currentPot().notes2.withNoteForStatus(statusText, noteText),
-        potId: potId,
+        potId,
     }),
     onNavigateToList: () => dispatcher.dispatch({
       type: 'page-list',
@@ -101,7 +101,7 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
       type: 'list-search-close',
     }),
     onSearch: (text: string) => {
-      console.log("search", text);
+      console.log('search', text);
       dispatcher.dispatch({
         type: 'list-search-term',
         text,
@@ -110,21 +110,21 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
     onAddImage: (potId: string, localUri: string) => {
       dispatcher.dispatch({
         type: 'image-add',
-        localUri: localUri,
-        potId: potId,
+        localUri,
+        potId,
       });
       dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'images3',
         value: [nameFromUri(localUri), ...PotsStore.getState().pots[potId].images3],
-        potId: potId,
+        potId,
       });
     },
     onSetMainImage: (potId: string, name: string) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'images3',
-      value: [name, ...PotsStore.getState().pots[potId].images3.filter(i => i != name)],
-      potId: potId,
+      value: [name, ...PotsStore.getState().pots[potId].images3.filter((i) => i !== name)],
+      potId,
     }),
     onExpandImage: (name: string) => dispatcher.dispatch({
       type: 'page-image',
@@ -153,7 +153,7 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
       });
     },
     onDelete: () => {
-      Alert.alert( 'Delete this pot?', undefined,
+      Alert.alert('Delete this pot?', undefined,
        [{text: 'Cancel', style: 'cancel'},
         {text: 'Delete', onPress: () => {
           dispatcher.dispatch({
@@ -169,13 +169,13 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
       ]);
     },
     onDeleteImage: (name: string) => {
-      Alert.alert( 'Delete this image?', undefined,
+      Alert.alert('Delete this image?', undefined,
        [{text: 'Cancel', style: 'cancel'},
         {text: 'Delete', onPress: () => {
           dispatcher.dispatch({
             type: 'pot-edit-field',
             field: 'images3',
-            value: currentPot().images3.filter(i => i != name),
+            value: currentPot().images3.filter((i) => i !== name),
             potId: currentPot().uuid,
           });
           dispatcher.dispatch({
@@ -192,10 +192,10 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
       imageNames: currentPot().images3,
     }),
     onCollapse: (section: string) => dispatcher.dispatch({
-      type: 'list-collapse', section
+      type: 'list-collapse', section,
     }),
     onScrollTo: (y: number) => dispatcher.dispatch({
-      type: 'list-scroll', y
+      type: 'list-scroll', y,
     }),
 
     onStartExport: () => dispatcher.dispatch({type: 'export-initiate'}),

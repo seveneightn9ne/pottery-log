@@ -12,7 +12,7 @@ type EmptyableBareStatus = {
 
 type EmptyStatus = {
   [k in StatusString]: undefined;
-}
+};
 
 type BareStatus = EmptyStatus & (
   {notstarted: Date}
@@ -24,13 +24,9 @@ type BareStatus = EmptyStatus & (
 
 type StatusConstructor = {
   [k in StatusString]?: Date | string | number;
-}
+};
 
 export default class Status {
-  // Immutable! Functions return copies.
-
-  // At least one field is definitely not undefined
-  status: BareStatus;
 /*
   private static empty(): EmptyableBareStatus {
     return {
@@ -43,11 +39,11 @@ export default class Status {
     };
   }*/
 
-  static prettify(name: StatusString): string {
+  public static prettify(name: StatusString): string {
     return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
   }
 
-  static longterm(name: StatusString) {
+  public static longterm(name: StatusString) {
     switch (name) {
       case 'bisqued': return 'bisquing';
       case 'glazed': return 'glaze firing';
@@ -57,7 +53,7 @@ export default class Status {
     }
   }
 
-  static progressive(name: StatusString) {
+  public static progressive(name: StatusString) {
     switch (name) {
       case 'thrown': return 'throwing';
       case 'trimmed': return 'trimming';
@@ -68,7 +64,7 @@ export default class Status {
     }
   }
 
-  static action(name: StatusString) {
+  public static action(name: StatusString) {
     switch (name) {
       case 'thrown': return 'throw';
       case 'trimmed': return 'trim';
@@ -79,13 +75,13 @@ export default class Status {
     }
   }
 
-  static ordered(): StatusString[] {
+  public static ordered(): StatusString[] {
     return ['pickedup', 'glazed', 'bisqued', 'trimmed', 'thrown', 'notstarted'];
   }
 
-  static isValidStatus(status: EmptyableBareStatus): status is BareStatus {
+  public static isValidStatus(status: EmptyableBareStatus): status is BareStatus {
     let isValid = false;
-    Status.ordered().forEach(s => {
+    Status.ordered().forEach((s) => {
       if (status[s]) {
         isValid = true;
       }
@@ -93,53 +89,57 @@ export default class Status {
     return isValid;
   }
 
+  public static dateText(date: Date): string  {
+    const dateStringLong = date.toDateString();
+    const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
+    return dateString;
+  }
+  // Immutable! Functions return copies.
+
+  // At least one field is definitely not undefined
+  public status: BareStatus;
+
   constructor(from: Partial<StatusConstructor>) {
 
     const status: EmptyableBareStatus = {};
 
     _.forOwn(from, (item, _s) => {
       const s = _s as keyof EmptyableBareStatus;
-      if (typeof(item) == "string" || typeof(item) == "number") {
+      if (typeof(item) == 'string' || typeof(item) == 'number') {
         status[s] = new Date(item);
       } else {
         status[s] = item;
       }
-    })
+    });
 
     if (Status.isValidStatus(status)) {
       this.status = status;
     } else {
-      throw Error("Status must have a date");
+      throw Error('Status must have a date');
     }
   }
 
-  toObj(): BareStatus {
+  public toObj(): BareStatus {
     return {...this.status};
   }
 
-  toJSON(): string {
+  public toJSON(): string {
     return JSON.stringify(this.toObj());
   }
 
-  static dateText(date: Date): string  {
-    const dateStringLong = date.toDateString();
-    const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
-    return dateString;
-  }
-
-  date(): Date {
+  public date(): Date {
     const date = this.status[this.currentStatus()];
     if (!date) {
-      throw Error("Impossible condition: Current status must have a date.");
+      throw Error('Impossible condition: Current status must have a date.');
     }
     return date;
   }
 
-  dateText(): string {
+  public dateText(): string {
     return Status.dateText(this.date());
   }
 
-  isOld(): boolean {
+  public isOld(): boolean {
     const date = this.date();
     if (!date) {
       return false;
@@ -147,43 +147,43 @@ export default class Status {
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
-    return new Date().getTime() - date.getTime() > oneWeekIsh && this.currentStatus() != "pickedup";
+    return new Date().getTime() - date.getTime() > oneWeekIsh && this.currentStatus() != 'pickedup';
   }
 
-  text(): string {
+  public text(): string {
     const status = this.currentStatus();
     if (!status) {
-      return "";
+      return '';
     }
-    return Status.prettify(status) + " on " + this.dateText();
+    return Status.prettify(status) + ' on ' + this.dateText();
   }
 
-  currentStatus(): StatusString {
-    let current: StatusString | undefined = undefined;
-    _.forEach(Status.ordered(), _s => {
+  public currentStatus(): StatusString {
+    let current: StatusString | undefined;
+    _.forEach(Status.ordered(), (_s) => {
       const s = _s as keyof BareStatus;
-      if(this.status[s]) {
+      if (this.status[s]) {
         current = s;
         return false;
       }
       return true;
    });
-   if (current == undefined) {
-    throw Error("Impossible condition: the status has no status");
+    if (current == undefined) {
+    throw Error('Impossible condition: the status has no status');
    }
-   return current;
+    return current;
   }
 
-  withStatus(name: StatusString, date?: Date): Status {
-    //const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
-    //console.log("I see current status is " + JSON.stringify(pot.status));
+  public withStatus(name: StatusString, date?: Date): Status {
+    // const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
+    // console.log("I see current status is " + JSON.stringify(pot.status));
     const prevDate = this.toObj()[name];
     date = date ? date : (prevDate ? prevDate : new Date());
     const newFullStatus: BareStatus = {
       ...this.toObj(),
       [name]: date,
-    }
-    //console.log("newFullStatus 0 is " + JSON.stringify(newFullStatus));
+    };
+    // console.log("newFullStatus 0 is " + JSON.stringify(newFullStatus));
     const statuses = Status.ordered();
     const prevStatus = this.currentStatus();
     if (prevStatus) {
@@ -193,11 +193,11 @@ export default class Status {
         newFullStatus[statuses[i]] = undefined;
       }
     }
-    //console.log("The new status will be " + JSON.stringify(newFullStatus));
+    // console.log("The new status will be " + JSON.stringify(newFullStatus));
     return new Status(newFullStatus);
   }
 
-  next(): StatusString | undefined {
+  public next(): StatusString | undefined {
     const current = this.currentStatus();
     let nextI;
     if (!current) {
@@ -212,7 +212,7 @@ export default class Status {
     return undefined;
   }
 
-  prev(): StatusString | undefined {
+  public prev(): StatusString | undefined {
     const current = this.currentStatus();
     if (!current) {
       return undefined;
@@ -225,7 +225,7 @@ export default class Status {
     return undefined;
   }
 
-  hasTimeline(): boolean {
-    return this.currentStatus() != "thrown" && this.currentStatus() != "notstarted"
+  public hasTimeline(): boolean {
+    return this.currentStatus() != 'thrown' && this.currentStatus() != 'notstarted';
   }
 }

@@ -1,35 +1,26 @@
 import React from 'react';
 import {Image} from 'react-native';
-import dispatcher from '../../AppDispatcher';
 import { ImageState } from '../../action';
+import dispatcher from '../../AppDispatcher';
 
-type Image3Props = {
-  image: ImageState | null,
-  style: any,
-  key: string,
-};
+interface Image3Props {
+  image: ImageState | null;
+  style: any;
+  key: string;
+}
 
-type Image3State = {
-  image: ImageState | null,
-  failed: boolean,
-  tries: number,
-};
+interface Image3State {
+  image: ImageState | null;
+  failed: boolean;
+  tries: number;
+}
 
 export default class Image3 extends React.Component<Image3Props, Image3State> {
-  state: Image3State;
-  constructor(props: Image3Props) {
-    super(props);
-    this.state = {
-      failed: false,
-      tries: Image3.defaultTries(props),
-      image: props.image,
-    };
-  }
 
   // 0 tries for local because iOS doesn't reload the image unless
   // the URI changed, so in order to load remote we need to try that
   // on the first failure.
-  static defaultTries(props: Image3Props) {
+  public static defaultTries(props: Image3Props) {
     if (!props.image) {
       return 0;
     }
@@ -42,7 +33,23 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     }
   }
 
-  uri() {
+  public static key(imageState: ImageState | null): string {
+    if (!imageState) {
+      return '';
+    }
+    return '' + imageState.localUri + imageState.fileUri + imageState.remoteUri;
+  }
+  public state: Image3State;
+  constructor(props: Image3Props) {
+    super(props);
+    this.state = {
+      failed: false,
+      tries: Image3.defaultTries(props),
+      image: props.image,
+    };
+  }
+
+  public uri() {
     if (!this.props.image) {
       return '';
     }
@@ -69,8 +76,8 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     }
   }*/
 
-  render() {
-    //console.log("We are rendering " + this.uri() + "  with " + this.state.tries + " tries");
+  public render() {
+    // console.log("We are rendering " + this.uri() + "  with " + this.state.tries + " tries");
     return <Image
       source={{uri: this.uri()}}
       style={this.props.style}
@@ -80,12 +87,12 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     />;
   }
 
-  onLoadStart() {
-    //console.log("start load " + this.uri() + " with " + this.state.tries + " tries left");
+  public onLoadStart() {
+    // console.log("start load " + this.uri() + " with " + this.state.tries + " tries left");
   }
 
-  onLoad() {
-    //console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
+  public onLoad() {
+    // console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
     if (!this.props.image) {
       return;
     }
@@ -93,21 +100,21 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
       type: 'image-loaded',
       name: this.props.image.name,
     });
-    this.setState({failed: false})
+    this.setState({failed: false});
   }
 
-  onLoadEnd() {
-    //console.log("onLoadEnd " + this.uri() + " with " + this.state.tries + " tries left");
+  public onLoadEnd() {
+    // console.log("onLoadEnd " + this.uri() + " with " + this.state.tries + " tries left");
   }
 
-  onError(e: Error) {
-    //console.log("Failed to load " + this.uri());
+  public onError(e: Error) {
+    // console.log("Failed to load " + this.uri());
     if (!this.props.image) {
       return;
     }
     if (this.state.tries > 0) {
-      //console.log("Decrementing tries for " + this.uri() + " to " + (this.state.tries-1));
-      this.setState({tries: this.state.tries-1, failed: false});
+      // console.log("Decrementing tries for " + this.uri() + " to " + (this.state.tries-1));
+      this.setState({tries: this.state.tries - 1, failed: false});
       return;
     }
     if (this.props.image.fileUri) {
@@ -130,15 +137,8 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     }
   }
 
-  static key(imageState: ImageState | null): string {
-    if (!imageState) {
-      return '';
-    }
-    return '' + imageState.localUri + imageState.fileUri + imageState.remoteUri;
-  }
-
   // Keep track of the image prop in the state to use in getDerivedStateFromProps
-  componentDidMount() {
+  public componentDidMount() {
     this.setState({image: this.props.image});
   }
 }

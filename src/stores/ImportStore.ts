@@ -1,24 +1,24 @@
 import {ReduceStore} from 'flux/utils';
-import dispatcher from '../AppDispatcher';
-import { startImport, importImage, importMetadata } from '../export';
-import { nameFromUri } from './ImageStore';
 import _ from 'lodash';
 import { Action } from '../action';
+import dispatcher from '../AppDispatcher';
+import { importImage, importMetadata, startImport } from '../export';
+import { nameFromUri } from './ImageStore';
 
-type ImageMapState = {[name: string]: {uri: string; started?: true}};
+interface ImageMapState {[name: string]: {uri: string; started?: true};}
 export interface ImportState {
-  importing: boolean,
-  totalImages?: number,
-  statusMessage?: string,
-  imageMap?: ImageMapState,
-  imagesImported?: number,
+  importing: boolean;
+  totalImages?: number;
+  statusMessage?: string;
+  imageMap?: ImageMapState;
+  imagesImported?: number;
 }
 
 class ImportStore extends ReduceStore<ImportState, Action> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(): ImportState {
+  public getInitialState(): ImportState {
     return {importing: false};
   }
 
@@ -40,13 +40,13 @@ class ImportStore extends ReduceStore<ImportState, Action> {
    *     -> retry saveToFile
    */
 
-  reduce(state: ImportState, action: Action): ImportState {
+  public reduce(state: ImportState, action: Action): ImportState {
     if (action.type == 'import-initiate') {
         startImport();
         return {
             importing: true,
             statusMessage: 'Starting import...',
-        }
+        };
     }
     if (!state.importing) {
         return state;
@@ -70,18 +70,18 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             let started = 0;
             const imageMap: ImageMapState = {...state.imageMap};
             _.forOwn(state.imageMap, (data, name) => {
-                //console.log("will import " + remoteUri);
+                // console.log("will import " + remoteUri);
                 if (started < 3) {
                     importImage(data.uri);
                     imageMap[name] = {
                         uri: data.uri,
                         started: true,
-                    }
+                    };
                     started += 1;
                 }
                 numImages += 1;
             });
-            console.log("Scheduled " + numImages + " for import");
+            console.log('Scheduled ' + numImages + ' for import');
             return {
                 ...state,
                 imageMap,
@@ -99,11 +99,11 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 console.log("Skipping image that's already imported.");
                 return state;
             }
-            //console.log("Will check off this image.");
+            // console.log("Will check off this image.");
             const newState = {...state, imageMap: {...state.imageMap}};
             delete newState.imageMap[action.name];
             if (Object.keys(newState.imageMap).length == 0) {
-                console.log("Import finished!");
+                console.log('Import finished!');
                 // Import finished!
                 setTimeout(() => dispatcher.dispatch({type: 'page-list'}), 0);
                 return {
@@ -119,11 +119,11 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 }
             });
             if (!hasStartedOne) {
-                console.log("All the images have been scheduled.", newState.imageMap);
+                console.log('All the images have been scheduled.', newState.imageMap);
             }
             newState.imagesImported = (state.imagesImported || 0) + 1;
             newState.statusMessage = `Importing images (${newState.imagesImported}/${newState.totalImages})...`;
-            //console.log(newState.statusMessage);
+            // console.log(newState.statusMessage);
             return newState;
         }
         case 'image-file-failed': {
@@ -132,7 +132,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             }
             const name = nameFromUri(action.uri);
             if (state.imageMap[name]) {
-                console.log("RETRYING IMAGE " + name);
+                console.log('RETRYING IMAGE ' + name);
                 importImage(action.uri);
             }
             return state;
@@ -144,7 +144,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             const name = nameFromUri(action.uri);
             if (name in state.imageMap) {
                 // It must be restarted.
-                console.log("Timed out on " + name + ", restarting.");
+                console.log('Timed out on ' + name + ', restarting.');
                 importImage(action.uri);
             }
             return state;
@@ -158,12 +158,12 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             return {
                 importing: false,
                 statusMessage: 'Import failed.\n' + action.error,
-            }
+            };
         }
         case 'page-list': {
             return {
                 importing: false,
-            }
+            };
         }
         default:
             return state;

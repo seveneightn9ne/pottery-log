@@ -1,15 +1,15 @@
-import { Pot, Image2 } from './models/Pot';
 import Notes from './models/Notes';
+import { Image2, Pot } from './models/Pot';
 import Status from './models/Status';
 
 export interface ImageState {
-    name: string,
+    name: string;
     // localUri and remoteUri are deprecated
     // they will be converted to a fileUri
-    localUri?: string,
-    remoteUri?: string,
-    fileUri?: string,
-    pots: string[],
+    localUri?: string;
+    remoteUri?: string;
+    fileUri?: string;
+    pots: string[];
   }
 
 export type Action = PotAction | ImageAction | UiAction | ImportAction | ExportAction | Reload;
@@ -67,7 +67,7 @@ type ExportAction = (
     | ExportImage
     | ExportFinished
     | ExportFailure
-)
+);
 
 interface MigrateFromImages2 {
     type: 'migrate-from-images2';
@@ -103,7 +103,7 @@ interface PotEditNote extends PotEditField {
     value: Notes;
 }
 
-interface PotEditTitle extends PotEditField{
+interface PotEditTitle extends PotEditField {
     field: 'title';
     value: string;
 }

@@ -1,44 +1,44 @@
 import React from 'react';
 import {
-  View,
-  Modal,
   DatePickerAndroid,
   DatePickerIOS,
+  Modal,
   Platform,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import styles from '../../style';
 import Status from '../../models/Status';
+import styles from '../../style';
 
-type DatePickerProps = {
-  value: Date,
-  fontLoaded: boolean,
-  onPickDate: (date: Date) => void,
-};
+interface DatePickerProps {
+  value: Date;
+  fontLoaded: boolean;
+  onPickDate: (date: Date) => void;
+}
 
-type State = {
+interface State {
   // Used only in iOS impl
   modalVisible: boolean;
 }
 
 class ImplAndroid extends React.Component<DatePickerProps, State> {
 
-  render() {
+  public render() {
     return <View style={[styles.chipOuter, styles.chipInner]}><TouchableOpacity
       onPress={this.pickDateAndroid}>
       <View style={styles.chipInner}>
 	{this.props.fontLoaded ?
-	    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text>: null}
+	    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text> : null}
         <Text style={styles.chipText}>
       	  {Status.dateText(this.props.value)}
         </Text>
         <View style={styles.chipArrow} />
       </View>
-	  </TouchableOpacity></View>
+	  </TouchableOpacity></View>;
   }
 
-  pickDateAndroid = async () => {
+  public pickDateAndroid = async () => {
     try {
       const {action, year, month, day} = await DatePickerAndroid.open({
         date: this.props.value,
@@ -54,14 +54,14 @@ class ImplAndroid extends React.Component<DatePickerProps, State> {
 }
 
 class ImplIOS extends React.Component<DatePickerProps, State> {
-  state = {
+  public state = {
     modalVisible: false,
-  }
+  };
 
-  render() {
+  public render() {
     return <View>
       <Modal
-        animationType={"slide"}
+        animationType={'slide'}
         transparent={false}
         visible={this.state.modalVisible}
         onRequestClose={() => this.setState({modalVisible: false})}>
@@ -69,17 +69,17 @@ class ImplIOS extends React.Component<DatePickerProps, State> {
           date={this.props.value}
           mode="date"
           onDateChange={(date: Date) => {
-            this.setState({modalVisible: false})
-            this.props.onPickDate(date)
+            this.setState({modalVisible: false});
+            this.props.onPickDate(date);
           }} />
       </Modal>
     <TouchableOpacity
       onPress={() => {
-        this.setState({modalVisible: true})
+        this.setState({modalVisible: true});
       }}>
       <Text>{Status.dateText(this.props.value)}</Text>
     </TouchableOpacity>
-    </View>
+    </View>;
   }
 }
 
@@ -87,6 +87,5 @@ const DatePicker = Platform.select({
   ios: ImplIOS,
   android: ImplAndroid,
 });
-
 
 export default DatePicker;

@@ -1,13 +1,13 @@
-import {ReduceStore} from 'flux/utils';
-import {Pot, IntermediatePot} from '../models/Pot';
-import Status from '../models/Status';
-import Notes from '../models/Notes';
-import dispatcher from '../AppDispatcher';
-import {StorageWriter} from './sync';
-import { AsyncStorage } from 'react-native';
-import {nameFromUri} from './ImageStore';
-import { Action, ImageState } from '../action';
 import { Dispatcher } from 'flux';
+import {ReduceStore} from 'flux/utils';
+import { AsyncStorage } from 'react-native';
+import { Action, ImageState } from '../action';
+import dispatcher from '../AppDispatcher';
+import Notes from '../models/Notes';
+import {IntermediatePot, Pot} from '../models/Pot';
+import Status from '../models/Status';
+import {nameFromUri} from './ImageStore';
+import {StorageWriter} from './sync';
 
 export interface PotsStoreState {
   potIds: string[];
@@ -20,19 +20,19 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(isImport?: boolean): PotsStoreState {
+  public getInitialState(isImport?: boolean): PotsStoreState {
     loadInitial(dispatcher, !!isImport);
-    return {pots: {}, potIds: [], hasLoaded: false}
+    return {pots: {}, potIds: [], hasLoaded: false};
   }
 
-  reduce(state: PotsStoreState, action: Action): PotsStoreState {
+  public reduce(state: PotsStoreState, action: Action): PotsStoreState {
     switch (action.type) {
       case 'loaded': {
         let newState: PotsStoreState = {
           pots: action.pots,
           potIds: action.potIds,
           hasLoaded: true,
-          imagesLoaded: state.imagesLoaded
+          imagesLoaded: state.imagesLoaded,
         };
         if (state.imagesLoaded && !action.isImport) {
           newState = this.deleteBrokenImages(newState, {images: state.imagesLoaded});
@@ -40,7 +40,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
         return newState;
       }
       case 'new': {
-        //dispatcher.waitFor(['loaded']);
+        // dispatcher.waitFor(['loaded']);
         const pot = {
           uuid: String(Math.random()).substring(2),
           title: 'New Pot',
@@ -51,7 +51,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
         const newState = {
           ...state,
           potIds: [...state.potIds, pot.uuid],
-          pots: {...state.pots, [pot.uuid]: pot}
+          pots: {...state.pots, [pot.uuid]: pot},
         };
         this.persist(newState, pot);
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 0);
@@ -83,28 +83,28 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
           imagesLoaded: state.imagesLoaded,
           pots: newPots,
           potIds: newPotIds,
-        }
+        };
         this.persist(newState);
-        console.log("will navigate to page list");
+        console.log('will navigate to page list');
         setTimeout(() => dispatcher.dispatch({type: 'page-list'}), 1);
         return newState;
       }
       case 'pot-copy': {
         const oldPot = state.pots[action.potId];
-        const oldTitleWords = oldPot.title.split(" ");
+        const oldTitleWords = oldPot.title.split(' ');
         const lastWordIndex = oldTitleWords.length - 1;
         const lastWord = oldTitleWords[lastWordIndex];
-        const newTitle = isNaN(Number(lastWord)) ? oldTitleWords.join(" ") + " 2" :
-            oldTitleWords.slice(0, lastWordIndex).join(" ") + " " + (1 + parseInt(lastWord));
+        const newTitle = isNaN(Number(lastWord)) ? oldTitleWords.join(' ') + ' 2' :
+            oldTitleWords.slice(0, lastWordIndex).join(' ') + ' ' + (1 + parseInt(lastWord));
         const pot = {
           ...oldPot,
           uuid: String(Math.random()).substring(2),
           title: newTitle,
-        }
+        };
         const newState = {
           ...state,
           potIds: [...state.potIds, pot.uuid],
-          pots: {...state.pots, [pot.uuid]: pot}
+          pots: {...state.pots, [pot.uuid]: pot},
         };
         this.persist(newState, pot);
         setTimeout(() => dispatcher.dispatch({type: 'page-new-pot', potId: pot.uuid}), 1);
@@ -115,7 +115,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
           return this.deleteBrokenImages(state, {images: action.images});
         } else {
           return {...state,
-            imagesLoaded: action.images,
+                  imagesLoaded: action.images,
           };
         }
       }
@@ -130,27 +130,27 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
     }
   }
 
-  persist(state: PotsStoreState, pot?: Pot) {
+  public persist(state: PotsStoreState, pot?: Pot) {
     if (pot != undefined) {
       StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot));
     }
     StorageWriter.put('@Pots', JSON.stringify(state.potIds));
   }
 
-  deleteBrokenImages(state: PotsStoreState, imageState: {images: {[name: string]: ImageState}}): PotsStoreState {
+  public deleteBrokenImages(state: PotsStoreState, imageState: {images: {[name: string]: ImageState}}): PotsStoreState {
     // Modify the PotsStoreState to not refer to any images that are nonexistent or broken.
     const newState = {...state};
     newState.pots = {};
-    state.potIds.forEach(potId => {
+    state.potIds.forEach((potId) => {
       const pot = {...state.pots[potId]};
-      const newImages3 = pot.images3.filter(imageName => {
+      const newImages3 = pot.images3.filter((imageName) => {
         const image = imageState.images[imageName];
         if (!image) {
-          console.log("Forgetting a gone image");
+          console.log('Forgetting a gone image');
           return false;
         }
         if (!image.localUri && !image.remoteUri && !image.fileUri) {
-          console.log("Forgetting a broken image");
+          console.log('Forgetting a broken image');
           return false;
         }
         return true;
@@ -167,12 +167,12 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
 }
 
 async function loadInitial(dispatcher: Dispatcher<Action>, isImport: boolean): Promise<void> {
-  const potIdsStr = await AsyncStorage.getItem('@Pots') || "";
+  const potIdsStr = await AsyncStorage.getItem('@Pots') || '';
   let potIds: string[];
   try {
     potIds = JSON.parse(potIdsStr) || [];
   } catch (error) {
-    console.log("Pot load failed to parse: " + potIdsStr);
+    console.log('Pot load failed to parse: ' + potIdsStr);
     console.warn(error);
     potIds = [];
   }
@@ -182,12 +182,12 @@ async function loadInitial(dispatcher: Dispatcher<Action>, isImport: boolean): P
   }
   Promise.all(promises).then((pots) => {
     const potsById: {[uuid: string]: Pot} = {};
-    pots.forEach(p => {
+    pots.forEach((p) => {
       if (p) {
         potsById[p.uuid] = p;
       }
     });
-    dispatcher.dispatch({type: 'loaded', pots: potsById, potIds: potIds, isImport: !!isImport});
+    dispatcher.dispatch({type: 'loaded', pots: potsById, potIds, isImport: !!isImport});
   });
 }
 
@@ -201,43 +201,43 @@ async function loadPot(uuid: string): Promise<Pot | null> {
   try {
     loaded = JSON.parse(loadedJson);
   } catch (error) {
-    console.log("Pot failed to parse: " + loadedJson);
+    console.log('Pot failed to parse: ' + loadedJson);
     console.warn(error);
     return null;
   }
   // Add all fields, for version compatibility
   const pot: IntermediatePot = {...loaded};
-  pot.status = typeof(loaded.status) == "string" ?
+  pot.status = typeof(loaded.status) == 'string' ?
     new Status(JSON.parse(loaded.status)) :
     new Status(loaded.status);
 
-  pot.notes2 = typeof(loaded.notes2) == "string" ?
+  pot.notes2 = typeof(loaded.notes2) == 'string' ?
     new Notes(JSON.parse(loaded.notes2)) :
     new Notes(loaded.notes2);
 
-  if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
+  if (loaded.notes != undefined && typeof(loaded.notes) != 'string') {
     delete pot.notes;
   }
   if (loaded.images != undefined && loaded.images2 == undefined) {
     // migrate - read the old data and convert to the new one, Miles said
     // it's ok for his old clients to lose the images.
-    console.log("Migrating images 1-2.")
+    console.log('Migrating images 1-2.');
     pot.images2 = [];
-    for (let i=0; i<loaded.images.length; i++) {
+    for (let i = 0; i < loaded.images.length; i++) {
       pot.images2.push({
         localUri: loaded.images[i],
       });
     }
   }
   if (pot.images2 != undefined && pot.images3 == undefined) {
-    console.log("Migrating images 2-3.");
+    console.log('Migrating images 2-3.');
     dispatcher.dispatch({
       type: 'migrate-from-images2',
       images2: pot.images2,
       potId: pot.uuid,
     });
     pot.images3 = [];
-    for (let i=0; i<pot.images2.length; i++) {
+    for (let i = 0; i < pot.images2.length; i++) {
       pot.images3.push(nameFromUri(pot.images2[i].localUri));
     }
   }

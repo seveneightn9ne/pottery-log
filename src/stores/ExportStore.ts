@@ -1,49 +1,49 @@
 import {ReduceStore} from 'flux/utils';
-import dispatcher from '../AppDispatcher';
-import { startExport, exportImage, finishExport } from '../export';
-import { ImageStore } from './ImageStore';
 import _ from 'lodash';
 import { Action } from '../action';
+import dispatcher from '../AppDispatcher';
+import { exportImage, finishExport, startExport } from '../export';
+import { ImageStore } from './ImageStore';
 
 export type ExportState = PreExportingState | StartExportingState | ExportingImagesState | PostExportingState;
 
 interface PreExportingState {
-    exporting: false,
-    statusMessage?: string,
+    exporting: false;
+    statusMessage?: string;
 }
 
 interface StartExportingState {
-    exporting: true,
-    exportId: number,
-    statusMessage: string,
+    exporting: true;
+    exportId: number;
+    statusMessage: string;
 }
 
 interface ExportingImagesState {
-    exporting: true,
-    exportId: number,
-    exportingImages: true,
-    //awaitingFile?: number,
-    imagesExported: number,
-    totalImages: number,
-    statusMessage: string,
+    exporting: true;
+    exportId: number;
+    exportingImages: true;
+    // awaitingFile?: number,
+    imagesExported: number;
+    totalImages: number;
+    statusMessage: string;
 }
 
 interface PostExportingState {
-    exporting: false,
-    exportUri: string,
-    statusMessage: string,
+    exporting: false;
+    exportUri: string;
+    statusMessage: string;
 }
 
 class ExportStore extends ReduceStore<ExportState, Action> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(): ExportState {
+  public getInitialState(): ExportState {
     return {exporting: false};
   }
 
-  reduce(state: ExportState, action: Action): ExportState {
-    //console.log("will check: " + action.type);
+  public reduce(state: ExportState, action: Action): ExportState {
+    // console.log("will check: " + action.type);
     if (action.type == 'export-initiate') {
         const id = Date.now();
         startExport(id);
@@ -61,7 +61,7 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             const {images} = ImageStore.getState();
             let totalImages = 0;
             // let awaitingFile = 0;
-            _.forOwn(images, imageState => {
+            _.forOwn(images, (imageState) => {
                const willExport = exportImage(state.exportId, imageState);
                if (willExport) {
                    totalImages += 1;
@@ -73,25 +73,25 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 ...state,
                 exportingImages: true,
                 imagesExported: 0,
-                totalImages: totalImages,
-                //awaitingFile: awaitingFile,
+                totalImages,
+                // awaitingFile: awaitingFile,
                 statusMessage: `Exporting images (0/${totalImages})...`,
-            }
+            };
         }
         case 'image-file-created': {
             if (!('exportingImages' in state)) {
                 return state;
             }
-            //const awaitingFile = state.awaitingFile - 1;
+            // const awaitingFile = state.awaitingFile - 1;
             const totalImages = state.totalImages + 1;
             exportImage(state.exportId, {fileUri: action.fileUri});
             return {
                 ...state,
-                totalImages: totalImages,
-                //awaitingFile: awaitingFile,
+                totalImages,
+                // awaitingFile: awaitingFile,
                 statusMessage: `Exporting images (${state.imagesExported}/${totalImages})...`,
 
-            }
+            };
         }
         /*case 'image-file-failure': {
             if (!state.exportingImages) {
@@ -112,7 +112,7 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 statusMessage: `Exporting images (${state.imagesExported + 1}/${state.totalImages})...`,
             };
             if (newState.imagesExported >= state.totalImages /*&& state.awaitingFile <= 0*/) {
-                newState.statusMessage = 'Finishing export...'
+                newState.statusMessage = 'Finishing export...';
                 finishExport(state.exportId);
             }
             return newState;
@@ -122,18 +122,18 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 ...state,
                 statusMessage: 'Export finished!',
                 exportUri: action.uri,
-            }
+            };
         }
         case 'export-failure': {
             return {
                 exporting: false,
                 statusMessage: 'Export failed.\n' + action.error,
-            }
+            };
         }
         case 'page-list': {
             return {
                 exporting: false,
-            }
+            };
         }
         default:
             return state;

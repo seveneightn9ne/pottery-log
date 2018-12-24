@@ -16,7 +16,7 @@ export class Sync<A> {
 	}
 
 	// Push an item. (sync)
-	push(item: A) {
+	public push(item: A) {
 		this.queue.push(item);
 		this.kick();
 	}
@@ -38,7 +38,7 @@ export class Sync<A> {
 		}
 
 		this.f(item).then(
-			() => this.loop()
+			() => this.loop(),
 		);
 	}
 }
@@ -59,25 +59,25 @@ class _StorageWriter extends Sync<SWAction> {
 		super(async (action) => {
 			switch (action.type) {
 				case 'put':
-					//console.log("AsyncStorage set " + action.key + "...");
+					// console.log("AsyncStorage set " + action.key + "...");
 					await AsyncStorage.setItem(action.key, action.value);
-					//console.log("AsyncStorage set done.");
+					// console.log("AsyncStorage set done.");
 					return;
 				case 'delete':
 					await AsyncStorage.removeItem(action.key);
 					return;
 				default:
-					console.log("StorageWriter received unknown action ", action);
+					console.log('StorageWriter received unknown action ', action);
 					return;
 			}
-		})
+		});
 	}
 
-	put(key: string, value: string) {
+	public put(key: string, value: string) {
 		this.push({type: 'put', key, value});
 	}
 
-	delete(key: string) {
+	public delete(key: string) {
 		this.push({type: 'delete', key});
 	}
 }

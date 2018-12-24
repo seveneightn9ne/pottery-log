@@ -1,54 +1,54 @@
 import {ReduceStore} from 'flux/utils';
-import dispatcher from '../AppDispatcher';
 import { Action } from '../action';
+import dispatcher from '../AppDispatcher';
 
 export type UIState = ListUiState | SearchingUiState | EditUiState | ImageUiState | SettingsUiState;
 
 interface BaseUiState {
-  page: string,
+  page: string;
   list: {
     collapsed: string[],
     yInitial: number,
     yCurrent: number,
-  }
+  };
 }
 
 export interface ListUiState extends BaseUiState {
-  page: 'list',
+  page: 'list';
 }
 
 export interface SearchingUiState extends ListUiState {
-  searching: true,
-  searchTerm: string,
+  searching: true;
+  searchTerm: string;
 }
 
 export interface EditUiState extends BaseUiState {
-  page: 'edit-pot',
-  editPotId: string,
-  new: boolean,
+  page: 'edit-pot';
+  editPotId: string;
+  new: boolean;
 }
 
 export interface ImageUiState extends BaseUiState {
-  page: 'image',
-  editPotId: string,
-  imageId: string,
+  page: 'image';
+  editPotId: string;
+  imageId: string;
 }
 
 export interface SettingsUiState extends BaseUiState {
-  page: 'settings',
+  page: 'settings';
 }
 
 class UIStore extends ReduceStore<UIState, Action> {
   constructor() {
     super(dispatcher);
   }
-  getInitialState(): UIState {
-    return {page: 'list', list: {collapsed: [], yInitial: 0, yCurrent: 0}}
+  public getInitialState(): UIState {
+    return {page: 'list', list: {collapsed: [], yInitial: 0, yCurrent: 0}};
   }
 
   // TODO(jessk): Persist collapsed state
 
-  reduce(state: UIState, action: Action): UIState {
+  public reduce(state: UIState, action: Action): UIState {
     switch (action.type) {
       case 'page-new-pot':
         if (state.page != 'list') {
@@ -74,9 +74,9 @@ class UIStore extends ReduceStore<UIState, Action> {
             new: false,
         };
       case 'page-list':
-        return {page: 'list', list: {...state.list}}
+        return {page: 'list', list: {...state.list}};
       case 'page-settings':
-        return {page: 'settings', list: {...state.list,  yInitial: state.list.yCurrent}}
+        return {page: 'settings', list: {...state.list,  yInitial: state.list.yCurrent}};
       case 'list-search-open':
         return {
           page: 'list',
@@ -84,8 +84,8 @@ class UIStore extends ReduceStore<UIState, Action> {
           list: {
             yCurrent: 0,
             yInitial: 0,
-            collapsed: state.list.collapsed
-          }
+            collapsed: state.list.collapsed,
+          },
         };
       case 'list-search-close':
         return {...state, page: 'list', searching: false, searchTerm: ''};
@@ -94,27 +94,27 @@ class UIStore extends ReduceStore<UIState, Action> {
       case 'list-collapse':
         if (state.list.collapsed.indexOf(action.section) != -1) {
           return {...state, list: {...state.list,
-            collapsed: state.list.collapsed.filter(i => i != action.section)}};
+                                   collapsed: state.list.collapsed.filter((i) => i != action.section)}};
         }
         return {...state, list: {...state.list,
-          collapsed: [...state.list.collapsed, action.section]}};
+                                 collapsed: [...state.list.collapsed, action.section]}};
       case 'list-scroll':
       	return {...state, list: {...state.list, yCurrent: action.y}};
       case 'page-image':
         if (state.page != 'edit-pot') {
           return state;
         }
-      	return {
+      	 return {
           page: 'image',
           editPotId: state.editPotId,
           imageId: action.imageId,
-          list: state.list
+          list: state.list,
         };
       case 'image-delete-from-pot':
         if (state.page != 'image') {
           return state;
         }
-      	return {
+      	 return {
           page: 'edit-pot',
           list: state.list,
           editPotId: state.editPotId,

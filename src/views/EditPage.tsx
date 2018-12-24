@@ -1,46 +1,46 @@
 import React from 'react';
-import { Text, View, TextInput, Dimensions, TouchableOpacity, ViewStyle } from 'react-native';
+import { Dimensions, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+import Button from 'react-native-button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Pot } from '../models/Pot';
 import Status, { StatusString } from '../models/Status';
-import styles from '../style'
+import { EditUiState } from '../stores/UIStore';
+import styles from '../style';
 import ImageList from './components/ImageList';
 import StatusDetail from './components/StatusDetail';
 import StatusSwitcher from './components/StatusSwitcher';
-import { EditUiState } from '../stores/UIStore';
-import Button from 'react-native-button';
 
-type EditPageProps = {
-  pot: Pot,
-  ui: EditUiState,
+interface EditPageProps {
+  pot: Pot;
+  ui: EditUiState;
   fontLoaded: boolean;
-  onChangeTitle: (potId: string, text: string) => void,
-  onChangeNote: (potId: string, status: StatusString, text: string) => void,
-  onNavigateToList: () => void,
-  onAddImage: (potId: string, localUri: string) => void,
-  onSetMainImage: (potId: string, imageName: string) => void,
-  onDeleteImage: (imageName: string) => void,
-  onExpandImage: (imageName: string) => void,
-  setStatus: (newStatus: StatusString) => void,
-  setStatusDate: (date: Date) => void,
-  onDelete: () => void,
-  onCopy: () => void,
-};
+  onChangeTitle: (potId: string, text: string) => void;
+  onChangeNote: (potId: string, status: StatusString, text: string) => void;
+  onNavigateToList: () => void;
+  onAddImage: (potId: string, localUri: string) => void;
+  onSetMainImage: (potId: string, imageName: string) => void;
+  onDeleteImage: (imageName: string) => void;
+  onExpandImage: (imageName: string) => void;
+  setStatus: (newStatus: StatusString) => void;
+  setStatusDate: (date: Date) => void;
+  onDelete: () => void;
+  onCopy: () => void;
+}
 
 export default class EditPage extends React.Component<EditPageProps, {}> {
-  titleInput: React.RefObject<TextInput>;
+  public titleInput: React.RefObject<TextInput>;
   constructor(props: EditPageProps) {
     super(props);
     this.titleInput = React.createRef();
   }
-  render() {
+  public render() {
     const { width } = Dimensions.get('window');
     const pot = this.props.pot;
     const backButton = this.props.fontLoaded ?
       <TouchableOpacity onPress={this.props.onNavigateToList}>
         <Text style={styles.searchBack}>arrow_back</Text>
       </TouchableOpacity> : null;
-    let editButton = this.props.fontLoaded ?
+    const editButton = this.props.fontLoaded ?
       <TouchableOpacity onPress={() => {
         if (this.titleInput.current) {
           this.titleInput.current.focus();
@@ -60,10 +60,10 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         note={pot.notes2 && pot.notes2.notes[s] || ''}
         status={s} potId={pot.uuid} date={pot.status.status[s] || new Date()}
         first={i == 0} last={i == numStatusDetails - 1}
-        onChangeNote={this.props.onChangeNote} />
+        onChangeNote={this.props.onChangeNote} />,
     );
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
-    const bottomBarStyle: ViewStyle[] = [styles.bottomBar,];
+    const bottomBarStyle: ViewStyle[] = [styles.bottomBar];
     if (details.length) {
       bottomBarStyle.push(styles.bottomBarWithContent);
     }
@@ -72,8 +72,8 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         {backButton}
         <TextInput style={styles.searchBox}
           ref={this.titleInput}
-          underlineColorAndroid='transparent'
-          placeholderTextColor='#FFCCBC'
+          underlineColorAndroid="transparent"
+          placeholderTextColor="#FFCCBC"
           onChangeText={(text) => this.props.onChangeTitle(pot.uuid, text)}
           value={pot.title} selectTextOnFocus={true} autoFocus={this.props.ui.new}
         />

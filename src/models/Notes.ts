@@ -5,11 +5,8 @@ type BareNotes = {
 };
 
 export default class Notes {
-  // Immutable! Functions return copies.
 
-  notes: BareNotes;
-
-  static empty(): BareNotes {
+  public static empty(): BareNotes {
     return {
       notstarted: undefined,
       thrown: undefined,
@@ -19,6 +16,9 @@ export default class Notes {
       pickedup: undefined,
     };
   }
+  // Immutable! Functions return copies.
+
+  public notes: BareNotes;
 
   constructor(notes?: BareNotes) {
     if (!notes) {
@@ -28,17 +28,17 @@ export default class Notes {
     this.notes = {...notes};
   }
 
-  toObj() {
+  public toObj() {
     return {...this.notes};
   }
 
-  toJSON(): string {
+  public toJSON(): string {
     return JSON.stringify(this.toObj());
   }
 
-  isEmpty(): boolean {
+  public isEmpty(): boolean {
     let empty = true;
-    Status.ordered().forEach(s => {
+    Status.ordered().forEach((s) => {
       if (this.notes[s]) {
         empty = false;
       }
@@ -46,22 +46,22 @@ export default class Notes {
     return empty;
   }
 
-  withNoteForStatus(status: StatusString, note: string): Notes {
+  public withNoteForStatus(status: StatusString, note: string): Notes {
     return new Notes({...this.toObj(), [status]: note});
   }
 
-  forStatus(status: Status): string {
+  public forStatus(status: Status): string {
     const currentStatus = status.currentStatus();
     if (!currentStatus) {
-      return "";
+      return '';
     }
-    return this.notes[currentStatus] || "";
+    return this.notes[currentStatus] || '';
   }
 
   // Used for searching
-  includes(text: string): boolean {
+  public includes(text: string): boolean {
     let contains = false;
-    Status.ordered().forEach(s => {
+    Status.ordered().forEach((s) => {
       const note = this.notes[s];
       if (note && note.includes(text)) {
         contains = true;

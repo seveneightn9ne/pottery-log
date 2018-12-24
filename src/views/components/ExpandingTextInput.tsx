@@ -1,19 +1,19 @@
-import React, {Component} from 'react'
-import { TextInput, TextInputProps } from 'react-native'
+import React, {Component} from 'react';
+import { TextInput, TextInputProps } from 'react-native';
 
 interface Props extends TextInputProps {
-  onSubmit: () => void,
+  onSubmit: () => void;
 }
-type State = {
-  height: number
+interface State {
+  height: number;
 }
 export class ExpandingTextInput extends Component<Props, State> {
-  state: State;
+  public state: State;
   constructor(props: Props) {
     super(props);
     this.state = {height: 0};
   }
-  render() {
+  public render() {
     return (
       <TextInput
         {...this.props}

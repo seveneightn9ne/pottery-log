@@ -1,27 +1,27 @@
 import React from 'react';
-import {Pot} from '../../models/Pot';
-import Image3 from './Image3';
-import { Dimensions, Text, View, TouchableOpacity, Image } from 'react-native';
-import styles from '../../style';
+import { Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
 import dispatcher from '../../AppDispatcher';
+import {Pot} from '../../models/Pot';
 import {nameToImageState} from '../../stores/ImageStore';
+import styles from '../../style';
+import Image3 from './Image3';
 
-type PotListItemProps = {
+interface PotListItemProps {
   pot: Pot,
   fontLoaded: boolean
   onPress: () => void,
-};
+}
 
 export default class PotListItem extends React.Component<PotListItemProps, {}> {
-  onPress = () => {
+  public onPress = () => {
     dispatcher.dispatch({type: 'page-edit-pot', potId: this.props.pot.uuid});
   }
 
-  render() {
+  public render() {
     const { width } = Dimensions.get('window');
     const imgstate = this.props.pot.images3.length ?
       nameToImageState(this.props.pot.images3[0]) : null;
-    const size = {width: width/2-6, height: width/2-6};
+    const size = {width: width / 2 - 6, height: width / 2 - 6};
     const img = this.props.pot.images3.length ?
       <Image3 image={imgstate} style={size} key={Image3.key(imgstate)} /> :
       <View style={[styles.liImagePlaceholder, size]}>

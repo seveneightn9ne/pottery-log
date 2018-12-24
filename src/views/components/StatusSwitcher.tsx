@@ -1,36 +1,36 @@
 import React from 'react';
+import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Status, { StatusString } from '../../models/Status';
-import { Text, View, TouchableOpacity, ViewStyle } from 'react-native';
-import DatePicker from './DatePicker';
 import styles from '../../style';
+import DatePicker from './DatePicker';
 import { Note, NoteModal } from './Note';
 
-type StatusSwitcherProps = {
-  fontLoaded: boolean,
-  status: Status,
-  note: string,
-  potId: string,
-  date: Date,
-  setStatus: (newStatus: StatusString) => void,
-  onPickDate: (newDate: Date) => void,
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void,
-};
+interface StatusSwitcherProps {
+  fontLoaded: boolean;
+  status: Status;
+  note: string;
+  potId: string;
+  date: Date;
+  setStatus: (newStatus: StatusString) => void;
+  onPickDate: (newDate: Date) => void;
+  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+}
 
 export default class StatusSwitcher extends React.Component<StatusSwitcherProps> {
-  modal: React.RefObject<NoteModal>;
+  public modal: React.RefObject<NoteModal>;
   constructor(props: StatusSwitcherProps) {
     super(props);
     this.modal = React.createRef();
   }
-  render() {
+  public render() {
     const editButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() => { this.modal.current && this.modal.current.open() }}>
+      <TouchableOpacity onPress={() => { this.modal.current && this.modal.current.open(); }}>
         <Text style={styles.addMainNote}>{this.props.note ? 'mode_edit' : 'note_add'}</Text>
       </TouchableOpacity>
       : null;
     const noteModal = <NoteModal note={this.props.note} status={this.props.status.currentStatus()}
       potId={this.props.potId} ref={this.modal}
-      onChangeNote={this.props.onChangeNote} />
+      onChangeNote={this.props.onChangeNote} />;
     let mainNoteStyle: ViewStyle | ViewStyle[] = styles.mainNote;
     if (!this.props.status.hasTimeline()) {
       mainNoteStyle = [styles.mainNote, styles.mainNoteNoBar];
@@ -58,7 +58,7 @@ export default class StatusSwitcher extends React.Component<StatusSwitcherProps>
           <TouchableOpacity style={styles.statusArrow}
             onPress={() => {
               const next = this.props.status.next();
-              if (next) this.props.setStatus(next)
+              if (next) { this.props.setStatus(next); }
             }}>
             <Text style={styles.statusArrowText}>keyboard_arrow_up</Text>
           </TouchableOpacity> : null}
@@ -67,7 +67,7 @@ export default class StatusSwitcher extends React.Component<StatusSwitcherProps>
           <TouchableOpacity style={styles.statusArrow}
             onPress={() => {
               const prev = this.props.status.prev();
-              if (prev) this.props.setStatus(prev)
+              if (prev) { this.props.setStatus(prev); }
             }}>
             <Text style={styles.statusArrowText}>keyboard_arrow_down</Text>
           </TouchableOpacity> : null}

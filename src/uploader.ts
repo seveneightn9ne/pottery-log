@@ -1,7 +1,7 @@
 import Expo from 'expo';
+import _ from 'lodash';
 import dispatcher from './AppDispatcher';
 import {nameFromUri} from './stores/ImageStore';
-import _ from 'lodash';
 
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';
@@ -11,13 +11,14 @@ const EXPORT_FINISH = apiPrefix + 'finish-export';
 const IMPORT = apiPrefix + 'import';
 const IMAGE_DELETE = 'https://jesskenney.com/pottery-log-images/delete';
 
-async function post<Req, Res = {}>(path: string, kvs: Req, onSuccess: (data: Res) => void, onError: (e: string | Error) => void) {
+async function post<Req, Res>(
+  path: string, kvs: Req, onSuccess: (data: Res) => void, onError: (e: string | Error) => void) {
   const formData = new FormData();
   _.forOwn(kvs, (val, key) => {
     formData.append(key, val);
   });
 
-  let options = {
+  const options = {
     method: 'POST',
     body: formData,
     headers: {
@@ -26,22 +27,22 @@ async function post<Req, Res = {}>(path: string, kvs: Req, onSuccess: (data: Res
     },
   };
 
-  let error = undefined;
+  let error;
   for (let tries = 0; tries < 3; tries++) {
     try {
       const response = await fetch(path, options);
       if (response.ok) {
         const r = await response.json();
-        if (r.status == "ok") {
+        if (r.status === 'ok') {
           return onSuccess(r);
-        } else if (r.status == "error") {
+        } else if (r.status === 'error') {
           error = r.message;
         }
       } else {
         error = response.statusText;
       }
     } catch (reason) {
-      console.log("Error accessing " + path);
+      console.log('Error accessing ' + path);
       console.warn(reason);
       error = reason;
     }
@@ -50,27 +51,27 @@ async function post<Req, Res = {}>(path: string, kvs: Req, onSuccess: (data: Res
 }
 
 function mimeFromUri(uri: string) {
-  let fileName = nameFromUri(uri);
-  let fileNameParts = fileName.split('.');
+  const fileName = nameFromUri(uri);
+  const fileNameParts = fileName.split('.');
   let fileType = fileNameParts[fileNameParts.length - 1];
-  if (fileType == "jpg") {
-    fileType = "jpeg";
+  if (fileType === 'jpg') {
+    fileType = 'jpeg';
   }
   return `image/${fileType}`;
 }
 
 export async function remove(uri: string) {
-  return post(IMAGE_DELETE, {uri}, () => {}, (e) => {throw e});
-};
+  return post(IMAGE_DELETE, {uri}, () => {}, (e) => { throw e; });
+}
 
 export async function startExport(id: number, metadata: any) {
   return post(
     EXPORT_START,
     { metadata: JSON.stringify(metadata),
-      deviceId: Expo.Constants.deviceId, },
+      deviceId: Expo.Constants.deviceId },
     () => dispatcher.dispatch({type: 'export-started', exportId: id}),
     (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
-};
+}
 
 export async function exportImage(id: number, uri: string) {
   return post(EXPORT_IMAGE, {
@@ -98,7 +99,7 @@ export async function startImport(uri: string) {
       uri,
       name: nameFromUri(uri),
       type: 'application/zip',
-    }
+    },
   }, (res: {metadata: string, image_map: {[i: string]: string}}) =>
     dispatcher.dispatch({type: 'import-started', metadata: res.metadata, imageMap: res.image_map}),
   (e) => dispatcher.dispatch({type: 'import-failure', error: e}));
