@@ -1,16 +1,13 @@
-// @flow
 import React from 'react';
-import {Pot} from '../../models/Pot';
 import styles from '../../style';
 import { Text, View, TouchableHighlight } from 'react-native';
 
-type PotListItemProps = {
-  pot: Pot,
+type NewPotButtonProps = {
+  fontLoaded: boolean,
   onPress: () => void,
 }
-export default class NewPotButton extends React.Component {
+export default class NewPotButton extends React.Component<NewPotButtonProps, {}> {
   render() {
-    console.log("rendering fontLoaded=", this.props.fontLoaded);
     return <TouchableHighlight onPress={this.props.onPress} style={styles.newPotButton}><View>
     {this.props.fontLoaded ?
       <Text style={styles.newPotButtonText}>add</Text>: null}

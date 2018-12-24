@@ -1,20 +1,26 @@
-// @flow
 import React from 'react';
-import Status from '../../models/Status';
-import { Text, View, TouchableOpacity } from 'react-native';
+import Status, { StatusString } from '../../models/Status';
+import { Text, View, TouchableOpacity, ViewStyle } from 'react-native';
 import styles from '../../style';
 import {Note, NoteModal} from './Note';
 
 type StatusDetailProps = {
+  fontLoaded: boolean,
   note: string,
-  status: string,
+  status: StatusString,
   date: Date,
   potId: string,
-  onChangeNote: (potId, status, newNote) => void,
+  first: boolean,
+  last: boolean,
+  onChangeNote: (potId: string, status: StatusString, newNote: string) => void,
 };
 
-export default class StatusDetail extends React.Component {
-  modal: NoteModal;
+export default class StatusDetail extends React.Component<StatusDetailProps, {}> {
+  modal: React.RefObject<NoteModal>;
+  constructor(props: StatusDetailProps) {
+    super(props);
+    this.modal = React.createRef();
+  }
   render() {
     const noteComponent = <Note fontLoaded={this.props.fontLoaded}
       textStyle={styles.statusDetailNote}
@@ -22,7 +28,7 @@ export default class StatusDetail extends React.Component {
       potId={this.props.potId} onChangeNote={this.props.onChangeNote}
       showNote={true} showAddNote={false} />;
     const editButton = this.props.fontLoaded ?
-          <TouchableOpacity onPress={() => {this.modal && this.modal.open()}}>
+          <TouchableOpacity onPress={() => {this.modal.current && this.modal.current.open()}}>
 	    <Text style={[styles.search, styles.editDetail]}>
 	      {this.props.note ? 'mode_edit' : 'note_add'}
 	    </Text>
@@ -30,9 +36,9 @@ export default class StatusDetail extends React.Component {
         : null;
     const noteModal = <NoteModal note={this.props.note}
       status={this.props.status}
-      potId={this.props.potId} ref={(e) => this.modal = e}
+      potId={this.props.potId} ref={this.modal}
       onChangeNote={this.props.onChangeNote} />
-    const timelineStyles = [styles.timeline,];
+    const timelineStyles: ViewStyle[] = [styles.timeline];
     if (this.props.first) timelineStyles.push(styles.timelineFirst);
     if (this.props.last) timelineStyles.push(styles.timelineLast);
     if (!this.props.first && this.props.last) timelineStyles.push(styles.timelineLastOnly);

@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import {Pot} from '../../models/Pot';
 import Image3 from './Image3';
@@ -9,22 +8,22 @@ import {nameToImageState} from '../../stores/ImageStore';
 
 type PotListItemProps = {
   pot: Pot,
+  fontLoaded: boolean
   onPress: () => void,
-  onError: (name: string, uri: string) => void,
 };
 
-export default class PotListItem extends React.Component {
+export default class PotListItem extends React.Component<PotListItemProps, {}> {
   onPress = () => {
-    dispatcher.dispatch({type: 'page-edit-pot', pot: this.props.pot});
+    dispatcher.dispatch({type: 'page-edit-pot', potId: this.props.pot.uuid});
   }
 
   render() {
-    const {height, width} = Dimensions.get('window');
+    const { width } = Dimensions.get('window');
     const imgstate = this.props.pot.images3.length ?
       nameToImageState(this.props.pot.images3[0]) : null;
     const size = {width: width/2-6, height: width/2-6};
     const img = this.props.pot.images3.length ?
-      <Image3 image={imgstate} style={[styles.liImage, size]} /> :
+      <Image3 image={imgstate} style={size} key={Image3.key(imgstate)} /> :
       <View style={[styles.liImagePlaceholder, size]}>
       	  <Image source={require('../../../assets/coffee.png')}
 	    style={{width: 48, height: 48}} />
@@ -44,6 +43,4 @@ export default class PotListItem extends React.Component {
       </View>
     </TouchableOpacity>);
   }
-
-
 }

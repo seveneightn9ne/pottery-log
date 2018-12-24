@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, Text, ToastAndroid, Clipboard } from 'react-native';
 import styles from '../../style';
 
-export default class Anchor extends React.Component {
+export default class Anchor extends React.Component<{href: string, onPress?: () => void}> {
   _handlePress = () => {
     Linking.openURL(this.props.href);
     this.props.onPress && this.props.onPress();

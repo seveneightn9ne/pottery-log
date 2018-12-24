@@ -1,23 +1,26 @@
 import React from 'react';
 import {Image} from 'react-native';
 import dispatcher from '../../AppDispatcher';
+import { ImageState } from '../../action';
 
 type Image3Props = {
-  image: ImageState,
+  image: ImageState | null,
   style: any,
+  key: string,
 };
 
 type Image3State = {
+  image: ImageState | null,
   failed: boolean,
   tries: number,
 };
 
-export default class Image3 extends React.Component {
-  state: any;
-  constructor(props) {
+export default class Image3 extends React.Component<Image3Props, Image3State> {
+  state: Image3State;
+  constructor(props: Image3Props) {
     super(props);
     this.state = {
-      failed: false, 
+      failed: false,
       tries: Image3.defaultTries(props),
       image: props.image,
     };
@@ -26,7 +29,10 @@ export default class Image3 extends React.Component {
   // 0 tries for local because iOS doesn't reload the image unless
   // the URI changed, so in order to load remote we need to try that
   // on the first failure.
-  static defaultTries(props) {
+  static defaultTries(props: Image3Props) {
+    if (!props.image) {
+      return 0;
+    }
     if (props.image.fileUri) {
       return 3;
     } else if (props.image.localUri) {
@@ -37,6 +43,9 @@ export default class Image3 extends React.Component {
   }
 
   uri() {
+    if (!this.props.image) {
+      return '';
+    }
     return this.props.image.fileUri || this.props.image.localUri || this.props.image.remoteUri;
   }
 
@@ -77,6 +86,9 @@ export default class Image3 extends React.Component {
 
   onLoad() {
     //console.log("loaded " + this.uri() + " with " + this.state.tries + " tries left");
+    if (!this.props.image) {
+      return;
+    }
     dispatcher.dispatch({
       type: 'image-loaded',
       name: this.props.image.name,
@@ -88,8 +100,11 @@ export default class Image3 extends React.Component {
     //console.log("onLoadEnd " + this.uri() + " with " + this.state.tries + " tries left");
   }
 
-  onError(e) {
+  onError(e: Error) {
     //console.log("Failed to load " + this.uri());
+    if (!this.props.image) {
+      return;
+    }
     if (this.state.tries > 0) {
       //console.log("Decrementing tries for " + this.uri() + " to " + (this.state.tries-1));
       this.setState({tries: this.state.tries-1, failed: false});
@@ -115,19 +130,11 @@ export default class Image3 extends React.Component {
     }
   }
 
-  static getDerivedStateFromProps(nextProps, state) {
-    // Reset state when props change.
-    if (nextProps.image.localUri != state.image.localUri
-      || nextProps.image.remoteUri != state.image.remoteUri
-      || nextProps.image.fileUri != state.image.fileUri) {
-    //console.log("Props changed for image " + this.uri());
-      return {
-        ...state,
-        failed: false,
-        tries: Image3.defaultTries(nextProps)
-      };
+  static key(imageState: ImageState | null): string {
+    if (!imageState) {
+      return '';
     }
-    return null;
+    return '' + imageState.localUri + imageState.fileUri + imageState.remoteUri;
   }
 
   // Keep track of the image prop in the state to use in getDerivedStateFromProps

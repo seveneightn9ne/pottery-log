@@ -13,10 +13,16 @@ import Status from '../../models/Status';
 
 type DatePickerProps = {
   value: Date,
+  fontLoaded: boolean,
   onPickDate: (date: Date) => void,
 };
 
-class ImplAndroid extends React.Component {
+type State = {
+  // Used only in iOS impl
+  modalVisible: boolean;
+}
+
+class ImplAndroid extends React.Component<DatePickerProps, State> {
 
   render() {
     return <View style={[styles.chipOuter, styles.chipInner]}><TouchableOpacity
@@ -37,8 +43,9 @@ class ImplAndroid extends React.Component {
       const {action, year, month, day} = await DatePickerAndroid.open({
         date: this.props.value,
       });
+      const def = new Date();
       if (action !== DatePickerAndroid.dismissedAction) {
-        this.props.onPickDate(new Date(year, month, day));
+        this.props.onPickDate(new Date(year || def.getFullYear(), month || def.getMonth(), day || def.getDate()));
       }
     } catch ({code, message}) {
       console.warn('Cannot open date picker', message);
@@ -46,7 +53,7 @@ class ImplAndroid extends React.Component {
   }
 }
 
-class ImplIOS extends React.Component {
+class ImplIOS extends React.Component<DatePickerProps, State> {
   state = {
     modalVisible: false,
   }
@@ -57,28 +64,22 @@ class ImplIOS extends React.Component {
         animationType={"slide"}
         transparent={false}
         visible={this.state.modalVisible}
-        onRequestClose={this.onModalClosed}
-        >
+        onRequestClose={() => this.setState({modalVisible: false})}>
         <DatePickerIOS
           date={this.props.value}
           mode="date"
-          onDateChange={this.onDateChange}
-        />
+          onDateChange={(date: Date) => {
+            this.setState({modalVisible: false})
+            this.props.onPickDate(date)
+          }} />
       </Modal>
     <TouchableOpacity
-      onPress={this.onStart}>
+      onPress={() => {
+        this.setState({modalVisible: true})
+      }}>
       <Text>{Status.dateText(this.props.value)}</Text>
     </TouchableOpacity>
     </View>
-  }
-
-  onStart = () => {
-    this.setState({modalVisible: true})
-  }
-
-  onDateChange = (date) => {
-    this.setState({modalVisible: false})
-    this.props.onPickDate(date)
   }
 }
 
@@ -88,4 +89,4 @@ const DatePicker = Platform.select({
 });
 
 
-export default DatePicker
+export default DatePicker;

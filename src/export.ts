@@ -3,7 +3,8 @@ import Expo from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
 import dispatcher from './AppDispatcher';
 import * as uploader from './uploader';
-import {ImageStore, ImageState} from './stores/ImageStore';
+import {ImageStore} from './stores/ImageStore';
+import {ImageState} from './action';
 
 async function getExportMetadata() {
   let allKeys = await AsyncStorage.getAllKeys();
@@ -24,7 +25,9 @@ function exportImage(id: number, imageState: ImageState) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri == imageState.remoteUri;
-    ImageStore.saveToFile(imageState.remoteUri, isRemote);
+    if (uri) {
+      ImageStore.saveToFile(uri, isRemote);
+    }
     return false;
   }
   uploader.exportImage(id, imageState.fileUri);
@@ -49,7 +52,7 @@ async function importMetadata(metadata: string) {
     const kvs = JSON.parse(metadata);
 
     Alert.alert('Ready to import. This will erase any existing data. Are you sure?', undefined,
-       [{text: 'Nevermind', style: 'cancel', onPress: () => 
+       [{text: 'Nevermind', style: 'cancel', onPress: () =>
           dispatcher.dispatch({type: 'import-cancel'})},
         {text: 'Continue', onPress: async () => {
           await AsyncStorage.clear();

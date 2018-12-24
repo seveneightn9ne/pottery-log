@@ -1,71 +1,125 @@
-// @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher';
+import { Action } from '../action';
 
-interface UIState {
+export type UIState = ListUiState | SearchingUiState | EditUiState | ImageUiState | SettingsUiState;
+
+interface BaseUiState {
   page: string,
-  editPotId: string,
+  list: {
+    collapsed: string[],
+    yInitial: number,
+    yCurrent: number,
+  }
 }
 
-class UIStore extends ReduceStore<UIState> {
+export interface ListUiState extends BaseUiState {
+  page: 'list',
+}
+
+export interface SearchingUiState extends ListUiState {
+  searching: true,
+  searchTerm: string,
+}
+
+export interface EditUiState extends BaseUiState {
+  page: 'edit-pot',
+  editPotId: string,
+  new: boolean,
+}
+
+export interface ImageUiState extends BaseUiState {
+  page: 'image',
+  editPotId: string,
+  imageId: string,
+}
+
+export interface SettingsUiState extends BaseUiState {
+  page: 'settings',
+}
+
+class UIStore extends ReduceStore<UIState, Action> {
   constructor() {
     super(dispatcher);
   }
   getInitialState(): UIState {
-    return {page: 'list', collapsed: [], yInitial: 0, yCurrent: 0, scrollEnabled: true}
+    return {page: 'list', list: {collapsed: [], yInitial: 0, yCurrent: 0}}
   }
 
   // TODO(jessk): Persist collapsed state
 
-  reduce(state: UIState, action: Object): UIState {
-    const collapsed = [...state.collapsed];
+  reduce(state: UIState, action: Action): UIState {
     switch (action.type) {
       case 'page-new-pot':
-        return {...state,
+        if (state.page != 'list') {
+          return state;
+        }
+        return {
             page: 'edit-pot',
             editPotId: action.potId,
-            yInitial: state.yCurrent,
+            list: {
+              ...state.list,
+              yInitial: state.list.yCurrent,
+            },
             new: true,
         };
       case 'page-edit-pot':
-        return {...state,
+        return {
             page: 'edit-pot',
             editPotId: action.potId,
-            yInitial: state.yCurrent,
+            list: {
+              ...state.list,
+              yInitial: state.list.yCurrent,
+            },
             new: false,
         };
       case 'page-list':
-        console.log("Navigate to list");
-        return {...state, page: 'list'}
+        return {page: 'list', list: {...state.list}}
       case 'page-settings':
-        console.log("Navigate to settings");
-        return {...state, page: 'settings', yInitial: state.yCurrent}
+        return {page: 'settings', list: {...state.list,  yInitial: state.list.yCurrent}}
       case 'list-search-open':
-      	console.log("Opened search");
-        return {...state, page: 'list', searching: true, yCurrent: 0, yInitial: 0};
+        return {
+          page: 'list',
+          searching: true,
+          list: {
+            yCurrent: 0,
+            yInitial: 0,
+            collapsed: state.list.collapsed
+          }
+        };
       case 'list-search-close':
         return {...state, page: 'list', searching: false, searchTerm: ''};
       case 'list-search-term':
       	return {...state, page: 'list', searching: true, searchTerm: action.text};
       case 'list-collapse':
-      	console.log("toggle collapse on " + action.section);
-      	console.log(state.collapsed);
-        if (state.collapsed.indexOf(action.section) != -1) {
-          return {...state, collapsed: collapsed.filter(i => i != action.section)};
+        if (state.list.collapsed.indexOf(action.section) != -1) {
+          return {...state, list: {...state.list,
+            collapsed: state.list.collapsed.filter(i => i != action.section)}};
         }
-        return {...state, collapsed: [...collapsed, action.section]};
+        return {...state, list: {...state.list,
+          collapsed: [...state.list.collapsed, action.section]}};
       case 'list-scroll':
-      	if (state.scrollEnabled) {
-      	  return {...state, yCurrent: action.y};
-	}
-      case 'list-scroll-disable':
-	return {...state, scrollEnabled: false};
-      case 'list-scroll-enable':
-	return {...state, scrollEnabled: true};
+      	return {...state, list: {...state.list, yCurrent: action.y}};
       case 'page-image':
-      	return {...state, page: 'image', imageId: action.imageId};
+        if (state.page != 'edit-pot') {
+          return state;
+        }
+      	return {
+          page: 'image',
+          editPotId: state.editPotId,
+          imageId: action.imageId,
+          list: state.list
+        };
       case 'image-delete-from-pot':
-      	return {...state, page: 'edit-pot'};
+        if (state.page != 'image') {
+          return state;
+        }
+      	return {
+          page: 'edit-pot',
+          list: state.list,
+          editPotId: state.editPotId,
+          new: false,
+        };
       case 'reload':
         return this.getInitialState();
 

@@ -1,13 +1,13 @@
-// @flow
 import dispatcher from './AppDispatcher';
 import PotsStore from './stores/PotsStore';
 import UIStore from './stores/UIStore';
-import AppView from './views/AppView';
+import AppView, { AppViewProps } from './views/AppView';
 import {Container} from 'flux/utils';
 import {Alert, BackHandler} from 'react-native';
 import {ImageStore, nameFromUri} from './stores/ImageStore';
 import ExportStore from './stores/ExportStore';
 import ImportStore from './stores/ImportStore';
+import { StatusString } from './models/Status';
 
 function getStores() {
   return [
@@ -20,12 +20,17 @@ function getStores() {
 }
 
 function currentPot() {
-  return PotsStore.getState().pots[UIStore.getState().editPotId];
+  const uiState = UIStore.getState();
+  if (!('editPotId' in uiState)) {
+    throw Error("currentPot called without a pot on page: " + uiState.page);
+  }
+  return PotsStore.getState().pots[uiState.editPotId];
 }
 
 BackHandler.addEventListener('hardwareBackPress', function() {
-  if (UIStore.getState().page == "list") {
-    if (UIStore.getState().searching) {
+  const uiState = UIStore.getState();
+  if (uiState.page == "list") {
+    if ('searching' in uiState) {
       dispatcher.dispatch({
         type: 'list-search-close',
       });
@@ -33,17 +38,18 @@ BackHandler.addEventListener('hardwareBackPress', function() {
     }
     return false;
   }
-  if (UIStore.getState().page == "image") {
+  if (uiState.page == "image") {
     dispatcher.dispatch({
       type: 'page-edit-pot',
-      potId: UIStore.getState().editPotId,
+      potId: uiState.editPotId,
     });
     return true;
   }
-  if (ExportStore.getState().exporting && !ExportStore.getState().exportUri) {
+  const exportState = ExportStore.getState();
+  if (exportState.exporting && !('exportUri' in exportState)) {
     Alert.alert('Cancel this export?', undefined,
        [{text: 'Stay here', style: 'cancel'},
-        {text: 'Cancel', onPress: () => 
+        {text: 'Cancel', onPress: () =>
           dispatcher.dispatch({type: 'page-list'})},
       ]);
     return true;
@@ -54,29 +60,29 @@ BackHandler.addEventListener('hardwareBackPress', function() {
   return true;
 });
 
-function getState(prevState, props) {
+function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
   return {
     pots: PotsStore.getState(),
     ui: UIStore.getState(),
     images: ImageStore.getState(),
     exports: ExportStore.getState(),
     imports: ImportStore.getState(),
-    fontLoaded: props.fontLoaded,
+    fontLoaded: !!(props && props.fontLoaded),
 
     onNew: () => dispatcher.dispatch({
       type: 'new',
     }),
-    onEdit: (potId) => dispatcher.dispatch({
+    onEdit: (potId: string) => dispatcher.dispatch({
       type: 'page-edit-pot',
       potId: potId,
     }),
-    onChangeTitle: (potId, newTitle) => dispatcher.dispatch({
+    onChangeTitle: (potId: string, newTitle: string) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'title',
       value: newTitle,
       potId: potId,
     }),
-    onChangeNote: (potId, statusText, noteText) => dispatcher.dispatch({
+    onChangeNote: (potId: string, statusText: StatusString, noteText: string) => dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'notes2',
         value: currentPot().notes2.withNoteForStatus(statusText, noteText),
@@ -101,7 +107,7 @@ function getState(prevState, props) {
         text,
       });
     },
-    onAddImage: (potId, localUri) => {
+    onAddImage: (potId: string, localUri: string) => {
       dispatcher.dispatch({
         type: 'image-add',
         localUri: localUri,
@@ -114,17 +120,17 @@ function getState(prevState, props) {
         potId: potId,
       });
     },
-    onSetMainImage: (potId, name) => dispatcher.dispatch({
+    onSetMainImage: (potId: string, name: string) => dispatcher.dispatch({
       type: 'pot-edit-field',
       field: 'images3',
       value: [name, ...PotsStore.getState().pots[potId].images3.filter(i => i != name)],
       potId: potId,
     }),
-    onExpandImage: (name) => dispatcher.dispatch({
+    onExpandImage: (name: string) => dispatcher.dispatch({
       type: 'page-image',
       imageId: name,
     }),
-    setStatus: (newStatus) => {
+    setStatus: (newStatus: StatusString) => {
       const newFullStatus = currentPot().status.withStatus(newStatus);
       dispatcher.dispatch({
         type: 'pot-edit-field',
@@ -133,9 +139,12 @@ function getState(prevState, props) {
         potId: currentPot().uuid,
       });
     },
-    setStatusDate: (date) => {
-      const newFullStatus = currentPot().status.withStatus(
-          currentPot().status.currentStatus(), date);
+    setStatusDate: (date: Date) => {
+      const currentStatus = currentPot().status.currentStatus();
+      if (!currentStatus) {
+        throw Error("Cannot set date when there's no status");
+      }
+      const newFullStatus = currentPot().status.withStatus(currentStatus, date);
       dispatcher.dispatch({
         type: 'pot-edit-field',
         field: 'status',
@@ -159,7 +168,7 @@ function getState(prevState, props) {
         }},
       ]);
     },
-    onDeleteImage: (name) => {
+    onDeleteImage: (name: string) => {
       Alert.alert( 'Delete this image?', undefined,
        [{text: 'Cancel', style: 'cancel'},
         {text: 'Delete', onPress: () => {
@@ -182,17 +191,12 @@ function getState(prevState, props) {
       potId: currentPot().uuid,
       imageNames: currentPot().images3,
     }),
-    onImageError: (name, uri) => dispatcher.dispatch({
-      type: 'image-error', name, uri,
-    }),
-    onCollapse: (section) => dispatcher.dispatch({
+    onCollapse: (section: string) => dispatcher.dispatch({
       type: 'list-collapse', section
     }),
-    onScrollTo: (y) => dispatcher.dispatch({
+    onScrollTo: (y: number) => dispatcher.dispatch({
       type: 'list-scroll', y
     }),
-    onStartScroll: () => dispatcher.dispatch({type: 'list-scroll-disable'}),
-    onEndScroll: () => dispatcher.dispatch({type: 'list-scroll-enable'}),
 
     onStartExport: () => dispatcher.dispatch({type: 'export-initiate'}),
     onStartImport: () => dispatcher.dispatch({type: 'import-initiate'}),

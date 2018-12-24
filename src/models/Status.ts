@@ -1,24 +1,38 @@
+import _ from 'lodash';
 
 export type StatusString = 'notstarted' | 'thrown' | 'trimmed' | 'bisqued' | 'glazed' | 'pickedup';
 
-(String.prototype as any).capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+export function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+type EmptyableBareStatus = {
+  [k in StatusString]?: Date | undefined;
 };
 
-type StatusFromJson = {
-  [k: string]: number | string | Date | undefined;
-  //[k in StatusString]: number | string | Date | undefined;
+type EmptyStatus = {
+  [k in StatusString]: undefined;
 }
-type BareStatus = {
-  [k in StatusString]: Date | undefined;
+
+type BareStatus = EmptyStatus & (
+  {notstarted: Date}
+  | {thrown: Date}
+  | {bisqued: Date}
+  | {trimmed: Date}
+  | {glazed: Date}
+  | {pickedup: Date});
+
+type StatusConstructor = {
+  [k in StatusString]?: Date | string | number;
 }
 
 export default class Status {
   // Immutable! Functions return copies.
 
+  // At least one field is definitely not undefined
   status: BareStatus;
-
-  static empty(): BareStatus {
+/*
+  private static empty(): EmptyableBareStatus {
     return {
       notstarted: undefined,
       thrown: undefined,
@@ -27,7 +41,7 @@ export default class Status {
       glazed: undefined,
       pickedup: undefined,
     };
-  }
+  }*/
 
   static prettify(name: StatusString): string {
     return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
@@ -69,37 +83,34 @@ export default class Status {
     return ['pickedup', 'glazed', 'bisqued', 'trimmed', 'thrown', 'notstarted'];
   }
 
-  constructor(from:
-    {json: string}
-    | {parsedJson: StatusFromJson}
-    | {bareStatus: BareStatus}
-   = {parsedJson: {}}) {
-
-    if ('bareStatus' in from) {
-      this.status = {...from.bareStatus};
-      return;
-    }
-
-    this.status = Status.empty();
-    let pullFrom: StatusFromJson;
-    if ('json' in from) {
-      try {
-        pullFrom = JSON.parse(from.json);
-      } catch (e) {
-        console.log("Status failed to parse: " + from.json);
-        console.warn(e);
-        pullFrom = {};
-      }
-    } else {
-      pullFrom = from.parsedJson;
-    }
-
+  static isValidStatus(status: EmptyableBareStatus): status is BareStatus {
+    let isValid = false;
     Status.ordered().forEach(s => {
-      const item = pullFrom[s];
-      if (item != undefined) {
-        this.status[s] = new Date(item);
+      if (status[s]) {
+        isValid = true;
       }
     });
+    return isValid;
+  }
+
+  constructor(from: Partial<StatusConstructor>) {
+
+    const status: EmptyableBareStatus = {};
+
+    _.forOwn(from, (item, _s) => {
+      const s = _s as keyof EmptyableBareStatus;
+      if (typeof(item) == "string" || typeof(item) == "number") {
+        status[s] = new Date(item);
+      } else {
+        status[s] = item;
+      }
+    })
+
+    if (Status.isValidStatus(status)) {
+      this.status = status;
+    } else {
+      throw Error("Status must have a date");
+    }
   }
 
   toObj(): BareStatus {
@@ -110,21 +121,21 @@ export default class Status {
     return JSON.stringify(this.toObj());
   }
 
-  static dateText(date: Date | undefined): string | undefined  {
-    if (date) {
-      const dateStringLong = date.toDateString();
-      const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
-      return dateString;
+  static dateText(date: Date): string  {
+    const dateStringLong = date.toDateString();
+    const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
+    return dateString;
+  }
+
+  date(): Date {
+    const date = this.status[this.currentStatus()];
+    if (!date) {
+      throw Error("Impossible condition: Current status must have a date.");
     }
-    return undefined;
+    return date;
   }
 
-  date(): Date | undefined {
-    const status = this.currentStatus();
-    return status ? this.status[status] : undefined;
-  }
-
-  dateText(): string | undefined {
+  dateText(): string {
     return Status.dateText(this.date());
   }
 
@@ -147,17 +158,23 @@ export default class Status {
     return Status.prettify(status) + " on " + this.dateText();
   }
 
-  currentStatus(): StatusString | undefined {
-   const statuses = Status.ordered();
-    for (let i=0; i < statuses.length; i++) {
-      if (this.status[statuses[i]]) {
-        return statuses[i];
+  currentStatus(): StatusString {
+    let current: StatusString | undefined = undefined;
+    _.forEach(Status.ordered(), _s => {
+      const s = _s as keyof BareStatus;
+      if(this.status[s]) {
+        current = s;
+        return false;
       }
-    }
-    return undefined;
+      return true;
+   });
+   if (current == undefined) {
+    throw Error("Impossible condition: the status has no status");
+   }
+   return current;
   }
 
-  withStatus(name: StatusString, date: Date): Status {
+  withStatus(name: StatusString, date?: Date): Status {
     //const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
     //console.log("I see current status is " + JSON.stringify(pot.status));
     const prevDate = this.toObj()[name];
@@ -177,10 +194,10 @@ export default class Status {
       }
     }
     //console.log("The new status will be " + JSON.stringify(newFullStatus));
-    return new Status({bareStatus: newFullStatus});
+    return new Status(newFullStatus);
   }
 
-  next(pretty: boolean = false): string | undefined {
+  next(): StatusString | undefined {
     const current = this.currentStatus();
     let nextI;
     if (!current) {
@@ -190,14 +207,12 @@ export default class Status {
       nextI = currentI - 1;
     }
     if (nextI >= 0) {
-      return pretty ?
-        Status.prettify(Status.ordered()[nextI]) :
-        Status.ordered()[nextI];
+      return Status.ordered()[nextI];
     }
     return undefined;
   }
 
-  prev(pretty: boolean = false): string | undefined {
+  prev(): StatusString | undefined {
     const current = this.currentStatus();
     if (!current) {
       return undefined;
@@ -205,9 +220,7 @@ export default class Status {
     const currentI = Status.ordered().indexOf(current);
     const prevI = currentI + 1;
     if (prevI < Status.ordered().length) {
-      return pretty ?
-        Status.prettify(Status.ordered()[prevI]) :
-        Status.ordered()[prevI];
+      return Status.ordered()[prevI];
     }
     return undefined;
   }

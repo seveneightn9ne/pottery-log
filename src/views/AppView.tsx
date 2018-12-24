@@ -6,39 +6,45 @@ import styles from '../style';
 import ListPage from './ListPage';
 import EditPage from './EditPage';
 import SettingsPage from './SettingsPage';
+import { StatusString } from '../models/Status';
+import { UIState } from '../stores/UIStore';
+import { PotsStoreState } from '../stores/PotsStore';
+import { ImageStoreState } from '../stores/ImageStore';
+import { ExportState } from '../stores/ExportStore';
+import { ImportState } from '../stores/ImportStore';
 
-type AppViewProps = {
-  pots: Object, // PotStoreState
-  ui: Object, // UIState
-  images: Object, // ImageStoreState
-  exports: Object, // ExportState
-  imports: Object, // ImportState
+export type AppViewProps = {
+  pots: PotsStoreState,
+  ui: UIState,
+  images: ImageStoreState,
+  exports: ExportState,
+  imports: ImportState,
 
   fontLoaded: boolean,
 
   onNew: () => void,
-  onChangeTitle: (text: string) => void,
-  onChangeNote: (potId: string, date: Date, text: string) => void,
-  onNewNote: () => void,
+  onChangeTitle: (potId: string, text: string) => void,
+  onChangeNote: (potId: string, status: StatusString, text: string) => void,
   onEdit: (potId: string) => void,
   onNavigateToList: () => void,
   onNavigateToSettings: () => void,
-  onAddImage: (potId, localUri) => void,
-  onSetMainImage: (potId, name) => void,
-  onDeleteImage: (name) => void,
-  setStatus: (newStatus) => void,
-  setStatusDate: (date) => void,
+  onAddImage: (potId: string, localUri: string) => void,
+  onSetMainImage: (potId: string, name: string) => void,
+  onDeleteImage: (name: string) => void,
+  onExpandImage: (name: string) => void,
+  setStatus: (newStatus: StatusString) => void,
+  setStatusDate: (date: Date) => void,
   onDelete: () => void,
   onCopy: () => void,
   onOpenSearch: () => void,
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
-  onExport: () => void,
-  onImport: (data: string) => void,
-  onImageError: (name ,uri) => void,
+  onStartExport: () => void,
+  onStartImport: () => void,
+  onCollapse: (section: string) => void,
 };
 
-function AppView(props: AppViewProps): React.ReactNode {
+function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
   switch (props.ui.page) {
     case 'list':
       return <ListPage pots={props.pots} ui={props.ui}
@@ -49,20 +55,14 @@ function AppView(props: AppViewProps): React.ReactNode {
         onCloseSearch={props.onCloseSearch}
         onSearch={props.onSearch}
         onNavigateToSettings={props.onNavigateToSettings}
-        onImageError={props.onImageError}
         onCollapse={props.onCollapse}
-        onScrollTo={props.onScrollTo}
-        onStartScroll={props.onStartScroll}
-        onEndScroll={props.onEndScroll}
       />;
     case 'edit-pot':
       return <EditPage pot={props.pots.pots[props.ui.editPotId]}
         ui={props.ui}
-        images={props.images}
         fontLoaded={props.fontLoaded}
         onChangeTitle={props.onChangeTitle}
         onChangeNote={props.onChangeNote}
-        onNewNote={props.onNewNote}
         onNavigateToList={props.onNavigateToList}
         onAddImage={props.onAddImage}
         onDeleteImage={props.onDeleteImage}

@@ -1,29 +1,37 @@
-// @flow
 import React from 'react';
-import Status from '../../models/Status';
-import { Text, View, TouchableOpacity } from 'react-native';
+import Status, { StatusString } from '../../models/Status';
+import { Text, View, TouchableOpacity, ViewStyle } from 'react-native';
 import DatePicker from './DatePicker';
 import styles from '../../style';
 import { Note, NoteModal } from './Note';
 
 type StatusSwitcherProps = {
+  fontLoaded: boolean,
   status: Status,
-  setStatus: (newStatus: string) => void,
+  note: string,
+  potId: string,
+  date: Date,
+  setStatus: (newStatus: StatusString) => void,
   onPickDate: (newDate: Date) => void,
+  onChangeNote: (potId: string, status: StatusString, newNote: string) => void,
 };
 
-export default class StatusDetail extends React.Component<StatusSwitcherProps> {
-  modal: NoteModal;
+export default class StatusSwitcher extends React.Component<StatusSwitcherProps> {
+  modal: React.RefObject<NoteModal>;
+  constructor(props: StatusSwitcherProps) {
+    super(props);
+    this.modal = React.createRef();
+  }
   render() {
     const editButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() => { this.modal && this.modal.open() }}>
+      <TouchableOpacity onPress={() => { this.modal.current && this.modal.current.open() }}>
         <Text style={styles.addMainNote}>{this.props.note ? 'mode_edit' : 'note_add'}</Text>
       </TouchableOpacity>
       : null;
     const noteModal = <NoteModal note={this.props.note} status={this.props.status.currentStatus()}
-      potId={this.props.potId} ref={(e) => this.modal = e}
+      potId={this.props.potId} ref={this.modal}
       onChangeNote={this.props.onChangeNote} />
-    let mainNoteStyle = styles.mainNote;
+    let mainNoteStyle: ViewStyle | ViewStyle[] = styles.mainNote;
     if (!this.props.status.hasTimeline()) {
       mainNoteStyle = [styles.mainNote, styles.mainNoteNoBar];
     }
@@ -48,13 +56,19 @@ export default class StatusDetail extends React.Component<StatusSwitcherProps> {
         {/* Up Arrow */}
         {this.props.fontLoaded ?
           <TouchableOpacity style={styles.statusArrow}
-            onPress={() => this.props.setStatus(this.props.status.next())}>
+            onPress={() => {
+              const next = this.props.status.next();
+              if (next) this.props.setStatus(next)
+            }}>
             <Text style={styles.statusArrowText}>keyboard_arrow_up</Text>
           </TouchableOpacity> : null}
         {/* Down Arrow */}
         {this.props.fontLoaded ?
           <TouchableOpacity style={styles.statusArrow}
-            onPress={() => this.props.setStatus(this.props.status.prev())}>
+            onPress={() => {
+              const prev = this.props.status.prev();
+              if (prev) this.props.setStatus(prev)
+            }}>
             <Text style={styles.statusArrowText}>keyboard_arrow_down</Text>
           </TouchableOpacity> : null}
       </View>

@@ -1,8 +1,7 @@
-// @flow
 import Expo from 'expo';
 import dispatcher from './AppDispatcher';
 import {nameFromUri} from './stores/ImageStore';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';
@@ -12,12 +11,12 @@ const EXPORT_FINISH = apiPrefix + 'finish-export';
 const IMPORT = apiPrefix + 'import';
 const IMAGE_DELETE = 'https://jesskenney.com/pottery-log-images/delete';
 
-async function post(path, kvs, onSuccess, onError) {
+async function post<Req, Res = {}>(path: string, kvs: Req, onSuccess: (data: Res) => void, onError: (e: string | Error) => void) {
   const formData = new FormData();
   _.forOwn(kvs, (val, key) => {
     formData.append(key, val);
   });
-  
+
   let options = {
     method: 'POST',
     body: formData,
@@ -28,7 +27,7 @@ async function post(path, kvs, onSuccess, onError) {
   };
 
   let error = undefined;
-  for (tries = 0; tries < 3; tries++) {
+  for (let tries = 0; tries < 3; tries++) {
     try {
       const response = await fetch(path, options);
       if (response.ok) {
@@ -61,10 +60,7 @@ function mimeFromUri(uri: string) {
 }
 
 export async function remove(uri: string) {
-  return post(IMAGE_DELETE, {uri}, () => dispatcher.dispatch({
-    type: 'image-delete-succeeded',
-    imageName: nameFromUri(uri),
-  }), (e) => {throw e});
+  return post(IMAGE_DELETE, {uri}, () => {}, (e) => {throw e});
 };
 
 export async function startExport(id: number, metadata: any) {
@@ -72,8 +68,8 @@ export async function startExport(id: number, metadata: any) {
     EXPORT_START,
     { metadata: JSON.stringify(metadata),
       deviceId: Expo.Constants.deviceId, },
-    () => dispatcher.dispatch({type: 'export-started', id}),
-    (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
+    () => dispatcher.dispatch({type: 'export-started', exportId: id}),
+    (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 };
 
 export async function exportImage(id: number, uri: string) {
@@ -85,14 +81,14 @@ export async function exportImage(id: number, uri: string) {
       type: mimeFromUri(uri),
     },
   },
-  () => dispatcher.dispatch({type: 'export-image', id, uri}),
-  (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
+  () => dispatcher.dispatch({type: 'export-image', exportId: id, uri}),
+  (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 }
 
 export async function finishExport(id: number) {
-  return post(EXPORT_FINISH, {deviceId: Expo.Constants.deviceId}, 
-    (res) => dispatcher.dispatch({type: 'export-finished', id, uri: res.uri}),
-    (e) => dispatcher.dispatch({type: 'export-failure', id, error: e}));
+  return post(EXPORT_FINISH, {deviceId: Expo.Constants.deviceId},
+    (res: {uri: string}) => dispatcher.dispatch({type: 'export-finished', exportId: id, uri: res.uri}),
+    (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 }
 
 export async function startImport(uri: string) {
@@ -103,6 +99,7 @@ export async function startImport(uri: string) {
       name: nameFromUri(uri),
       type: 'application/zip',
     }
-  }, (res) => dispatcher.dispatch({type: 'import-started', metadata: res.metadata, imageMap: res.image_map}),
+  }, (res: {metadata: string, image_map: {[i: string]: string}}) =>
+    dispatcher.dispatch({type: 'import-started', metadata: res.metadata, imageMap: res.image_map}),
   (e) => dispatcher.dispatch({type: 'import-failure', error: e}));
 }

@@ -1,4 +1,3 @@
-// @flow
 import {ReduceStore} from 'flux/utils';
 import {Pot, IntermediatePot} from '../models/Pot';
 import Status from '../models/Status';
@@ -10,7 +9,7 @@ import {nameFromUri} from './ImageStore';
 import { Action, ImageState } from '../action';
 import { Dispatcher } from 'flux';
 
-interface PotsStoreState {
+export interface PotsStoreState {
   potIds: string[];
   pots: {[uuid: string]: Pot};
   hasLoaded: boolean;
@@ -46,7 +45,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
           uuid: String(Math.random()).substring(2),
           title: 'New Pot',
           images3: [],
-          status: new Status().withStatus('thrown', new Date()),
+          status: new Status({thrown: new Date()}),
           notes2: new Notes(),
         };
         const newState = {
@@ -183,71 +182,68 @@ async function loadInitial(dispatcher: Dispatcher<Action>, isImport: boolean): P
   }
   Promise.all(promises).then((pots) => {
     const potsById: {[uuid: string]: Pot} = {};
-    pots.forEach(p => potsById[p.uuid] = p);
+    pots.forEach(p => {
+      if (p) {
+        potsById[p.uuid] = p;
+      }
+    });
     dispatcher.dispatch({type: 'loaded', pots: potsById, potIds: potIds, isImport: !!isImport});
   });
 }
 
-async function loadPot(uuid: string): Promise<Pot> {
+async function loadPot(uuid: string): Promise<Pot | null> {
   const loadedJson = await AsyncStorage.getItem('@Pot:' + uuid);
-  //console.log("Loading pot from storage: " + loadedJson);
-  if (loadedJson != null) {
-    let loaded;
-    try {
-      loaded = JSON.parse(loadedJson);
-    } catch (error) {
-      console.log("Pot failed to parse: " + loadedJson);
-      console.warn(error);
-      loaded = {};
-    }
-    // Add all fields, for version compatibility
-    const pot: IntermediatePot = {...loaded};
-    pot.status = typeof(loaded.status) == "string" ?
-      new Status({json: loaded.status}) :
-      new Status({parsedJson: loaded.status});
-
-    pot.notes2 = typeof(loaded.notes2) == "string" ?
-      new Notes(JSON.parse(loaded.notes2)) :
-      new Notes(loaded.notes2);
-
-    if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
-      delete pot.notes;
-    }
-    if (loaded.images != undefined && loaded.images2 == undefined) {
-      // migrate - read the old data and convert to the new one, Miles said
-      // it's ok for his old clients to lose the images.
-      console.log("Migrating images 1-2.")
-      pot.images2 = [];
-      for (let i=0; i<loaded.images.length; i++) {
-        pot.images2.push({
-          localUri: loaded.images[i],
-        });
-      }
-    }
-    if (pot.images2 != undefined && pot.images3 == undefined) {
-      console.log("Migrating images 2-3.");
-      dispatcher.dispatch({
-        type: 'migrate-from-images2',
-        images2: pot.images2,
-        potId: pot.uuid,
-      });
-      pot.images3 = [];
-      for (let i=0; i<pot.images2.length; i++) {
-        pot.images3.push(nameFromUri(pot.images2[i].localUri));
-      }
-    }
-    delete pot.images;
-    delete pot.images2;
-    //console.log("Done building pot", pot);
-    return pot;
+  if (!loadedJson) {
+    return null;
   }
-  return {
-    uuid,
-    title: "",
-    status: new Status(),
-    notes2: new Notes(),
-    images3: [],
-  };
+
+  let loaded;
+  try {
+    loaded = JSON.parse(loadedJson);
+  } catch (error) {
+    console.log("Pot failed to parse: " + loadedJson);
+    console.warn(error);
+    return null;
+  }
+  // Add all fields, for version compatibility
+  const pot: IntermediatePot = {...loaded};
+  pot.status = typeof(loaded.status) == "string" ?
+    new Status(JSON.parse(loaded.status)) :
+    new Status(loaded.status);
+
+  pot.notes2 = typeof(loaded.notes2) == "string" ?
+    new Notes(JSON.parse(loaded.notes2)) :
+    new Notes(loaded.notes2);
+
+  if (loaded.notes != undefined && typeof(loaded.notes) != "string") {
+    delete pot.notes;
+  }
+  if (loaded.images != undefined && loaded.images2 == undefined) {
+    // migrate - read the old data and convert to the new one, Miles said
+    // it's ok for his old clients to lose the images.
+    console.log("Migrating images 1-2.")
+    pot.images2 = [];
+    for (let i=0; i<loaded.images.length; i++) {
+      pot.images2.push({
+        localUri: loaded.images[i],
+      });
+    }
+  }
+  if (pot.images2 != undefined && pot.images3 == undefined) {
+    console.log("Migrating images 2-3.");
+    dispatcher.dispatch({
+      type: 'migrate-from-images2',
+      images2: pot.images2,
+      potId: pot.uuid,
+    });
+    pot.images3 = [];
+    for (let i=0; i<pot.images2.length; i++) {
+      pot.images3.push(nameFromUri(pot.images2[i].localUri));
+    }
+  }
+  delete pot.images;
+  delete pot.images2;
+  return pot;
 }
 
 export default new PotsStore();

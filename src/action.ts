@@ -1,5 +1,6 @@
-import { Pot } from './models/Pot';
-
+import { Pot, Image2 } from './models/Pot';
+import Notes from './models/Notes';
+import Status from './models/Status';
 
 export interface ImageState {
     name: string,
@@ -11,7 +12,7 @@ export interface ImageState {
     pots: string[],
   }
 
-export type Action = PotAction | ImageAction | UiAction | ImportAction | Reload;
+export type Action = PotAction | ImageAction | UiAction | ImportAction | ExportAction | Reload;
 
 type ImageAction = (
     ImageStateLoaded
@@ -30,7 +31,10 @@ type PotAction = (
     Loaded
     | MigrateFromImages2
     | New
-    | PotEditField
+    | PotEditNote
+    | PotEditTitle
+    | PotEditImages3
+    | PotEditStatus
     | PotDelete
     | PotCopy
 );
@@ -38,6 +42,14 @@ type PotAction = (
 type UiAction = (
     PageNewPot
     | PageList
+    | PageEditPot
+    | PageSettings
+    | ListSearchOpen
+    | ListSearchClose
+    | ListSearchTerm
+    | ListCollapse
+    | ListScroll
+    | PageImage
 );
 
 type ImportAction = (
@@ -49,9 +61,17 @@ type ImportAction = (
     | ImportFailure
 );
 
+type ExportAction = (
+    ExportInitiate
+    | ExportStarted
+    | ExportImage
+    | ExportFinished
+    | ExportFailure
+)
+
 interface MigrateFromImages2 {
     type: 'migrate-from-images2';
-    images2: any[]; // TODO
+    images2: Image2[];
     potId: string;
 }
 
@@ -75,7 +95,27 @@ interface PotEditField {
     type: 'pot-edit-field';
     potId: string;
     field: string;
-    value: any; // TODO
+    value: any;
+}
+
+interface PotEditNote extends PotEditField {
+    field: 'notes2';
+    value: Notes;
+}
+
+interface PotEditTitle extends PotEditField{
+    field: 'title';
+    value: string;
+}
+
+interface PotEditImages3 extends PotEditField {
+    field: 'images3';
+    value: string[];
+}
+
+interface PotEditStatus extends PotEditField {
+    field: 'status';
+    value: Status;
 }
 
 interface PotDelete {
@@ -127,6 +167,7 @@ interface ImageAdd {
 
 interface ImageErrorRemote {
     type: 'image-error-remote';
+    name: string;
 }
 
 interface ImageErrorLocal {
@@ -177,4 +218,68 @@ interface ImportCancel {
 interface ImportFailure {
     type: 'import-failure';
     error: string | Error;
+}
+
+interface ExportInitiate {
+    type: 'export-initiate';
+}
+
+interface ExportStarted {
+    type: 'export-started';
+    exportId: number;
+}
+
+interface ExportImage {
+    type: 'export-image';
+    exportId: number;
+    uri: string;
+}
+
+interface ExportFinished {
+    type: 'export-finished';
+    exportId: number;
+    uri: string;
+}
+
+interface ExportFailure {
+    type: 'export-failure';
+    exportId: number;
+    error: string | Error;
+}
+
+interface PageEditPot {
+    type: 'page-edit-pot';
+    potId: string;
+}
+
+interface PageSettings {
+    type: 'page-settings';
+}
+
+interface ListSearchOpen {
+    type: 'list-search-open';
+}
+
+interface ListSearchClose {
+    type: 'list-search-close';
+}
+
+interface ListSearchTerm {
+    type: 'list-search-term';
+    text: string;
+}
+
+interface ListCollapse {
+    type: 'list-collapse';
+    section: string;
+}
+
+interface ListScroll {
+    type: 'list-scroll';
+    y: number;
+}
+
+interface PageImage {
+    type: 'page-image';
+    imageId: string;
 }

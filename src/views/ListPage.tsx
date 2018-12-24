@@ -1,31 +1,32 @@
-// @flow
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Dimensions, Picker, Button, TouchableOpacity, SectionList, FlatList } from 'react-native';
+import React, { ReactNode } from 'react';
+import { Text, View, TextInput, TouchableHighlight, Dimensions, SectionList, FlatList } from 'react-native';
 import { Pot } from '../models/Pot';
-import Status from '../models/Status';
+import Status, { StatusString, capitalize } from '../models/Status';
 import styles from '../style'
-import NewPotListItem from './components/NewPotListItem';
 import NewPotButton from './components/NewPotButton';
 import PotListItem from './components/PotListItem';
+import { PotsStoreState } from '../stores/PotsStore';
+import { ListUiState, SearchingUiState } from '../stores/UIStore';
 
 type ListPageProps = {
-  pots: Object, // PotStoreState
-  ui: Object, // UIState
+  pots: PotsStoreState,
+  ui: ListUiState | SearchingUiState,
+  fontLoaded: boolean,
   onNewPot: () => void,
   onClickPot: (potId: string) => void,
   onOpenSearch: () => void,
   onCloseSearch: () => void,
   onSearch: (search: string) => void,
   onNavigateToSettings: () => void,
-  onImageError: (name: string, uri: string) => void,
+  onCollapse: (section: string) => void,
 };
 
-function filterSortedPots(allPots, status, searching, searchTerm) {
+function filterSortedPots(allPots: Pot[], status: StatusString, searchTerm: string) {
   return allPots
     .filter(pot => pot.status.currentStatus() == status)
     .filter(pot => {
       // Filter for search
-      if (!searching || !searchTerm) { return true; }
+      if (!searchTerm) { return true; }
       if (pot.title.includes(searchTerm)) return true;
       if (pot.notes2.includes(searchTerm)) return true;
       return false;
@@ -33,8 +34,14 @@ function filterSortedPots(allPots, status, searching, searchTerm) {
     .sort((potA, potB) => {
       // Sort the pots by date most recent at bottom.
       // Except sort pots with that are 'Finished' most recent at top.
-      let tA = potA.status.date().getTime();
-      let tB = potB.status.date().getTime();
+      const dA = potA.status.date();
+      const dB = potB.status.date();
+      if (!dA || !dB) {
+        // one of the dates is undefined. whatever
+        return 0;
+      }
+      let tA = dA.getTime();
+      let tB = dB.getTime();
       let cmp = 0;
       if (tA < tB) {
         cmp = -1;
@@ -51,83 +58,73 @@ function filterSortedPots(allPots, status, searching, searchTerm) {
     });
 }
 
-export default class ListPage extends React.Component {
-  // TODO(jessk): it doesn't scroll all the way, why?
-  /*componentDidMount() {
-    if (this.sectionList && this.props.ui.y) {
-    	console.log("Will scroll to " + this.props.ui.y);
-	setTimeout(() => {
-	    this.props.onStartScroll();
-	    this.sectionList.getScrollResponder().scrollTo({y: this.props.ui.y, animated: false});
-	    //this.props.onEndScroll();
-	}, 0);
-    } else {
-    	console.log("Skipping list scroll");
-    }
-  }*/
-  render() {
-    const { height, width } = Dimensions.get('window');
+export default class ListPage extends React.Component<ListPageProps, {}> {
+  render(): ReactNode {
+    const { width } = Dimensions.get('window');
     const potsLoaded = this.props.pots.hasLoaded;
 
     const backButton = this.props.fontLoaded ?
       <TouchableHighlight onPress={this.props.onCloseSearch}>
         <Text style={styles.searchBack}>arrow_back</Text>
       </TouchableHighlight> : null;
-    const topWhenSearching = (
-      <View style={styles.header}>
-        {backButton}
-        <TextInput style={styles.searchBox}
-          underlineColorAndroid='transparent'
-          placeholderTextColor='#c8e6c9'
-          onChangeText={this.props.onSearch}
-          autoFocus={true} placeholder={'search'} value={this.props.ui.searchTerm || ''} />
-      </View>
-    );
 
-    let searchButton = this.props.fontLoaded && potsLoaded ?
-      <TouchableHighlight onPress={this.props.onOpenSearch}>
-        <Text style={[styles.search, {paddingRight: 8}]}>search</Text>
-      </TouchableHighlight>
-      : null;
-    
-    let settingsButton = this.props.fontLoaded && potsLoaded ?
-      <TouchableHighlight onPress={this.props.onNavigateToSettings}>
-        <Text style={[styles.search, {paddingLeft: 8}]}>settings</Text>
-      </TouchableHighlight>
-      : null;
-
-    const topWhenNotSearching = (
-      <View style={styles.header}>
-        <Text style={[styles.h1, {flex: 1}]}>Pottery Log</Text>
-        <View style={{ flexDirection: 'row' }}>
-          {searchButton}
-          {settingsButton}
+    let header;
+    if ('searching' in this.props.ui) {
+      header = (
+        <View style={styles.header}>
+          {backButton}
+          <TextInput style={styles.searchBox}
+            underlineColorAndroid='transparent'
+            placeholderTextColor='#c8e6c9'
+            onChangeText={this.props.onSearch}
+            autoFocus={true} placeholder={'search'} value={this.props.ui.searchTerm || ''} />
         </View>
-      </View>
-    );
+      );
+    } else {
+      const searchButton = this.props.fontLoaded && potsLoaded ?
+        <TouchableHighlight onPress={this.props.onOpenSearch}>
+          <Text style={[styles.search, {paddingRight: 8}]}>search</Text>
+        </TouchableHighlight>
+        : null;
+
+      const settingsButton = this.props.fontLoaded && potsLoaded ?
+        <TouchableHighlight onPress={this.props.onNavigateToSettings}>
+          <Text style={[styles.search, {paddingLeft: 8}]}>settings</Text>
+        </TouchableHighlight>
+        : null;
+
+      header = (
+        <View style={styles.header}>
+          <Text style={[styles.h1, {flex: 1}]}>Pottery Log</Text>
+          <View style={{ flexDirection: 'row' }}>
+            {searchButton}
+            {settingsButton}
+          </View>
+        </View>
+      );
+    }
 
     const newPotButton = <NewPotButton onPress={this.props.onNewPot} fontLoaded={this.props.fontLoaded} />
 
     if (!potsLoaded) {
       return <View style={styles.container}>
-        {topWhenNotSearching}
+        {header}
         <Text style={styles.listMessage}>Loading...</Text>
       </View>
     }
 
     if (this.props.pots.potIds.length == 0) {
       return <View style={styles.container}>
-        {topWhenNotSearching}
+        {header}
         <Text style={styles.listMessage}>You don't have any pots yet.</Text>
         {newPotButton}
       </View>
     }
 
     const allPots = this.props.pots.potIds.map(id => this.props.pots.pots[id]);
-    const searching = this.props.ui.searching;
-    const searchTerm = this.props.ui.searchTerm;
+    const searchTerm =  ('searching' in this.props.ui && this.props.ui.searchTerm) || '';
 
-    const stripCount = (sectionTitle) => {
+    const stripCount = (sectionTitle: string) => {
       if (sectionTitle.charAt(sectionTitle.length - 1) != ")") {
         return sectionTitle;
       }
@@ -136,14 +133,14 @@ export default class ListPage extends React.Component {
       return section;
     }
 
-    const collapsed = (section) => {
-      return this.props.ui.collapsed.indexOf(stripCount(section)) != -1;
+    const collapsed = (section: string) => {
+      return this.props.ui.list.collapsed.indexOf(stripCount(section)) != -1;
     }
 
     const sections = Status.ordered().reverse().map(status => {
       return {
-        data: filterSortedPots(allPots, status, searching, searchTerm),
-        title: Status.longterm(status).capitalize(),
+        data: filterSortedPots(allPots, status, searchTerm),
+        title: capitalize(Status.longterm(status)),
       };
     }).filter((section) => section.data.length > 0)
       .map((section) => collapsed(section.title) ? {
@@ -161,12 +158,12 @@ export default class ListPage extends React.Component {
      */
     const itemSize = width / 2 - 2;
     return (<View style={styles.container}>
-      {this.props.ui.searching ? topWhenSearching : topWhenNotSearching}
+      {header}
       <SectionList
         renderItem={({ item }) => <FlatList
           numColumns={2}
           data={item.data}
-          keyExtractor={(pot, index) => pot.uuid}
+          keyExtractor={(pot: Pot, index) => pot.uuid}
           getItemLayout={(layoutData, index) => ({
             length: itemSize,
             offset: itemSize * index,
@@ -177,7 +174,6 @@ export default class ListPage extends React.Component {
             key={item.uuid}
             pot={item}
             onPress={() => this.props.onClickPot(item.uuid)}
-            onError={this.props.onImageError}
           />}
         />}
         renderSectionHeader={({ section }) =>
@@ -186,7 +182,7 @@ export default class ListPage extends React.Component {
             underlayColor="#fff"><View style={styles.lh}>
               <Text style={styles.lhText}>{section.title}</Text>
               {this.props.fontLoaded ?
-                <Text style={[styles.rhText, styles.collapse]}>{collapsed(stripCount(section.title)) ?
+                <Text style={styles.collapse}>{collapsed(stripCount(section.title)) ?
                   "keyboard_arrow_down" : "keyboard_arrow_up"}</Text> : null}
             </View></TouchableHighlight>}
         sections={sections}

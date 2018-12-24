@@ -1,4 +1,3 @@
-// @flow
 import {ReduceStore} from 'flux/utils';
 import dispatcher from '../AppDispatcher';
 import {StorageWriter} from './sync';
@@ -7,7 +6,7 @@ import * as ImageUploader from '../uploader';
 import { ImageState, Action } from '../action';
 import { FileSystem } from 'expo';
 
-interface ImageStoreState {
+export interface ImageStoreState {
   images: {[name: string]: ImageState},
 }
 
@@ -337,25 +336,11 @@ export function nameToUri(name: string): string {
   return i.fileUri || i.localUri || i.remoteUri || "";
 }
 
-export function nameToImageState(name: string) {
+export function nameToImageState(name: string): ImageState | null {
   const i = ImageStore.getState().images[name];
   if (!i) {
     console.log("That image named " + name + " is not in the image store.");
-    return {};
+    return null;
   }
   return i;
-}
-
-/**
- * @deprecated
- */
-export function isAnySyncing(imageNames: string[]): boolean {
-  const state = ImageStore.getState();
-  for (let i=0; i<imageNames.length; i++) {
-    const image = state.images[imageNames[i]];
-    if (image === undefined) continue;
-    if (!image.fileUri) return true;
-    if (image.pots.length == 0) return true;
-  }
-  return false;
 }

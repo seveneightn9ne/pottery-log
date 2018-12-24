@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { Action } from '../action';
 
 type ImageMapState = {[name: string]: {uri: string; started?: true}};
-interface ImportState {
+export interface ImportState {
   importing: boolean,
   totalImages?: number,
   statusMessage?: string,

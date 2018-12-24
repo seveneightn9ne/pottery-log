@@ -1,35 +1,23 @@
-// @flow
-import Expo from 'expo';
 import React from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View, ScrollView, TextInput, TouchableHighlight, Modal, Image, Dimensions, Picker, Button, TouchableOpacity, Linking } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ExpandingTextInput } from './components/ExpandingTextInput'
-import {Pot, Image as PotImage} from '../models/Pot';
-import Status from '../models/Status';
+import { ActivityIndicator, Alert, Text, View, Button, TouchableOpacity } from 'react-native';
 import styles from '../style'
-import ImagePicker from './components/ImagePicker';
-import ImageList from './components/ImageList';
-import DatePicker from './components/DatePicker';
-import StatusDetail from './components/StatusDetail';
-import StatusSwitcher from './components/StatusSwitcher';
 import Anchor from './components/Anchor';
+import { ExportState } from '../stores/ExportStore';
+import { ImportState } from '../stores/ImportStore';
 
 type SettingsPageProps = {
   onNavigateToList: () => void,
   onStartExport: () => void,
   onStartImport: () => void,
+  fontLoaded: boolean,
   exports: ExportState,
   imports: ImportState,
 };
 
-export default class SettingsPage extends React.Component {
-  constructor(props: SettingsPageProps) {
-    super(props);
-    this.state = { modalOpen: false, data: '' };
-  }
+export default class SettingsPage extends React.Component<SettingsPageProps> {
 
   onBack() {
-    if (this.props.exports.exporting && !this.props.exports.exportUri) {
+    if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
       Alert.alert('Cancel this export?', undefined,
         [{text: 'Stay here', style: 'cancel'},
         {text: 'Cancel', onPress: this.props.onNavigateToList},
@@ -46,7 +34,7 @@ export default class SettingsPage extends React.Component {
       </TouchableOpacity> : null;
 
     let body;
-    if (this.props.exports.exportUri) {
+    if ('exportUri' in this.props.exports) {
       body = <View>
         <Text style={styles.settingsText}>The export is available at:</Text>
         <Text style={styles.settingsText}><Anchor href={this.props.exports.exportUri} /></Text>
@@ -66,7 +54,7 @@ export default class SettingsPage extends React.Component {
         <Button title="Import" onPress={this.props.onStartImport} />
       </View>;
     }
-    
+
     return <View style={styles.container}>
       <View style={styles.header}>
         {backButton}
