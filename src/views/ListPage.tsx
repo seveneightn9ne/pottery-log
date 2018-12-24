@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Dimensions, FlatList, SectionList, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { Dimensions, FlatList, SectionList, SectionListData, Text, TextInput,
+  TouchableHighlight, View } from 'react-native';
 import { Pot } from '../models/Pot';
 import Status, { capitalize, StatusString } from '../models/Status';
 import { PotsStoreState } from '../stores/PotsStore';
@@ -162,11 +163,11 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
       <View style={styles.container}>
         {header}
         <SectionList
-          renderItem={this.renderSection.bind(this)}
-          renderSectionHeader={this.renderSectionHeader.bind(this)}
+          renderItem={this.renderSection}
+          renderSectionHeader={this.renderSectionHeader}
           sections={sections}
-          keyExtractor={(listdata, index) => listdata.title}
-          renderSectionFooter={() => <View style={styles.separator} />}
+          keyExtractor={this.sectionKeyExtractor}
+          renderSectionFooter={this.renderSectionFooter}
         />
         {newPotButton}
         {/*<View style={styles.eraseLastSeparator} />*/}
@@ -174,7 +175,10 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
     );
   }
 
-  private stripCount(sectionTitle: string): string {
+  private sectionKeyExtractor = (listdata: SectionT, index: number) => listdata.title;
+  private renderSectionFooter = () => <View style={styles.separator} />;
+
+  private stripCount = (sectionTitle: string): string => {
     if (sectionTitle.charAt(sectionTitle.length - 1) !== ')') {
       return sectionTitle;
     }
@@ -183,11 +187,11 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
     return section;
   }
 
-  private collapsed(section: string) {
+  private collapsed = (section: string) => {
     return this.props.ui.list.collapsed.indexOf(this.stripCount(section)) !== -1;
   }
 
-  private sectionItemLayout(layoutData: {}, index: number) {
+  private sectionItemLayout = (layoutData: any, index: number) => {
     const itemSize = this.width / 2 - 2;
     return {
       length: itemSize,
@@ -196,30 +200,36 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
     };
   }
 
-  private renderPotListItem(data: {item: Pot}): JSX.Element {
+  private renderPotListItem = (data: {item: Pot}): JSX.Element => {
     return (
       <PotListItem
         fontLoaded={this.props.fontLoaded}
         key={data.item.uuid}
         pot={data.item}
-        onPress={() => this.props.onClickPot(data.item.uuid)}
+        onPress={this.onClickPot(data.item)}
       />
     );
   }
 
-  private renderSection(data: {item: SectionData}): JSX.Element {
+  private onClickPot(pot: Pot) {
+    return () => this.props.onClickPot(pot.uuid);
+  }
+
+  private renderSection = (data: {item: SectionData}): JSX.Element => {
     return (
       <FlatList
         numColumns={2}
         data={data.item.data}
-        keyExtractor={(pot: Pot, index) => pot.uuid}
-        getItemLayout={this.sectionItemLayout.bind(this)}
-        renderItem={this.renderPotListItem.bind(this)}
+        keyExtractor={this.potKeyExtractor}
+        getItemLayout={this.sectionItemLayout}
+        renderItem={this.renderPotListItem}
       />
     );
   }
 
-  private renderSectionHeader(info: {section: SectionT}): JSX.Element {
+  private potKeyExtractor = (pot: Pot, index: number) => pot.uuid;
+
+  private renderSectionHeader = (info: {section: SectionListData<SectionT>}): JSX.Element => {
     const section = info.section;
     console.log(section);
     const content = this.props.fontLoaded ? (
@@ -229,7 +239,7 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
      ) : null;
     return (
       <TouchableHighlight
-        onPress={() => this.props.onCollapse(this.stripCount(section.title))}
+        onPress={this.collapseSection(section.title)}
         underlayColor="#fff"
       >
         <View style={styles.lh}>
@@ -238,5 +248,9 @@ export default class ListPage extends React.Component<ListPageProps, {}> {
         </View>
       </TouchableHighlight>
     );
+  }
+
+  private collapseSection = (section: string) => {
+    return () => this.props.onCollapse(this.stripCount(section));
   }
 }

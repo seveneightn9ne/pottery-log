@@ -5,7 +5,7 @@ import dispatcher from '../AppDispatcher';
 import { importImage, importMetadata, startImport } from '../export';
 import { nameFromUri } from './ImageStore';
 
-interface ImageMapState {[name: string]: {uri: string; started?: true};}
+interface ImageMapState {[name: string]: {uri: string; started?: true}; }
 export interface ImportState {
   importing: boolean;
   totalImages?: number;
@@ -41,7 +41,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
    */
 
   public reduce(state: ImportState, action: Action): ImportState {
-    if (action.type == 'import-initiate') {
+    if (action.type === 'import-initiate') {
         startImport();
         return {
             importing: true,
@@ -91,7 +91,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             };
         }
         case 'image-file-created': {
-            if (!state.imageMap || state.imagesImported == undefined) {
+            if (!state.imageMap || state.imagesImported === undefined) {
                 // Not even started importing images yet
                 return state;
             }
@@ -102,7 +102,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             // console.log("Will check off this image.");
             const newState = {...state, imageMap: {...state.imageMap}};
             delete newState.imageMap[action.name];
-            if (Object.keys(newState.imageMap).length == 0) {
+            if (Object.keys(newState.imageMap).length === 0) {
                 console.log('Import finished!');
                 // Import finished!
                 setTimeout(() => dispatcher.dispatch({type: 'page-list'}), 0);

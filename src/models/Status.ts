@@ -27,17 +27,6 @@ type StatusConstructor = {
 };
 
 export default class Status {
-/*
-  private static empty(): EmptyableBareStatus {
-    return {
-      notstarted: undefined,
-      thrown: undefined,
-      bisqued: undefined,
-      trimmed: undefined,
-      glazed: undefined,
-      pickedup: undefined,
-    };
-  }*/
 
   public static prettify(name: StatusString): string {
     return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
@@ -103,13 +92,10 @@ export default class Status {
 
     const status: EmptyableBareStatus = {};
 
-    _.forOwn(from, (item, _s) => {
-      const s = _s as keyof EmptyableBareStatus;
-      if (typeof(item) == 'string' || typeof(item) == 'number') {
-        status[s] = new Date(item);
-      } else {
-        status[s] = item;
-      }
+    _.forOwn(from, (item, ss) => {
+      const s = ss as keyof EmptyableBareStatus;
+      status[s] = (typeof(item) === 'string' || typeof(item) === 'number') ?
+        status[s] = new Date(item) : status[s] = item;
     });
 
     if (Status.isValidStatus(status)) {
@@ -147,7 +133,7 @@ export default class Status {
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
     const oneWeekIsh = week - (12 * hour);
-    return new Date().getTime() - date.getTime() > oneWeekIsh && this.currentStatus() != 'pickedup';
+    return new Date().getTime() - date.getTime() > oneWeekIsh && this.currentStatus() !== 'pickedup';
   }
 
   public text(): string {
@@ -160,15 +146,14 @@ export default class Status {
 
   public currentStatus(): StatusString {
     let current: StatusString | undefined;
-    _.forEach(Status.ordered(), (_s) => {
-      const s = _s as keyof BareStatus;
+    _.forEach(Status.ordered(), (s: keyof BareStatus) => {
       if (this.status[s]) {
         current = s;
         return false;
       }
       return true;
    });
-    if (current == undefined) {
+    if (current === undefined) {
     throw Error('Impossible condition: the status has no status');
    }
     return current;
@@ -226,6 +211,6 @@ export default class Status {
   }
 
   public hasTimeline(): boolean {
-    return this.currentStatus() != 'thrown' && this.currentStatus() != 'notstarted';
+    return this.currentStatus() !== 'thrown' && this.currentStatus() !== 'notstarted';
   }
 }

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Status, { StatusString } from '../../models/Status';
 import styles from '../../style';
-import {Note, NoteModal} from './Note';
+import Note from './Note';
+import NoteModal from './NoteModal';
 
 interface StatusDetailProps {
   fontLoaded: boolean;
@@ -22,41 +23,57 @@ export default class StatusDetail extends React.Component<StatusDetailProps, {}>
     this.modal = React.createRef();
   }
   public render() {
-    const noteComponent = <Note fontLoaded={this.props.fontLoaded}
-      textStyle={styles.statusDetailNote}
-      note={this.props.note} status={this.props.status}
-      potId={this.props.potId} onChangeNote={this.props.onChangeNote}
-      showNote={true} showAddNote={false} />;
-    const editButton = this.props.fontLoaded ?
-          <TouchableOpacity onPress={() => {this.modal.current && this.modal.current.open();}}>
-	    <Text style={[styles.search, styles.editDetail]}>
-	      {this.props.note ? 'mode_edit' : 'note_add'}
-	    </Text>
-          </TouchableOpacity>
-        : null;
-    const noteModal = <NoteModal note={this.props.note}
+    const noteComponent = (
+    <Note
+      fontLoaded={this.props.fontLoaded}
+      textStyle={styles.statusDetailNote as TextStyle}
+      note={this.props.note}
       status={this.props.status}
-      potId={this.props.potId} ref={this.modal}
-      onChangeNote={this.props.onChangeNote} />;
-    const timelineStyles: ViewStyle[] = [styles.timeline];
-    if (this.props.first) { timelineStyles.push(styles.timelineFirst); }
-    if (this.props.last) { timelineStyles.push(styles.timelineLast); }
-    if (!this.props.first && this.props.last) { timelineStyles.push(styles.timelineLastOnly); }
-    if (this.props.first && this.props.last) { timelineStyles.push(styles.timelineOnly); }
-    return <View style={[styles.statusDetail, {flexDirection: 'row'}]}>
+      potId={this.props.potId}
+      onChangeNote={this.props.onChangeNote}
+      showNote={true}
+      showAddNote={false}
+    />);
+    const editButton = this.props.fontLoaded ? (
+      <TouchableOpacity onPress={this.openModal}>
+        <Text style={[styles.search, styles.editDetail]}>
+          {this.props.note ? 'mode_edit' : 'note_add'}
+        </Text>
+      </TouchableOpacity>
+      ) : null;
+    const noteModal = (
+      <NoteModal
+        note={this.props.note}
+        status={this.props.status}
+        potId={this.props.potId}
+        ref={this.modal}
+        onChangeNote={this.props.onChangeNote}
+      />);
+    const timelineStyles: ViewStyle[] = [styles.timeline as ViewStyle];
+    if (this.props.first) { timelineStyles.push(styles.timelineFirst as ViewStyle); }
+    if (this.props.last) { timelineStyles.push(styles.timelineLast as ViewStyle); }
+    if (!this.props.first && this.props.last) { timelineStyles.push(styles.timelineLastOnly as ViewStyle); }
+    if (this.props.first && this.props.last) { timelineStyles.push(styles.timelineOnly as ViewStyle); }
+    return (
+    <View style={[styles.statusDetail, {flexDirection: 'row'}]}>
       {noteModal}
       <View style={timelineStyles}>
-	<View style={styles.timelineInner} />
+        <View style={styles.timelineInner} />
       </View>
       <View style={styles.statusDetailInner}>
-	<View style={{flexDirection: 'row'}}>
-	    <Text style={styles.status}>
-	    {Status.prettify(this.props.status)}</Text>
-	    <Text style={styles.statusDetailDate}> {Status.dateText(this.props.date)} </Text>
-	</View>
-	{this.props.note ? noteComponent : null}
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.status}>{Status.prettify(this.props.status)}</Text>
+          <Text style={styles.statusDetailDate}>{Status.dateText(this.props.date)}</Text>
+        </View>
+        {this.props.note ? noteComponent : null}
       </View>
       {editButton}
-    </View>;
+    </View>);
+  }
+
+  private openModal = () => {
+    if (this.modal.current) {
+      this.modal.current.open();
+    }
   }
 }

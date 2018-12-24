@@ -22,8 +22,9 @@
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
     "test": "node node_modules/jest/bin/jest.js --watch",
-    "lint": "node_modules/tslint/bin/tslint src/**/*.ts",
-    "validate": "npm run lint --scripts-prepend-node-path && tsc --noEmit"
+    "lint": "node_modules/tslint/bin/tslint --project .",
+    "tsc": "node_modules/typescript/bin/tsc --project . --noEmit",
+    "validate": "npm run lint && node_modules/typescript/bin/tsc src/**/*.ts{,x} --noEmit"
   },
   "dependencies": {
     "@babel/core": "^7.0.0-0",

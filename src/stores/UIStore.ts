@@ -51,7 +51,7 @@ class UIStore extends ReduceStore<UIState, Action> {
   public reduce(state: UIState, action: Action): UIState {
     switch (action.type) {
       case 'page-new-pot':
-        if (state.page != 'list') {
+        if (state.page !== 'list') {
           return state;
         }
         return {
@@ -90,31 +90,31 @@ class UIStore extends ReduceStore<UIState, Action> {
       case 'list-search-close':
         return {...state, page: 'list', searching: false, searchTerm: ''};
       case 'list-search-term':
-      	return {...state, page: 'list', searching: true, searchTerm: action.text};
+        return {...state, page: 'list', searching: true, searchTerm: action.text};
       case 'list-collapse':
-        if (state.list.collapsed.indexOf(action.section) != -1) {
+        if (state.list.collapsed.indexOf(action.section) !== -1) {
           return {...state, list: {...state.list,
-                                   collapsed: state.list.collapsed.filter((i) => i != action.section)}};
+                                   collapsed: state.list.collapsed.filter((i) => i !== action.section)}};
         }
         return {...state, list: {...state.list,
                                  collapsed: [...state.list.collapsed, action.section]}};
       case 'list-scroll':
-      	return {...state, list: {...state.list, yCurrent: action.y}};
+        return {...state, list: {...state.list, yCurrent: action.y}};
       case 'page-image':
-        if (state.page != 'edit-pot') {
+        if (state.page !== 'edit-pot') {
           return state;
         }
-      	 return {
+        return {
           page: 'image',
           editPotId: state.editPotId,
           imageId: action.imageId,
           list: state.list,
         };
       case 'image-delete-from-pot':
-        if (state.page != 'image') {
+        if (state.page !== 'image') {
           return state;
         }
-      	 return {
+        return {
           page: 'edit-pot',
           list: state.list,
           editPotId: state.editPotId,

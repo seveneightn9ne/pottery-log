@@ -1,5 +1,7 @@
+
 import { FileSystem } from 'expo';
 import {ReduceStore} from 'flux/utils';
+import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
 import { Action, ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
@@ -10,7 +12,7 @@ export interface ImageStoreState {
   images: {[name: string]: ImageState};
 }
 
-class _ImageStore extends ReduceStore<ImageStoreState, Action> {
+class CImageStore extends ReduceStore<ImageStoreState, Action> {
   constructor() {
     super(dispatcher);
   }
@@ -52,9 +54,9 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
         }
         const newState = {images: {...state.images,
                                    [action.imageName]:
-            {...im, pots: im.pots.filter((p) => p != action.potId)},
+            {...im, pots: im.pots.filter((p) => p !== action.potId)},
         }};
-        if (newState.images[action.imageName].pots.length == 0) {
+        if (newState.images[action.imageName].pots.length === 0) {
           if (im.remoteUri) {
             ImageUploader.remove(im.remoteUri);
           }
@@ -68,12 +70,12 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
       }
       case 'image-delete-all-from-pot': {
         const newState = {images: {...state.images}};
-        for (let i = 0; i < action.imageNames.length; i++) {
-          const oldI = newState.images[action.imageNames[i]];
+        for (const name of action.imageNames) {
+          const oldI = newState.images[name];
           if (!oldI) { continue; }
-          const newI = {...oldI, pots: oldI.pots.filter((p) => p != action.potId)};
-          newState.images[action.imageNames[i]] = newI;
-          if (newI.pots.length == 0) {
+          const newI = {...oldI, pots: oldI.pots.filter((p) => p !== action.potId)};
+          newState.images[name] = newI;
+          if (newI.pots.length === 0) {
             if (newI.remoteUri) {
               ImageUploader.remove(newI.remoteUri);
             }
@@ -93,14 +95,13 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
           // Can skip persist if we aren't processing them.
           return newState;
         }
-        for (const imageName in newState.images) {
-          const image = newState.images[imageName];
+        _.forOwn(newState.images, (image, imageName) => {
           if (!image.remoteUri && !image.fileUri && !image.localUri) {
             // the cached image was deleted before we could move it somewhere permanent :'(
             // If any pots refer to this image then the pot store must handle that
             delete newState.images[imageName];
           }
-          if (image.pots && image.pots.length == 0) {
+          if (image.pots && image.pots.length === 0) {
             if (image.remoteUri) {
               ImageUploader.remove(image.remoteUri);
             }
@@ -114,7 +115,7 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
           } else if (!image.fileUri && image.localUri) {
             this.saveToFile(image.localUri);
           }
-        }
+        });
         this.persist(newState);
         return newState;
       }
@@ -131,25 +132,28 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
       }
       case 'pot-copy': {
         const newState = {images: {...state.images}};
-        for (let i = 0; i < action.imageNames.length; i++) {
-          const name = action.imageNames[i];
-          newState.images[name] = {...newState.images[name],
-                                   pots: [...newState.images[name].pots, action.potId]};
+        for (const name of action.imageNames) {
+          newState.images[name] = {
+            ...newState.images[name],
+            pots: [...newState.images[name].pots, action.potId],
+          };
         }
         this.persist(newState);
         return newState;
       }
       case 'migrate-from-images2': {
         const newState = {images: {...state.images}};
-        for (let i = 0; i < action.images2.length; i++) {
-          const localUri = action.images2[i].localUri;
-          const remoteUri = action.images2[i].remoteUri;
+        for (const image of action.images2) {
+          const localUri = image.localUri;
+          const remoteUri = image.remoteUri;
           const name = nameFromUri(localUri);
           if (newState.images[name]) {
             // This image exists for another pot already
-            if (newState.images[name].pots.indexOf(action.potId) == -1) {
-              newState.images[name] = {...newState.images[name],
-                                       pots: [...newState.images[name].pots, action.potId]};
+            if (newState.images[name].pots.indexOf(action.potId) === -1) {
+              newState.images[name] = {
+                ...newState.images[name],
+                pots: [...newState.images[name].pots, action.potId],
+              };
             }
           } else {
             // New image
@@ -169,22 +173,21 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
         }
         const newState = {images: {...state.images}};
         let modified = false;
-        for (const imageName in state.images) {
-          const newImage = {...state.images[imageName]};
-          if (newImage.pots == undefined) {
+        _.forOwn(state.images, (image, imageName) => {
+          const newImage = {...image};
+          if (newImage.pots === undefined) {
             modified = true;
             newImage.pots = [];
           }
           const newPots = [];
-          for (let i = 0; i < newImage.pots.length; i++) {
-            if (action.potIds.indexOf(newImage.pots[i]) >= 0 &&
-                newPots.indexOf(newImage.pots[i]) == -1) {
-              newPots.push(newImage.pots[i]);
+          for (const pot of newImage.pots) {
+            if (action.potIds.indexOf(pot) >= 0 && newPots.indexOf(pot) === -1) {
+              newPots.push(pot);
             }
           }
           // this might modify the state but we won't mark it modified
           newImage.pots = newPots;
-          if (newPots.length == 0) {
+          if (newPots.length === 0) {
             console.log('Uh, an unused image: ' + imageName);
             if (newImage.remoteUri) {
               ImageUploader.remove(newImage.remoteUri);
@@ -196,7 +199,7 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
             modified = true;
           }
           newState.images[imageName] = newImage;
-        }
+        });
         if (modified) {
           this.persist(newState);
         }
@@ -237,7 +240,7 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
         return state;
       }
       case 'image-file-created': {
-        if (state.images[action.name] == undefined) {
+        if (state.images[action.name] === undefined) {
           console.warn('Image file created, but no image exists for it! This is quite bad, probably.');
           return state;
         }
@@ -320,7 +323,7 @@ class _ImageStore extends ReduceStore<ImageStoreState, Action> {
   }
 }
 
-export const ImageStore = new _ImageStore();
+export const ImageStore = new CImageStore();
 
 export function nameFromUri(uri: string): string {
   const uriParts = uri.split('/');

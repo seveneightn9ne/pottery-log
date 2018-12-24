@@ -15,28 +15,29 @@ interface ImagePageProps {
 }
 
 export default class ImagePage extends React.Component<ImagePageProps> {
+
   public render() {
     const {width} = Dimensions.get('window');
-    const isMainImage = this.props.pot.images3[0] == this.props.image;
+    const isMainImage = this.props.pot.images3[0] === this.props.image;
     const star = isMainImage ? 'star' : 'star_border';
-    const backButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() => this.props.onBack(this.props.pot.uuid)}>
+    const backButton = this.props.fontLoaded ? (
+      <TouchableOpacity onPress={this.onBack}>
         <Text style={styles.searchBack}>close</Text>
-      </TouchableOpacity> : null;
-    const starButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() =>
-      	  this.props.onSetMainImage(this.props.pot.uuid, this.props.image)}>
+      </TouchableOpacity>
+     ) : null;
+    const starButton = this.props.fontLoaded ? (
+      <TouchableOpacity onPress={this.onSetMainImage}>
         <Text style={styles.search}>{star}</Text>
-      </TouchableOpacity> : null;
-    const deleteButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() => this.props.onDeleteImage(this.props.image)}>
+      </TouchableOpacity>
+     ) : null;
+    const deleteButton = this.props.fontLoaded ? (
+      <TouchableOpacity onPress={this.onDeleteImage}>
         <Text style={styles.search}>delete</Text>
-      </TouchableOpacity> : null;
+      </TouchableOpacity>
+     ) : null;
     const imageState = nameToImageState(this.props.image);
-    return <View style={[styles.container, {
-      justifyContent: 'center',
-      backgroundColor: '#000',
-    }]}>
+    return (
+    <View style={[styles.container, styles.imagePage]}>
       <View style={styles.imageBar}>
         {backButton}
         <View style={{flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
@@ -45,6 +46,17 @@ export default class ImagePage extends React.Component<ImagePageProps> {
         </View>
       </View>
       <Image3 image={imageState} key={Image3.key(imageState)} style={{width, height: width}} />
-    </View>;
+    </View>
+    );
+  }
+
+  private onBack = () => this.props.onBack(this.props.pot.uuid);
+
+  private onSetMainImage = () => {
+    this.props.onSetMainImage(this.props.pot.uuid, this.props.image);
+  }
+
+  private onDeleteImage = () => {
+    this.props.onDeleteImage(this.props.image);
   }
 }

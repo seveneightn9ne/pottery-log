@@ -44,7 +44,7 @@ class ExportStore extends ReduceStore<ExportState, Action> {
 
   public reduce(state: ExportState, action: Action): ExportState {
     // console.log("will check: " + action.type);
-    if (action.type == 'export-initiate') {
+    if (action.type === 'export-initiate') {
         const id = Date.now();
         startExport(id);
         return {
@@ -53,7 +53,7 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             statusMessage: 'Starting export...',
         };
     }
-    if (!state.exporting || ('exportId' in action && action.exportId != state.exportId)) {
+    if (!state.exporting || ('exportId' in action && action.exportId !== state.exportId)) {
         return state;
     }
     switch (action.type) {

@@ -15,23 +15,6 @@ interface SettingsPageProps {
 }
 
 export default class SettingsPage extends React.Component<SettingsPageProps> {
-
-  constructor(props: SettingsPageProps) {
-    super(props);
-    this.onBack = this.onBack.bind(this);
-  }
-
-  public onBack() {
-    if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
-      Alert.alert('Cancel this export?', undefined,
-        [{text: 'Stay here', style: 'cancel'},
-        {text: 'Cancel', onPress: this.props.onNavigateToList},
-      ]);
-    } else {
-      this.props.onNavigateToList();
-    }
-  }
-
   public render() {
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.onBack}>
@@ -75,5 +58,16 @@ export default class SettingsPage extends React.Component<SettingsPageProps> {
         </View>
         {body}
     </View>);
+  }
+
+  private onBack = () => {
+    if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
+      Alert.alert('Cancel this export?', undefined,
+        [{text: 'Stay here', style: 'cancel'},
+        {text: 'Cancel', onPress: this.props.onNavigateToList},
+      ]);
+    } else {
+      this.props.onNavigateToList();
+    }
   }
 }

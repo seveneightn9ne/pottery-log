@@ -47,7 +47,10 @@ export interface AppViewProps {
 function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
   switch (props.ui.page) {
     case 'list':
-      return <ListPage pots={props.pots} ui={props.ui}
+      return (
+      <ListPage
+        pots={props.pots}
+        ui={props.ui}
         fontLoaded={props.fontLoaded}
         onNewPot={props.onNew}
         onClickPot={props.onEdit}
@@ -56,9 +59,11 @@ function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
         onSearch={props.onSearch}
         onNavigateToSettings={props.onNavigateToSettings}
         onCollapse={props.onCollapse}
-      />;
+      />);
     case 'edit-pot':
-      return <EditPage pot={props.pots.pots[props.ui.editPotId]}
+      return (
+      <EditPage
+        pot={props.pots.pots[props.ui.editPotId]}
         ui={props.ui}
         fontLoaded={props.fontLoaded}
         onChangeTitle={props.onChangeTitle}
@@ -70,29 +75,34 @@ function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
         onExpandImage={props.onExpandImage}
         setStatus={props.setStatus}
         setStatusDate={props.setStatusDate}
-        onDelete={props.onDelete} onCopy={props.onCopy}
-      />;
+        onDelete={props.onDelete}
+        onCopy={props.onCopy}
+      />);
     case 'settings':
-      return <SettingsPage
+      return (
+      <SettingsPage
         exports={props.exports}
         imports={props.imports}
         fontLoaded={props.fontLoaded}
         onNavigateToList={props.onNavigateToList}
         onStartExport={props.onStartExport}
         onStartImport={props.onStartImport}
-        />;
+      />);
     case 'image':
-      return <ImagePage image={props.ui.imageId}
-      	pot={props.pots.pots[props.ui.editPotId]}
-      	fontLoaded={props.fontLoaded}
+      return (
+      <ImagePage
+        image={props.ui.imageId}
+        pot={props.pots.pots[props.ui.editPotId]}
+        fontLoaded={props.fontLoaded}
         onDeleteImage={props.onDeleteImage}
         onSetMainImage={props.onSetMainImage}
         onBack={props.onEdit}
-      />;
+      />);
     default:
-      return <View style={styles.container}>
+      return (
+      <View style={styles.container}>
         <Text style={styles.h1}>Unknown Page</Text>
-      </View>;
+      </View>);
   }
 }
 

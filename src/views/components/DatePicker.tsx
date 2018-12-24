@@ -17,25 +17,22 @@ interface DatePickerProps {
   onPickDate: (date: Date) => void;
 }
 
-interface State {
-  // Used only in iOS impl
-  modalVisible: boolean;
-}
-
-class ImplAndroid extends React.Component<DatePickerProps, State> {
-
+class ImplAndroid extends React.Component<DatePickerProps, {}> {
   public render() {
-    return <View style={[styles.chipOuter, styles.chipInner]}><TouchableOpacity
-      onPress={this.pickDateAndroid}>
-      <View style={styles.chipInner}>
-	{this.props.fontLoaded ?
-	    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text> : null}
-        <Text style={styles.chipText}>
-      	  {Status.dateText(this.props.value)}
-        </Text>
-        <View style={styles.chipArrow} />
-      </View>
-	  </TouchableOpacity></View>;
+    const today = this.props.fontLoaded ?
+      <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text> : null;
+    return (
+    <View style={[styles.chipOuter, styles.chipInner]}>
+      <TouchableOpacity onPress={this.pickDateAndroid}>
+        <View style={styles.chipInner}>
+          {today}
+          <Text style={styles.chipText}>
+            {Status.dateText(this.props.value)}
+          </Text>
+          <View style={styles.chipArrow} />
+        </View>
+      </TouchableOpacity>
+    </View>);
   }
 
   public pickDateAndroid = async () => {
@@ -53,38 +50,49 @@ class ImplAndroid extends React.Component<DatePickerProps, State> {
   }
 }
 
-class ImplIOS extends React.Component<DatePickerProps, State> {
+// tslint:disable-next-line:max-classes-per-file
+class ImplIOS extends React.Component<DatePickerProps, {modalVisible: boolean}> {
   public state = {
     modalVisible: false,
   };
 
   public render() {
-    return <View>
+    return (
+    <View>
       <Modal
         animationType={'slide'}
         transparent={false}
         visible={this.state.modalVisible}
-        onRequestClose={() => this.setState({modalVisible: false})}>
+        onRequestClose={this.closeModal}
+      >
         <DatePickerIOS
           date={this.props.value}
           mode="date"
-          onDateChange={(date: Date) => {
-            this.setState({modalVisible: false});
-            this.props.onPickDate(date);
-          }} />
+          onDateChange={this.onChangeDate}
+        />
       </Modal>
-    <TouchableOpacity
-      onPress={() => {
-        this.setState({modalVisible: true});
-      }}>
+    <TouchableOpacity onPress={this.openModal}>
       <Text>{Status.dateText(this.props.value)}</Text>
     </TouchableOpacity>
-    </View>;
+    </View>);
+  }
+
+  private onChangeDate = (date: Date) => {
+    this.closeModal();
+    this.props.onPickDate(date);
+  }
+
+  private openModal = () => {
+    this.setState({modalVisible: true});
+  }
+
+  private closeModal = () => {
+    this.setState({modalVisible: false});
   }
 }
 
 const DatePicker = Platform.select({
-  ios: ImplIOS,
+  ios: ImplIOS as (typeof ImplAndroid | typeof ImplIOS),
   android: ImplAndroid,
 });
 

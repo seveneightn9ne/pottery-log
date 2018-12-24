@@ -36,59 +36,72 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
   public render() {
     const { width } = Dimensions.get('window');
     const pot = this.props.pot;
-    const backButton = this.props.fontLoaded ?
+    const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.props.onNavigateToList}>
         <Text style={styles.searchBack}>arrow_back</Text>
-      </TouchableOpacity> : null;
-    const editButton = this.props.fontLoaded ?
-      <TouchableOpacity onPress={() => {
-        if (this.titleInput.current) {
-          this.titleInput.current.focus();
-        }
-      }}>
+      </TouchableOpacity>
+    ) : null;
+    const editButton = this.props.fontLoaded ? (
+      <TouchableOpacity onPress={this.focusTitle}>
         <Text style={styles.search}>mode_edit</Text>
       </TouchableOpacity>
-      : null;
+    ) : null;
     const mainImgSize = width - 100;
 
     /* status text */
     const currentStatus = pot.status.currentStatus();
     const currentStatusIndex = currentStatus ? Status.ordered().indexOf(currentStatus) : -1;
     const numStatusDetails = Status.ordered().length - currentStatusIndex - 2;
-    const details = Status.ordered().splice(currentStatusIndex + 1, numStatusDetails).map((s, i) =>
-      <StatusDetail key={s} fontLoaded={this.props.fontLoaded}
+    const details = Status.ordered().splice(currentStatusIndex + 1, numStatusDetails).map((s, i) => (
+      <StatusDetail
+        key={s}
+        fontLoaded={this.props.fontLoaded}
         note={pot.notes2 && pot.notes2.notes[s] || ''}
-        status={s} potId={pot.uuid} date={pot.status.status[s] || new Date()}
-        first={i == 0} last={i == numStatusDetails - 1}
-        onChangeNote={this.props.onChangeNote} />,
-    );
+        status={s}
+        potId={pot.uuid}
+        date={pot.status.status[s] || new Date()}
+        first={i === 0}
+        last={i === numStatusDetails - 1}
+        onChangeNote={this.props.onChangeNote}
+      />
+    ));
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
-    const bottomBarStyle: ViewStyle[] = [styles.bottomBar];
+    const bottomBarStyle: ViewStyle[] = [styles.bottomBar as ViewStyle];
     if (details.length) {
-      bottomBarStyle.push(styles.bottomBarWithContent);
+      bottomBarStyle.push(styles.bottomBarWithContent as ViewStyle);
     }
-    return <View style={styles.container}>
+    return (
+    <View style={styles.container}>
       <View style={[styles.header, { elevation: 8 }]}>
         {backButton}
-        <TextInput style={styles.searchBox}
+        <TextInput
+          style={styles.searchBox}
           ref={this.titleInput}
           underlineColorAndroid="transparent"
           placeholderTextColor="#FFCCBC"
-          onChangeText={(text) => this.props.onChangeTitle(pot.uuid, text)}
-          value={pot.title} selectTextOnFocus={true} autoFocus={this.props.ui.new}
+          onChangeText={this.onChangeTitle}
+          value={pot.title}
+          selectTextOnFocus={true}
+          autoFocus={this.props.ui.new}
         />
         {editButton}
       </View>
       <KeyboardAwareScrollView extraHeight={100}>
         <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
-          <ImageList size={mainImgSize} images={pot.images3}
-            onAddImage={(i) => this.props.onAddImage(pot.uuid, i)}
+          <ImageList
+            size={mainImgSize}
+            images={pot.images3}
+            onAddImage={this.onAddImage}
             onClickImage={this.props.onExpandImage}
-            onDeleteImage={(i) => this.props.onDeleteImage(i)} />
-          <StatusSwitcher fontLoaded={this.props.fontLoaded}
-            status={pot.status} setStatus={this.props.setStatus}
+            onDeleteImage={this.props.onDeleteImage}
+          />
+          <StatusSwitcher
+            fontLoaded={this.props.fontLoaded}
+            status={pot.status}
+            setStatus={this.props.setStatus}
             note={currentNoteText}
-            onChangeNote={this.props.onChangeNote} potId={pot.uuid}
+            onChangeNote={this.props.onChangeNote}
+            potId={pot.uuid}
             date={pot.status.date()}
             onPickDate={this.props.setStatusDate}
           />
@@ -100,6 +113,21 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         <Button onPress={this.props.onDelete} style={[styles.button3, styles.bbb]}>DELETE POT</Button>
         <Button onPress={this.props.onCopy} style={[styles.button3, styles.bbb]}>COPY POT</Button>
       </View>
-    </View>;
+    </View>
+    );
+  }
+
+  private onAddImage = (i: string) => {
+    this.props.onAddImage(this.props.pot.uuid, i);
+  }
+
+  private onChangeTitle = (text: string) => {
+    this.props.onChangeTitle(this.props.pot.uuid, text);
+  }
+
+  private focusTitle = () => {
+    if (this.titleInput.current) {
+      this.titleInput.current.focus();
+    }
   }
 }

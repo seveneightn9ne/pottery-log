@@ -7,8 +7,9 @@
     "tslint-react"
   ],
   "linterOptions": {
-    "exclude": [
-      "node_modules/**/*"
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
     ]
   },
   "rules": {
@@ -17,8 +18,6 @@
     "object-literal-sort-keys": false,
     "no-console": false,
     "no-empty": [true, "allow-empty-functions"],
-    "interface-name": false,
-    "jsx-no-lambda": false,
-    "jsx-no-bind": false
+    "interface-name": false
   }
 }

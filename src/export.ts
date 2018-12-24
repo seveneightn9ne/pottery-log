@@ -21,7 +21,7 @@ async function startExport(id: number) {
   uploader.startExport(id, metadata);
 }
 
-function exportImage(id: number, imageState: ImageState) {
+function exportImage(id: number, imageState: Partial<ImageState>) {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri === imageState.remoteUri;

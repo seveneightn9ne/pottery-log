@@ -1,4 +1,3 @@
-import { Dispatcher } from 'flux';
 import {ReduceStore} from 'flux/utils';
 import { AsyncStorage } from 'react-native';
 import { Action, ImageState } from '../action';
@@ -21,7 +20,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
     super(dispatcher);
   }
   public getInitialState(isImport?: boolean): PotsStoreState {
-    loadInitial(dispatcher, !!isImport);
+    loadInitial(!!isImport);
     return {pots: {}, potIds: [], hasLoaded: false};
   }
 
@@ -95,7 +94,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
         const lastWordIndex = oldTitleWords.length - 1;
         const lastWord = oldTitleWords[lastWordIndex];
         const newTitle = isNaN(Number(lastWord)) ? oldTitleWords.join(' ') + ' 2' :
-            oldTitleWords.slice(0, lastWordIndex).join(' ') + ' ' + (1 + parseInt(lastWord));
+            oldTitleWords.slice(0, lastWordIndex).join(' ') + ' ' + (1 + parseInt(lastWord, 10));
         const pot = {
           ...oldPot,
           uuid: String(Math.random()).substring(2),
@@ -131,7 +130,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
   }
 
   public persist(state: PotsStoreState, pot?: Pot) {
-    if (pot != undefined) {
+    if (pot !== undefined) {
       StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot));
     }
     StorageWriter.put('@Pots', JSON.stringify(state.potIds));
@@ -156,7 +155,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
         return true;
       });
       newState.pots[potId] = pot;
-      if (newImages3.length != pot.images3.length) {
+      if (newImages3.length !== pot.images3.length) {
         pot.images3 = newImages3;
         this.persist(newState, pot);
       }
@@ -166,7 +165,7 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
 
 }
 
-async function loadInitial(dispatcher: Dispatcher<Action>, isImport: boolean): Promise<void> {
+async function loadInitial(isImport: boolean): Promise<void> {
   const potIdsStr = await AsyncStorage.getItem('@Pots') || '';
   let potIds: string[];
   try {
@@ -177,8 +176,8 @@ async function loadInitial(dispatcher: Dispatcher<Action>, isImport: boolean): P
     potIds = [];
   }
   const promises = [];
-  for (let i = 0; i < potIds.length; i++) {
-    promises.push(loadPot(potIds[i]));
+  for (const potId of potIds) {
+    promises.push(loadPot(potId));
   }
   Promise.all(promises).then((pots) => {
     const potsById: {[uuid: string]: Pot} = {};
@@ -207,29 +206,29 @@ async function loadPot(uuid: string): Promise<Pot | null> {
   }
   // Add all fields, for version compatibility
   const pot: IntermediatePot = {...loaded};
-  pot.status = typeof(loaded.status) == 'string' ?
+  pot.status = typeof(loaded.status) === 'string' ?
     new Status(JSON.parse(loaded.status)) :
     new Status(loaded.status);
 
-  pot.notes2 = typeof(loaded.notes2) == 'string' ?
+  pot.notes2 = typeof(loaded.notes2) === 'string' ?
     new Notes(JSON.parse(loaded.notes2)) :
     new Notes(loaded.notes2);
 
-  if (loaded.notes != undefined && typeof(loaded.notes) != 'string') {
+  if (loaded.notes !== undefined && typeof(loaded.notes) !== 'string') {
     delete pot.notes;
   }
-  if (loaded.images != undefined && loaded.images2 == undefined) {
+  if (loaded.images !== undefined && loaded.images2 === undefined) {
     // migrate - read the old data and convert to the new one, Miles said
     // it's ok for his old clients to lose the images.
     console.log('Migrating images 1-2.');
     pot.images2 = [];
-    for (let i = 0; i < loaded.images.length; i++) {
+    for (const image of loaded.images) {
       pot.images2.push({
-        localUri: loaded.images[i],
+        localUri: image,
       });
     }
   }
-  if (pot.images2 != undefined && pot.images3 == undefined) {
+  if (pot.images2 !== undefined && pot.images3 === undefined) {
     console.log('Migrating images 2-3.');
     dispatcher.dispatch({
       type: 'migrate-from-images2',
@@ -237,8 +236,8 @@ async function loadPot(uuid: string): Promise<Pot | null> {
       potId: pot.uuid,
     });
     pot.images3 = [];
-    for (let i = 0; i < pot.images2.length; i++) {
-      pot.images3.push(nameFromUri(pot.images2[i].localUri));
+    for (const image of pot.images2) {
+      pot.images3.push(nameFromUri(image.localUri));
     }
   }
   delete pot.images;

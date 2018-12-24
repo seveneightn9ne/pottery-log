@@ -16,6 +16,10 @@ export default StyleSheet.create({
         position: 'relative',
         // paddingTop: 20,
     },
+    imagePage: {
+        justifyContent: 'center',
+        backgroundColor: '#000',
+    },
     newPotButton: {
         backgroundColor: ORANGE,
         elevation: 5,

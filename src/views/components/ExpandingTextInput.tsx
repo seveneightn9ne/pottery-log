@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { TextInput, TextInputProps } from 'react-native';
+import { NativeSyntheticEvent, TextInput, TextInputContentSizeChangeEventData, TextInputProps } from 'react-native';
 
 interface Props extends TextInputProps {
   onSubmit: () => void;
@@ -19,12 +19,13 @@ export class ExpandingTextInput extends Component<Props, State> {
         {...this.props}
         multiline={true}
         underlineColorAndroid={'transparent'}
-        onContentSizeChange={(event) => {
-          this.setState({height: event.nativeEvent.contentSize.height});
-        }}
+        onContentSizeChange={this.onChangeSize}
         style={[this.props.style, {height: this.state.height}]}
         onEndEditing={this.props.onSubmit}
       />
     );
+  }
+  private onChangeSize = (event: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+    this.setState({height: event.nativeEvent.contentSize.height});
   }
 }
