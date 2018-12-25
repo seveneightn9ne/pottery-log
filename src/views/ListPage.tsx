@@ -61,7 +61,7 @@ function filterSortedPots(allPots: Pot[], status: StatusString, searchTerm: stri
     });
 }
 
-export default class ListPage extends React.Component<ListPageProps, {}> {
+export class ListPage extends React.Component<ListPageProps, {}> {
   private width: number;
 
   constructor(props: ListPageProps) {

@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import AppContainer from './src/AppContainer';
 import {AsyncStorage} from 'react-native';

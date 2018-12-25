@@ -6,3 +6,5 @@ assets/*.apk
 exp
 app.json
 expo-cli
+.jest/
+.envrc

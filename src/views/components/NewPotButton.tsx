@@ -6,11 +6,9 @@ interface NewPotButtonProps {
   fontLoaded: boolean;
   onPress: () => void;
 }
-export default class NewPotButton extends React.Component<NewPotButtonProps, {}> {
-  public render() {
-    return (
-    <TouchableHighlight onPress={this.props.onPress} style={styles.newPotButton}><View>
-      {this.props.fontLoaded ? <Text style={styles.newPotButtonText}>add</Text> : null}
-    </View></TouchableHighlight>);
-  }
+export default function(props: NewPotButtonProps) {
+  return (
+  <TouchableHighlight onPress={props.onPress} style={styles.newPotButton}><View>
+    {props.fontLoaded ? <Text style={styles.newPotButtonText}>add</Text> : null}
+  </View></TouchableHighlight>);
 }

@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import {Text, View} from 'react-native';
 import { StatusString } from '../models/Status';
@@ -10,7 +9,7 @@ import { UIState } from '../stores/UIStore';
 import styles from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
-import ListPage from './ListPage';
+import { ListPage } from './ListPage';
 import SettingsPage from './SettingsPage';
 
 export interface AppViewProps {

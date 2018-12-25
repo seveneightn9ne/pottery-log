@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches the snapshot 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#fff",
+      "flex": 1,
+      "justifyContent": "flex-start",
+      "position": "relative",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#4caf50",
+        "elevation": 4,
+        "flexDirection": "row",
+        "height": 76,
+        "justifyContent": "space-between",
+        "paddingTop": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#fff",
+            "fontSize": 20,
+            "fontWeight": "400",
+            "padding": 16,
+            "paddingBottom": 0,
+          },
+          Object {
+            "flex": 1,
+          },
+        ]
+      }
+    >
+      Pottery Log
+    </Text>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+        }
+      }
+    />
+  </View>
+  <Text
+    style={
+      Object {
+        "alignSelf": "center",
+        "color": "#00000099",
+        "paddingTop": 72,
+        "textAlign": "center",
+      }
+    }
+  >
+    Loading...
+  </Text>
+</View>
+`;
