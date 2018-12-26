@@ -2,7 +2,7 @@ import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { exportImage, finishExport, startExport } from '../export';
+import { exportImage, finishExport, startExport } from '../exports';
 import { ImageStore } from './ImageStore';
 
 export type ExportState = PreExportingState | StartExportingState | ExportingImagesState | PostExportingState;
@@ -69,14 +69,27 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                    // awaitingFile += 1;
                }
             });
-            return {
-                ...state,
-                exportingImages: true,
-                imagesExported: 0,
-                totalImages,
-                // awaitingFile: awaitingFile,
-                statusMessage: `Exporting images (0/${totalImages})...`,
-            };
+            if (totalImages > 0) {
+                return {
+                    ...state,
+                    exportingImages: true,
+                    imagesExported: 0,
+                    totalImages,
+                    // awaitingFile: awaitingFile,
+                    statusMessage: `Exporting images (0/${totalImages})...`,
+                };
+            } else {
+                // No images, export is finished
+                // TODO: some may be awaitingFile
+                finishExport(state.exportId);
+                return {
+                    ...state,
+                    exportingImages: true,
+                    imagesExported: 0,
+                    totalImages: 0,
+                    statusMessage: 'Finishing export...',
+                };
+            }
         }
         case 'image-file-created': {
             if (!('exportingImages' in state)) {

@@ -2,7 +2,7 @@ import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { importImage, importMetadata, startImport } from '../export';
+import { importImage, importMetadata, startImport } from '../exports';
 import { nameFromUri } from './ImageStore';
 
 interface ImageMapState {[name: string]: {uri: string; started?: true}; }
