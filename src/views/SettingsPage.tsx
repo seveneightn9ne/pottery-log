@@ -39,11 +39,13 @@ export default class SettingsPage extends React.Component<SettingsPageProps> {
           <Text style={styles.settingsText}>{status}</Text>
         </View>);
     } else {
+      // There may be an export or import failure message
+      const status = this.props.exports.statusMessage
+        || this.props.imports.statusMessage
+        || 'Exporting will save your Pottery Log data so you can move your data to a new phone.';
       body = (
         <View style={{padding: 20, paddingTop: 0}}>
-          <Text style={styles.settingsText}>
-            Exporting will save your Pottery Log data so you can move your data to a new phone.
-          </Text>
+          <Text style={styles.settingsText}>{status}</Text>
           <Button title="Export" onPress={this.props.onStartExport} />
           <View style={{height: 20}} />
           <Button title="Import" onPress={this.props.onStartImport} />

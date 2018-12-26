@@ -84,7 +84,6 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 finishExport(state.exportId);
                 return {
                     ...state,
-                    exportingImages: true,
                     imagesExported: 0,
                     totalImages: 0,
                     statusMessage: 'Finishing export...',
@@ -126,13 +125,14 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             };
             if (newState.imagesExported >= state.totalImages /*&& state.awaitingFile <= 0*/) {
                 newState.statusMessage = 'Finishing export...';
+                delete newState.exportingImages;
                 finishExport(state.exportId);
             }
             return newState;
         }
         case 'export-finished': {
             return {
-                ...state,
+                exporting: false,
                 statusMessage: 'Export finished!',
                 exportUri: action.uri,
             };
@@ -144,9 +144,11 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             };
         }
         case 'page-list': {
-            return {
-                exporting: false,
-            };
+            return this.getInitialState();
+        }
+        case 'page-settings': {
+            // Make sure it's re-initialized when you navigate here
+            return this.getInitialState();
         }
         default:
             return state;
