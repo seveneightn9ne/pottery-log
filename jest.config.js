@@ -8,5 +8,6 @@ module.exports = {
   ],
   transform: {
     "^.+\\.(js|ts|tsx)$": "babel-jest"
-  }
+  },
+  setupTestFrameworkScriptFile: "<rootDir>setupTests.js",
 };

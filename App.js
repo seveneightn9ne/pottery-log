@@ -19,6 +19,7 @@ export default class App extends React.Component {
     });
     this.setState({fontLoaded: true});
   }
+
   render() {
     return <AppContainer fontLoaded={this.state.fontLoaded} />
   }

@@ -1,8 +1,10 @@
 import React from 'react';
 import App from '../App';
-import renderer from 'react-test-renderer';
+import { shallow } from 'enzyme';
 
-it('matches the snapshot', () => {
-    const tree = renderer.create(<App />).toJSON();
-    expect(tree).toMatchSnapshot();
+it('matches the snapshot after font loaded', async () => {
+    const wrapper = await shallow(<App/>);
+    await wrapper.instance().componentDidMount();
+    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.state('fontLoaded')).toEqual(true);
 });

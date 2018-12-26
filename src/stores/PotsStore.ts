@@ -167,13 +167,14 @@ class PotsStore extends ReduceStore<PotsStoreState, Action> {
 
 async function loadInitial(isImport: boolean): Promise<void> {
   const potIdsStr = await AsyncStorage.getItem('@Pots') || '';
-  let potIds: string[];
-  try {
-    potIds = JSON.parse(potIdsStr) || [];
-  } catch (error) {
-    console.log('Pot load failed to parse: ' + potIdsStr);
-    console.warn(error);
-    potIds = [];
+  let potIds: string[] = [];
+  if (potIdsStr) {
+    try {
+      potIds = JSON.parse(potIdsStr) || [];
+    } catch (error) {
+      console.warn('Pot load failed to parse: ' + potIdsStr);
+      console.warn(error);
+    }
   }
   const promises = [];
   for (const potId of potIds) {
