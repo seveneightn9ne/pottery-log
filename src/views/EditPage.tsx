@@ -36,6 +36,9 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
   public render() {
     const { width } = Dimensions.get('window');
     const pot = this.props.pot;
+    if (!pot) {
+      return null;
+    }
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.props.onNavigateToList}>
         <Text style={styles.searchBack}>arrow_back</Text>
