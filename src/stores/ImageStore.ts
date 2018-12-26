@@ -68,7 +68,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         this.persist(newState);
         return newState;
       }
-      case 'image-delete-all-from-pot': {
+      case 'pot-delete': {
         const newState = {images: {...state.images}};
         for (const name of action.imageNames) {
           const oldI = newState.images[name];

@@ -19,7 +19,6 @@ type ImageAction = (
     | ImageLoaded
     | ImageAdd
     | ImageDeleteFromPot
-    | ImageDeleteAllFromPot
     | ImageErrorRemote
     | ImageErrorLocal
     | ImageRemoteFailed
@@ -121,6 +120,7 @@ interface PotEditStatus extends PotEditField {
 interface PotDelete {
     type: 'pot-delete';
     potId: string;
+    imageNames: string[];
 }
 
 interface PageList {
@@ -151,12 +151,6 @@ interface ImageDeleteFromPot {
     type: 'image-delete-from-pot';
     imageName: string;
     potId: string;
-}
-
-interface ImageDeleteAllFromPot {
-    type: 'image-delete-all-from-pot';
-    potId: string;
-    imageNames: string[];
 }
 
 interface ImageAdd {

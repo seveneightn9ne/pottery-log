@@ -159,10 +159,6 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
           dispatcher.dispatch({
             type: 'pot-delete',
             potId: currentPot().uuid,
-          });
-          dispatcher.dispatch({
-            type: 'image-delete-all-from-pot',
-            potId: currentPot().uuid,
             imageNames: currentPot().images3,
           });
         }},
