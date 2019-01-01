@@ -1,15 +1,15 @@
-import Expo from 'expo';
+import { Constants } from 'expo';
 import _ from 'lodash';
 import dispatcher from './AppDispatcher';
 import {nameFromUri} from './stores/ImageStore';
 
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';
-const EXPORT_START = apiPrefix + 'export';
-const EXPORT_IMAGE = apiPrefix + 'export-image';
-const EXPORT_FINISH = apiPrefix + 'finish-export';
-const IMPORT = apiPrefix + 'import';
-const IMAGE_DELETE = 'https://jesskenney.com/pottery-log-images/delete';
+export const EXPORT_START = apiPrefix + 'export';
+export const EXPORT_IMAGE = apiPrefix + 'export-image';
+export const EXPORT_FINISH = apiPrefix + 'finish-export';
+export const IMPORT = apiPrefix + 'import';
+export const IMAGE_DELETE = 'https://jesskenney.com/pottery-log-images/delete';
 
 async function post<Req, Res>(
   path: string, kvs: Req, onSuccess: (data: Res) => void, onError: (e: string | Error) => void) {
@@ -68,14 +68,14 @@ export async function startExport(id: number, metadata: any) {
   return post(
     EXPORT_START,
     { metadata: JSON.stringify(metadata),
-      deviceId: Expo.Constants.deviceId },
+      deviceId: Constants.deviceId },
     () => dispatcher.dispatch({type: 'export-started', exportId: id}),
     (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 }
 
 export async function exportImage(id: number, uri: string) {
   return post(EXPORT_IMAGE, {
-    deviceId: Expo.Constants.deviceId,
+    deviceId: Constants.deviceId,
     image: {
       uri,
       name: nameFromUri(uri),
@@ -87,14 +87,14 @@ export async function exportImage(id: number, uri: string) {
 }
 
 export async function finishExport(id: number) {
-  return post(EXPORT_FINISH, {deviceId: Expo.Constants.deviceId},
+  return post(EXPORT_FINISH, {deviceId: Constants.deviceId},
     (res: {uri: string}) => dispatcher.dispatch({type: 'export-finished', exportId: id, uri: res.uri}),
     (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 }
 
 export async function startImport(uri: string) {
   return post(IMPORT, {
-    deviceId: Expo.Constants.deviceId,
+    deviceId: Constants.deviceId,
     import: {
       uri,
       name: nameFromUri(uri),

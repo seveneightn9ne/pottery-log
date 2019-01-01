@@ -1,5 +1,4 @@
-// @flow
-import Expo from 'expo';
+import { DocumentPicker } from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
 import {ImageState} from './action';
 import dispatcher from './AppDispatcher';
@@ -39,7 +38,7 @@ async function finishExport(id: number) {
 }
 
 async function startImport() {
-  const docResult = await Expo.DocumentPicker.getDocumentAsync();
+  const docResult = await DocumentPicker.getDocumentAsync();
   if (docResult.type === 'success') {
     return uploader.startImport(docResult.uri);
   } else if (docResult.type === 'cancel') {
@@ -47,6 +46,13 @@ async function startImport() {
   }
 }
 
+/**
+ * Dispatches:
+ *  'import-cancel' if the user declines the import.
+ *  'imported-metadata' after the metadata has been imported.
+ *  'import-failure' if the input is not valid JSON, with the `error`.
+ * @param metadata JSON of the keys & values to put in AsyncStorage
+ */
 async function importMetadata(metadata: string) {
   try {
     const kvs = JSON.parse(metadata);

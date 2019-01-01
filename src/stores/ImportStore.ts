@@ -81,6 +81,13 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 }
                 numImages += 1;
             });
+            if (numImages === 0) {
+                // Done already!
+                setTimeout(() => dispatcher.dispatch({type: 'page-list'}), 0);
+                return {
+                    importing: false,
+                };
+            }
             console.log('Scheduled ' + numImages + ' for import');
             return {
                 ...state,
@@ -160,7 +167,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 statusMessage: 'Import failed.\n' + action.error,
             };
         }
-        case 'page-list': {
+        case 'page-settings': {
             return {
                 importing: false,
             };
