@@ -204,6 +204,4 @@ describe('uploader', () => {
             error: 'something is wrong',
         });
     });
-
-
 });
