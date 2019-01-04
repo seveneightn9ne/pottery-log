@@ -1,9 +1,9 @@
 
 import { Alert, AsyncStorage } from 'react-native';
-import dispatcher from '../AppDispatcher';
+import dispatcher from '../../AppDispatcher';
 import { DocumentPicker } from 'expo';
 import * as exports from '../exports';
-import { ImageStore } from '../stores/ImageStore';
+import { ImageStore } from '../../stores/ImageStore';
 import * as uploader from '../uploader';
 
 global.FormData = function() {
@@ -42,7 +42,7 @@ function expectFormValue(fetch, field, val) {
     expect(fetch.mock.calls[0][1].body.append).toHaveBeenCalledWith(field, val);
 }
 
-jest.mock('../AppDispatcher');
+jest.mock('../../AppDispatcher');
 jest.mock('expo', ()=>({
     Constants: {
         deviceId: '1001',

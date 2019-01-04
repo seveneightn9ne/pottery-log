@@ -3,10 +3,11 @@ import {Alert, BackHandler} from 'react-native';
 import dispatcher from './AppDispatcher';
 import { StatusString } from './models/Status';
 import ExportStore from './stores/ExportStore';
-import {ImageStore, nameFromUri} from './stores/ImageStore';
+import {ImageStore} from './stores/ImageStore';
 import ImportStore from './stores/ImportStore';
 import PotsStore from './stores/PotsStore';
 import UIStore from './stores/UIStore';
+import { nameFromUri } from './utils/imageutils';
 import AppView, { AppViewProps } from './views/AppView';
 
 function getStores() {

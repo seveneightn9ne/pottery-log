@@ -1,7 +1,7 @@
 import { Constants } from 'expo';
 import _ from 'lodash';
-import dispatcher from './AppDispatcher';
-import {nameFromUri} from './stores/ImageStore';
+import dispatcher from '../AppDispatcher';
+import {nameFromUri} from './imageutils';
 
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';

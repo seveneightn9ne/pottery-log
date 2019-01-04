@@ -2,8 +2,8 @@ import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { importImage, importMetadata, startImport } from '../exports';
-import { nameFromUri } from './ImageStore';
+import { importImage, importMetadata, startImport } from '../utils/exports';
+import { nameFromUri } from '../utils/imageutils';
 
 interface ImageMapState {[name: string]: {uri: string; started?: true}; }
 export interface ImportState {
@@ -69,7 +69,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
             let numImages = 0;
             let started = 0;
             const imageMap: ImageMapState = {...state.imageMap};
-            _.forOwn(state.imageMap, (data, name) => {
+            _.forOwn(imageMap, (data, name) => {
                 // console.log("will import " + remoteUri);
                 if (started < 3) {
                     importImage(data.uri);

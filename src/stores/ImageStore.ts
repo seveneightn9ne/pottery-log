@@ -1,12 +1,12 @@
 
-import { FileSystem } from 'expo';
 import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
 import { Action, ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
-import * as ImageUploader from '../uploader';
-import {StorageWriter} from './sync';
+import * as utils from '../utils/imageutils';
+import {StorageWriter} from '../utils/sync';
+import * as ImageUploader from '../utils/uploader';
 
 export interface ImageStoreState {
   images: {[name: string]: ImageState};
@@ -21,27 +21,6 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
     return {
       images: {},
     };
-  }
-
-  public async _loadInitial(isImport?: boolean) {
-    console.log('Loading ImageStore');
-    const json = await AsyncStorage.getItem('@ImageStore');
-
-    if (!json) {
-      console.log('There was no ImageStore to load.');
-      return;
-    }
-    try {
-      const parsed = JSON.parse(json);
-      dispatcher.dispatch({
-        type: 'image-state-loaded',
-        images: parsed.images || {},
-        isImport: !!isImport,
-      });
-    } catch (e) {
-      console.log('Failed to parse: ' + json);
-      console.warn(e);
-    }
   }
 
   public reduce(state: ImageStoreState, action: Action): ImageStoreState {
@@ -61,7 +40,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
             ImageUploader.remove(im.remoteUri);
           }
           if (im.fileUri) {
-            this.deleteFile(im.fileUri);
+            utils.deleteFile(im.fileUri);
           }
           delete newState.images[action.imageName];
         }
@@ -80,7 +59,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
               ImageUploader.remove(newI.remoteUri);
             }
             if (newI.fileUri) {
-              this.deleteFile(newI.fileUri);
+              utils.deleteFile(newI.fileUri);
             }
             delete newState.images[newI.name];
           }
@@ -106,27 +85,27 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
               ImageUploader.remove(image.remoteUri);
             }
             if (image.fileUri) {
-              this.deleteFile(image.fileUri);
+              utils.deleteFile(image.fileUri);
             }
             delete newState.images[imageName];
           }
           if (!image.fileUri && image.remoteUri) {
-            this.saveToFile(image.remoteUri, true /* isRemote */);
+            utils.saveToFile(image.remoteUri, true /* isRemote */);
           } else if (!image.fileUri && image.localUri) {
-            this.saveToFile(image.localUri);
+            utils.saveToFile(image.localUri);
           }
         });
         this.persist(newState);
         return newState;
       }
       case 'image-add': {
-        const name = nameFromUri(action.localUri);
+        const name = utils.nameFromUri(action.localUri);
         const newState = {images: {...state.images, [name]: {
           name,
           localUri: action.localUri,
           pots: [action.potId],
         }}};
-        this.saveToFile(action.localUri);
+        utils.saveToFile(action.localUri);
         this.persist(newState);
         return newState;
       }
@@ -146,7 +125,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         for (const image of action.images2) {
           const localUri = image.localUri;
           const remoteUri = image.remoteUri;
-          const name = nameFromUri(localUri);
+          const name = utils.nameFromUri(localUri);
           if (newState.images[name]) {
             // This image exists for another pot already
             if (newState.images[name].pots.indexOf(action.potId) === -1) {
@@ -193,7 +172,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
               ImageUploader.remove(newImage.remoteUri);
             }
             if (newImage.fileUri) {
-              this.deleteFile(newImage.fileUri);
+              utils.deleteFile(newImage.fileUri);
             }
             delete newState.images[imageName];
             modified = true;
@@ -233,9 +212,9 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
           return state;
         }
         if (i.localUri) {
-          this.saveToFile(i.localUri);
+          utils.saveToFile(i.localUri);
         } else if (i.remoteUri) {
-          this.saveToFile(i.remoteUri, true);
+          utils.saveToFile(i.remoteUri, true);
         }
         return state;
       }
@@ -271,79 +250,45 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
     }
   }
 
-  public saveToFile(uri: string, isRemote = false, isRetry = false) {
-    // console.log("Will save " + uri);
-    const onError = () => {
-      /*if (uri) {
-        console.log("saveToFile FAILED on " + nameFromUri(uri));
-      } else {
-        console.log("saveToFile FAILED on " + uri);
-      }*/
-      dispatcher.dispatch({type: 'image-file-failed', uri});
-    };
-    if (!uri) {
-      console.warn('No URI passed to saveToFile');
-      setTimeout(onError, 0);
-      return;
+  /* Public Getters */
+
+  public imageState(name: string): ImageState | null {
+    const i = this.getState().images[name];
+    if (!i) {
+      console.log('That image named ' + name + ' is not in the image store.');
+      return null;
     }
-    const name = nameFromUri(uri);
-    const random = Math.floor((Math.random() * 1000000) + 1);
-    const dir = FileSystem.documentDirectory + random;
-    FileSystem.makeDirectoryAsync(dir, {intermediates: true}).then(() => {
-      const fileUri = dir + '/' + name;
-      const afterCopy = () => {
-        // console.log("saveToFile SUCCESS on " + name);
-        dispatcher.dispatch({
-          type: 'image-file-created',
-          name, fileUri,
-        });
-      };
-      if (isRemote) {
-        // console.log("saveToFile starting " + name);
-        FileSystem.downloadAsync(uri, fileUri).then(afterCopy).catch(onError);
-      } else {
-        // console.log("Will copyAsync");
-        FileSystem.copyAsync({from: uri, to: fileUri}).then(afterCopy).catch((reason) => {
-          // Local cache is missing. Nothing to do, but don't crash or dispatch success message.
-          console.warn(reason);
-          onError();
-        });
-      }
-      // console.log("Save of " + uri + " initiated.");
-    });
+    return i;
   }
 
-  public deleteFile(uri: string) {
-    FileSystem.deleteAsync(uri, {idempotent: true});
-  }
+  /* Private Helpers */
 
-  public persist(state: ImageStoreState) {
+  private persist(state: ImageStoreState) {
     // console.log("Persisting ImageStore");
     StorageWriter.put('@ImageStore', JSON.stringify(state));
   }
+
+  private async _loadInitial(isImport?: boolean) {
+    console.log('Loading ImageStore');
+    const json = await AsyncStorage.getItem('@ImageStore');
+
+    if (!json) {
+      console.log('There was no ImageStore to load.');
+      return;
+    }
+    try {
+      const parsed = JSON.parse(json);
+      dispatcher.dispatch({
+        type: 'image-state-loaded',
+        images: parsed.images || {},
+        isImport: !!isImport,
+      });
+    } catch (e) {
+      console.log('Failed to parse: ' + json);
+      console.warn(e);
+    }
+  }
+
 }
 
 export const ImageStore = new CImageStore();
-
-export function nameFromUri(uri: string): string {
-  const uriParts = uri.split('/');
-  return uriParts[uriParts.length - 1];
-}
-
-export function nameToUri(name: string): string {
-  const i = ImageStore.getState().images[name];
-  if (!i) {
-    console.log('That image named ' + name + ' is not in the image store.');
-    return '';
-  }
-  return i.fileUri || i.localUri || i.remoteUri || '';
-}
-
-export function nameToImageState(name: string): ImageState | null {
-  const i = ImageStore.getState().images[name];
-  if (!i) {
-    console.log('That image named ' + name + ' is not in the image store.');
-    return null;
-  }
-  return i;
-}

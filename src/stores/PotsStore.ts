@@ -5,8 +5,8 @@ import dispatcher from '../AppDispatcher';
 import Notes from '../models/Notes';
 import {IntermediatePot, Pot} from '../models/Pot';
 import Status from '../models/Status';
-import {nameFromUri} from './ImageStore';
-import {StorageWriter} from './sync';
+import {nameFromUri} from '../utils/imageutils';
+import {StorageWriter} from '../utils/sync';
 
 export interface PotsStoreState {
   potIds: string[];

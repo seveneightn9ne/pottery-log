@@ -1,15 +1,15 @@
 
 import { Alert, AsyncStorage } from 'react-native';
-import dispatcher from '../AppDispatcher';
+import dispatcher from '../../AppDispatcher';
 import { DocumentPicker } from 'expo';
 import * as exports from '../exports';
-import { ImageStore } from '../stores/ImageStore';
 import * as uploader from '../uploader';
+import * as imageutils from '../imageutils';
 
 jest.mock('../uploader');
 jest.mock('AsyncStorage');
-jest.mock('../stores/ImageStore');
-jest.mock('../AppDispatcher');
+jest.mock('../imageutils');
+jest.mock('../../AppDispatcher');
 jest.mock('expo', ()=>({
     DocumentPicker: {
         getDocumentAsync: jest.fn(),
@@ -44,7 +44,7 @@ describe('exporting', () => {
         });
         expect(isReady).toBeTruthy();
         expect(uploader.exportImage).toHaveBeenCalledWith(12345, 'f.jpg');
-        expect(ImageStore.saveToFile).not.toHaveBeenCalled();
+        expect(imageutils.saveToFile).not.toHaveBeenCalled();
     });
 
 
@@ -55,7 +55,7 @@ describe('exporting', () => {
         });
         expect(isReady).toBeFalsy();
         expect(uploader.exportImage).not.toHaveBeenCalled();
-        expect(ImageStore.saveToFile).toHaveBeenCalledWith('r.jpg', true);
+        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.jpg', true);
     });
 
     it('exportImage save local first', () => {
@@ -64,14 +64,14 @@ describe('exporting', () => {
         });
         expect(isReady).toBeFalsy();
         expect(uploader.exportImage).not.toHaveBeenCalled();
-        expect(ImageStore.saveToFile).toHaveBeenCalledWith('l.jpg', false);
+        expect(imageutils.saveToFile).toHaveBeenCalledWith('l.jpg', false);
     });
 
     it('exportImage not exportable', () => {
         const isReady = exports.exportImage(12345, {});
         expect(isReady).toBeFalsy();
         expect(uploader.exportImage).not.toHaveBeenCalled();
-        expect(ImageStore.saveToFile).not.toHaveBeenCalled();
+        expect(imageutils.saveToFile).not.toHaveBeenCalled();
     });
 
     it('finishExport', () => {
@@ -134,7 +134,7 @@ describe('importing', () => {
         jest.useFakeTimers();
         exports.importImage('r.png');
         jest.runAllTimers();
-        expect(ImageStore.saveToFile).toHaveBeenCalledWith('r.png', true, false);
+        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.png', true, false);
         expect(dispatcher.dispatch).toHaveBeenCalledWith({
             type: 'image-timeout',
             uri: 'r.png',
@@ -145,7 +145,7 @@ describe('importing', () => {
         jest.useFakeTimers();
         exports.importImage('r.png', true);
         jest.runAllTimers();
-        expect(ImageStore.saveToFile).toHaveBeenCalledWith('r.png', true, true);
+        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.png', true, true);
         expect(dispatcher.dispatch).toHaveBeenCalledWith({
             type: 'image-timeout',
             uri: 'r.png',

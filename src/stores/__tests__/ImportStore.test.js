@@ -1,8 +1,8 @@
 
-import * as exports from '../../exports';
+import * as exports from '../../utils/exports';
 import ImportStore from '../ImportStore';
 
-jest.mock('../../exports');
+jest.mock('../../utils/exports');
 
 describe('ImportStore', () => {
     afterEach(() => jest.clearAllMocks());

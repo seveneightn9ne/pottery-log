@@ -1,8 +1,8 @@
 import { DocumentPicker } from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
-import {ImageState} from './action';
-import dispatcher from './AppDispatcher';
-import {ImageStore} from './stores/ImageStore';
+import {ImageState} from '../action';
+import dispatcher from '../AppDispatcher';
+import { saveToFile } from './imageutils';
 import * as uploader from './uploader';
 
 async function getExportMetadata() {
@@ -25,7 +25,7 @@ function exportImage(id: number, imageState: Partial<ImageState>) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri === imageState.remoteUri;
     if (uri) {
-      ImageStore.saveToFile(uri, isRemote);
+      saveToFile(uri, isRemote);
     }
     return false;
   }
@@ -74,7 +74,7 @@ async function importMetadata(metadata: string) {
 
 function importImage(remoteUri: string, isRetry = false) {
   // console.log("importImage");
-  ImageStore.saveToFile(remoteUri, true /* isRemote */, !!isRetry);
+  saveToFile(remoteUri, true /* isRemote */, !!isRetry);
   setTimeout(() => dispatcher.dispatch({
     type: 'image-timeout',
     uri: remoteUri,

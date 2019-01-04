@@ -2,7 +2,7 @@ import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { exportImage, finishExport, startExport } from '../exports';
+import { exportImage, finishExport, startExport } from '../utils/exports';
 import { ImageStore } from './ImageStore';
 
 export type ExportState = PreExportingState | StartExportingState | ExportingImagesState | PostExportingState;

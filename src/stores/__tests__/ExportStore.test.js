@@ -1,9 +1,9 @@
 
 import ExportStore from '../ExportStore';
 import * as ImageStore from '../ImageStore';
-import * as exports from '../../exports';
+import * as exports from '../../utils/exports';
 
-jest.mock('../../exports');
+jest.mock('../../utils/exports');
 jest.mock('../ImageStore');
 
 describe('ExportStore', () => {

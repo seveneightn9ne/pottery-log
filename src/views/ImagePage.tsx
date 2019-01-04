@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import {Pot} from '../models/Pot';
-import {nameToImageState} from '../stores/ImageStore';
+import { ImageStore } from '../stores/ImageStore';
 import styles from '../style';
 import Image3 from './components/Image3';
 
@@ -35,7 +35,7 @@ export default class ImagePage extends React.Component<ImagePageProps> {
         <Text style={styles.search}>delete</Text>
       </TouchableOpacity>
      ) : null;
-    const imageState = nameToImageState(this.props.image);
+    const imageState = ImageStore.imageState(this.props.image);
     return (
     <View style={[styles.container, styles.imagePage]}>
       <View style={styles.imageBar}>
