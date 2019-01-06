@@ -134,18 +134,7 @@ describe('importing', () => {
         jest.useFakeTimers();
         exports.importImage('r.png');
         jest.runAllTimers();
-        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.png', true, false);
-        expect(dispatcher.dispatch).toHaveBeenCalledWith({
-            type: 'image-timeout',
-            uri: 'r.png',
-        });
-    });
-
-    it('importImage retry', () => {
-        jest.useFakeTimers();
-        exports.importImage('r.png', true);
-        jest.runAllTimers();
-        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.png', true, true);
+        expect(imageutils.saveToFile).toHaveBeenCalledWith('r.png', true);
         expect(dispatcher.dispatch).toHaveBeenCalledWith({
             type: 'image-timeout',
             uri: 'r.png',

@@ -3,7 +3,10 @@ import { FileSystem } from 'expo';
 import _ from 'lodash';
 import dispatcher from '../AppDispatcher';
 
-export function saveToFile(uri: string, isRemote = false, isRetry = false): Promise<void> {
+/**
+ * Errors are always caught. Dispatches 'image-file-created' or 'image-file-failed'.
+ */
+export function saveToFile(uri: string, isRemote = false): Promise<void> {
     // console.log("Will save " + uri);
     const onError = (e: Error | string) => {
         console.warn('saveToFile failure:', e);

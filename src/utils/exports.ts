@@ -72,9 +72,9 @@ async function importMetadata(metadata: string) {
   }
 }
 
-function importImage(remoteUri: string, isRetry = false) {
+function importImage(remoteUri: string) {
   // console.log("importImage");
-  saveToFile(remoteUri, true /* isRemote */, !!isRetry);
+  saveToFile(remoteUri, true /* isRemote */);
   setTimeout(() => dispatcher.dispatch({
     type: 'image-timeout',
     uri: remoteUri,
