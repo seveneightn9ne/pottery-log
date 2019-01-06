@@ -38,8 +38,11 @@ export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
 
   public pickImageFromCamera = async () => {
     try {
-      await Permissions.askAsync(Permissions.CAMERA);
-      await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      const perm1 = await Permissions.askAsync(Permissions.CAMERA);
+      const perm2 = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (perm1.status !== 'granted' || perm2.status !== 'granted') {
+        throw 'Permission for camera was not granted.';
+      }
     } catch (e) {
       console.warn(e);
       return;
@@ -49,7 +52,10 @@ export default class ImagePicker extends React.Component<ImagePickerProps, {}> {
 
   public pickImageFromLibrary = async () => {
     try {
-      await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        throw 'Permission to access library was not granted.';
+      }
     } catch (e) {
       console.warn(e);
       return;
