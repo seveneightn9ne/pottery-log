@@ -40,6 +40,7 @@ export interface AppViewProps {
   onSearch: (search: string) => void;
   onStartExport: () => void;
   onStartImport: () => void;
+  onStartUrlImport: (url: string) => void;
   onCollapse: (section: string) => void;
 }
 
@@ -86,6 +87,7 @@ function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
         onNavigateToList={props.onNavigateToList}
         onStartExport={props.onStartExport}
         onStartImport={props.onStartImport}
+        onStartUrlImport={props.onStartUrlImport}
       />);
     case 'image':
       return (

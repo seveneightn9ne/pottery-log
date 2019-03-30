@@ -2,7 +2,7 @@ import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { importImage, importMetadata, startImport } from '../utils/exports';
+import { importImage, importMetadata, startImport, startUrlImport } from '../utils/exports';
 import { nameFromUri } from '../utils/imageutils';
 
 interface ImageMapState {[name: string]: {uri: string; started?: true}; }
@@ -24,11 +24,14 @@ class ImportStore extends ReduceStore<ImportState, Action> {
 
   /**
    * Import flow:
-   * Button press
-   * -> 'import-initiate'
-   * -> choose a file
-   * -> upload file
-   * -> 'import-started'
+   * Button press - either:
+   *   -> upload - 'import-initiate'
+   *     -> choose a file
+   *       -> upload file
+   *         -> 'import-started'
+   *   -> url - 'import-initiate-url'
+   *     -> upload URL
+   *        -> 'import-started'
    * -> confirmation popup
    * -> set metadata
    * -> 'imported-metadata'
@@ -43,6 +46,13 @@ class ImportStore extends ReduceStore<ImportState, Action> {
   public reduce(state: ImportState, action: Action): ImportState {
     if (action.type === 'import-initiate') {
         startImport();
+        return {
+            importing: true,
+            statusMessage: 'Starting import...',
+        };
+    }
+    if (action.type === 'import-initiate-url') {
+        startUrlImport(action.url);
         return {
             importing: true,
             statusMessage: 'Starting import...',

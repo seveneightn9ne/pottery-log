@@ -197,6 +197,10 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
 
     onStartExport: () => dispatcher.dispatch({type: 'export-initiate'}),
     onStartImport: () => dispatcher.dispatch({type: 'import-initiate'}),
+    onStartUrlImport: (url: string) => dispatcher.dispatch({
+      type: 'import-initiate-url',
+      url
+    })
   };
 }
 

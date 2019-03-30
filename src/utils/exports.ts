@@ -46,6 +46,10 @@ async function startImport() {
   }
 }
 
+async function startUrlImport(url: string) {
+  return uploader.startUrlImport(url);
+}
+
 /**
  * Dispatches:
  *  'import-cancel' if the user declines the import.
@@ -81,4 +85,4 @@ function importImage(remoteUri: string) {
   }), 30000);
 }
 
-export { startExport, exportImage, finishExport, startImport, importMetadata, importImage };
+export { startExport, exportImage, finishExport, startImport, startUrlImport, importMetadata, importImage };

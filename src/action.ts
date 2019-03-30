@@ -53,6 +53,7 @@ type UiAction = (
 
 type ImportAction = (
     ImportInitiate
+    | ImportInitiateUrl
     | ImportStarted
     | ImportedMetadata
     | ImageTimeout
@@ -192,6 +193,11 @@ interface ImageFileFailed {
 
 interface ImportInitiate {
     type: 'import-initiate';
+}
+
+interface ImportInitiateUrl {
+    type: 'import-initiate-url';
+    url: string;
 }
 
 interface ImportStarted {

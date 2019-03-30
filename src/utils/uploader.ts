@@ -39,7 +39,8 @@ async function post<Req, Res>(
           error = r.message;
         }
       } else {
-        error = response.statusText;
+        error = response.statusText || `HTTP ${response.status}`;
+        console.log(`Error accessing ${path}`, error);
       }
     } catch (reason) {
       console.log('Error accessing ' + path);
@@ -100,7 +101,21 @@ export async function startImport(uri: string) {
       name: nameFromUri(uri),
       type: 'application/zip',
     },
-  }, (res: {metadata: string, image_map: {[i: string]: string}}) =>
-    dispatcher.dispatch({type: 'import-started', metadata: res.metadata, imageMap: res.image_map}),
-  (e) => dispatcher.dispatch({type: 'import-failure', error: e}));
+  }, handleImportResponse, handleImportFailure);
 }
+
+export async function startUrlImport(uri: string) {
+  return post(IMPORT, {
+    deviceId: Constants.deviceId,
+    importURL: uri,
+  }, handleImportResponse, handleImportFailure);
+}
+
+const handleImportResponse = (res: {metadata: string, image_map: {[i: string]: string}}) =>
+  dispatcher.dispatch({
+    type: 'import-started',
+    metadata: res.metadata,
+    imageMap: res.image_map,
+  });
+
+const handleImportFailure = (e: string | Error) => dispatcher.dispatch({type: 'import-failure', error: e});
