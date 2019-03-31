@@ -60,23 +60,10 @@ async function startUrlImport(url: string) {
 async function importMetadata(metadata: string) {
   try {
     const kvs = JSON.parse(metadata);
-    // No good; infinite loop
-    // setTimeout(() => dispatcher.dispatch({ type: 'import-metadata-again', metadata }), 100);
-    Alert.alert('Ready to import. This will erase any existing data. Are you sure?', undefined,
-      [{
-        text: 'Nevermind', style: 'cancel', onPress: () =>
-          dispatcher.dispatch({ type: 'import-cancel' }),
-      },
-      {
-        text: 'Continue', onPress: async () => {
-          await AsyncStorage.clear();
-          const kvpairs = Object.keys(kvs).map((k) => [k, kvs[k]]);
-          await AsyncStorage.multiSet(kvpairs);
-          dispatcher.dispatch({ type: 'imported-metadata' });
-        },
-      },
-      ],
-      { cancelable: false });
+    await AsyncStorage.clear();
+    const kvpairs = Object.keys(kvs).map((k) => [k, kvs[k]]);
+    await AsyncStorage.multiSet(kvpairs);
+    dispatcher.dispatch({ type: 'imported-metadata' });
   } catch (error) {
     setTimeout(() => dispatcher.dispatch({ type: 'import-failure', error }), 0);
   }
