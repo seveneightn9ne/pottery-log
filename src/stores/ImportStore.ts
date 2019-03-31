@@ -2,7 +2,7 @@ import { ReduceStore } from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
-import { importImage, importMetadata, startImport, startUrlImport } from '../utils/exports';
+import { importImage, importMetadataNow, startImport, startUrlImport } from '../utils/exports';
 import { nameFromUri } from '../utils/imageutils';
 import { StorageWriter } from '../utils/sync';
 import { AsyncStorage } from 'react-native';
@@ -97,7 +97,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
         // Actions that require importing
         switch (action.type) {
             case 'import-started': {
-                importMetadata(action.metadata);
+                importMetadataNow(action.metadata);
                 const imageMap: ImageMapState = {};
                 _.forOwn(action.imageMap, (uri, name) => {
                     imageMap[name] = { uri };
@@ -111,12 +111,12 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 this.persist(newState);
                 return newState;
             }
-            case 'import-metadata-again': {
+            /*case 'import-metadata-again': {
                 if (state.statusMessage === 'Importing pots...') {
                     importMetadata(action.metadata);
                 }
                 return state;
-            }
+            }*/
             case 'imported-metadata': {
                 let numImages = 0;
                 let started = 0;

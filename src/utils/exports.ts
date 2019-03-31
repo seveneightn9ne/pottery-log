@@ -70,6 +70,21 @@ async function startUrlImport(url: string) {
  * @param metadata JSON of the keys & values to put in AsyncStorage
  */
 async function importMetadata(metadata: string) {
+  // No good; infinite loop
+  // setTimeout(() => dispatcher.dispatch({ type: 'import-metadata-again', metadata }), 100);
+  Alert.alert('Ready to import. This will erase any existing data. Are you sure?', undefined,
+    [{
+      text: 'Nevermind', style: 'cancel', onPress: () =>
+        dispatcher.dispatch({ type: 'import-cancel' }),
+    },
+    {
+      text: 'Continue', onPress: () => importMetadataNow(metadata),
+    },
+    ],
+    { cancelable: false });
+}
+
+async function importMetadataNow(metadata: string) {
   try {
     const existingKeys = await AsyncStorage.getAllKeys();
     for (let existingKey in existingKeys) {
@@ -96,5 +111,5 @@ function importImage(remoteUri: string) {
   }), 30000);
 }
 
-export { startExport, exportImage, finishExport, startImport, startUrlImport, importMetadata, importImage };
+export { startExport, exportImage, finishExport, startImport, startUrlImport, importMetadata, importMetadataNow, importImage };
 
