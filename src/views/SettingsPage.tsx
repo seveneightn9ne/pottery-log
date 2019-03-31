@@ -63,6 +63,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
           <Button title="Export" onPress={this.props.onStartExport} />
           <View style={{height: 20}} />
           <Button title="Import" onPress={this.importPopup} />
+          <Text style={styles.settingsText}>App version: 2.24.5</Text>
       </View>);
     }
 
