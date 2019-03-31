@@ -1,6 +1,6 @@
 import { DocumentPicker } from 'expo';
 import { Alert, AsyncStorage } from 'react-native';
-import {ImageState} from '../action';
+import { ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
 import { saveToFile } from './imageutils';
 import * as uploader from './uploader';
@@ -8,7 +8,7 @@ import * as uploader from './uploader';
 async function getExportMetadata() {
   const allKeys = await AsyncStorage.getAllKeys();
   const pairs = await AsyncStorage.multiGet(allKeys);
-  const snapshot: {[key: string]: string} = {};
+  const snapshot: { [key: string]: string } = {};
   pairs.forEach((pair) => {
     snapshot[pair[0]] = pair[1];
   });
@@ -42,7 +42,7 @@ async function startImport() {
   if (docResult.type === 'success') {
     return uploader.startImport(docResult.uri);
   } else if (docResult.type === 'cancel') {
-    dispatcher.dispatch({type: 'import-cancel'});
+    dispatcher.dispatch({ type: 'import-cancel' });
   }
 }
 
@@ -60,19 +60,25 @@ async function startUrlImport(url: string) {
 async function importMetadata(metadata: string) {
   try {
     const kvs = JSON.parse(metadata);
-
+    // No good; infinite loop
+    // setTimeout(() => dispatcher.dispatch({ type: 'import-metadata-again', metadata }), 100);
     Alert.alert('Ready to import. This will erase any existing data. Are you sure?', undefined,
-       [{text: 'Nevermind', style: 'cancel', onPress: () =>
-          dispatcher.dispatch({type: 'import-cancel'})},
-        {text: 'Continue', onPress: async () => {
+      [{
+        text: 'Nevermind', style: 'cancel', onPress: () =>
+          dispatcher.dispatch({ type: 'import-cancel' }),
+      },
+      {
+        text: 'Continue', onPress: async () => {
           await AsyncStorage.clear();
           const kvpairs = Object.keys(kvs).map((k) => [k, kvs[k]]);
           await AsyncStorage.multiSet(kvpairs);
-          dispatcher.dispatch({type: 'imported-metadata'});
-        }},
-      ]);
+          dispatcher.dispatch({ type: 'imported-metadata' });
+        },
+      },
+      ],
+      { cancelable: false });
   } catch (error) {
-    setTimeout(() => dispatcher.dispatch({type: 'import-failure', error}), 0);
+    setTimeout(() => dispatcher.dispatch({ type: 'import-failure', error }), 0);
   }
 }
 
@@ -86,3 +92,4 @@ function importImage(remoteUri: string) {
 }
 
 export { startExport, exportImage, finishExport, startImport, startUrlImport, importMetadata, importImage };
+

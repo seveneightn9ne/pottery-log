@@ -10,7 +10,7 @@ export interface ImageState {
     remoteUri?: string;
     fileUri?: string;
     pots: string[];
-  }
+}
 
 export type Action = PotAction | ImageAction | UiAction | ImportAction | ExportAction | Reload;
 
@@ -56,6 +56,7 @@ type ImportAction = (
     | ImportInitiateUrl
     | ImportStarted
     | ImportedMetadata
+    | ImportMetadataAgain
     | ImageTimeout
     | ImportCancel
     | ImportFailure
@@ -77,7 +78,7 @@ interface MigrateFromImages2 {
 
 interface Loaded {
     type: 'loaded';
-    pots: {[uuid: string]: Pot};
+    pots: { [uuid: string]: Pot };
     potIds: string[];
     isImport: boolean;
 }
@@ -137,7 +138,7 @@ interface PotCopy {
 interface ImageStateLoaded {
     type: 'image-state-loaded';
     isImport: boolean;
-    images: {[name: string]: ImageState};
+    images: { [name: string]: ImageState };
 }
 
 interface Reload {
@@ -203,7 +204,7 @@ interface ImportInitiateUrl {
 interface ImportStarted {
     type: 'import-started';
     metadata: string;
-    imageMap: {[name: string]: string};
+    imageMap: { [name: string]: string };
 }
 
 interface ImageTimeout {
@@ -218,6 +219,11 @@ interface ImportCancel {
 interface ImportFailure {
     type: 'import-failure';
     error: string | Error;
+}
+
+interface ImportMetadataAgain {
+    type: 'import-metadata-again';
+    metadata: string;
 }
 
 interface ExportInitiate {
