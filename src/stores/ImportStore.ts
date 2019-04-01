@@ -87,7 +87,7 @@ class ImportStore extends ReduceStore<ImportState, Action> {
                 const imageMap: ImageMapState = { ...state.imageMap };
                 _.forOwn(imageMap, (data, name) => {
                     // console.log("will import " + remoteUri);
-                    if (started < 1) { // Down from 3 to prevent OOM
+                    if (started < 2) { // Down from 3 to prevent OOM
                         importImage(data.uri);
                         imageMap[name] = {
                             uri: data.uri,
