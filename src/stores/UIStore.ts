@@ -36,6 +36,7 @@ export interface ImageUiState extends BaseUiState {
 
 export interface SettingsUiState extends BaseUiState {
   page: 'settings';
+  resumeImport: boolean;
 }
 
 class UIStore extends ReduceStore<UIState, Action> {
@@ -76,7 +77,11 @@ class UIStore extends ReduceStore<UIState, Action> {
       case 'page-list':
         return {page: 'list', list: {...state.list}};
       case 'page-settings':
-        return {page: 'settings', list: {...state.list,  yInitial: state.list.yCurrent}};
+        return {
+          page: 'settings',
+          list: {...state.list,  yInitial: state.list.yCurrent},
+          resumeImport: false,
+        };
       case 'list-search-open':
         return {
           page: 'list',
@@ -120,6 +125,22 @@ class UIStore extends ReduceStore<UIState, Action> {
           editPotId: state.editPotId,
           new: false,
         };
+      case 'import-resume': {
+        return {
+          page: 'settings',
+          list: {...state.list,  yInitial: state.list.yCurrent},
+          resumeImport: true,
+        };
+      }
+      case 'import-resume-affirm': {
+        return {
+          page: 'settings',
+          list: {...state.list,  yInitial: state.list.yCurrent},
+          resumeImport: false,
+        }
+      }
+      case 'import-resume-cancel':
+        return {page: 'list', list: {...state.list}};
       case 'reload':
         return this.getInitialState();
 

@@ -1,12 +1,24 @@
 import { DocumentPicker } from 'expo';
-import { Alert, AsyncStorage } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
 import { saveToFile } from './imageutils';
 import * as uploader from './uploader';
 
+const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
+
+const keyIsExportable = (key: string) => {
+  for (let i=0; i < EXPORT_KEY_PREFIX.length; i++){
+    if (key.indexOf(EXPORT_KEY_PREFIX[i]) === 0) {
+      return true;
+    }
+  }
+  return false;
+}
+const keyIsImportable = keyIsExportable;
+
 async function getExportMetadata() {
-  const allKeys = await AsyncStorage.getAllKeys();
+  const allKeys = (await AsyncStorage.getAllKeys()).filter(keyIsExportable);
   const pairs = await AsyncStorage.multiGet(allKeys);
   const snapshot: { [key: string]: string } = {};
   pairs.forEach((pair) => {
@@ -59,9 +71,15 @@ async function startUrlImport(url: string) {
  */
 async function importMetadata(metadata: string) {
   try {
-    const kvs = JSON.parse(metadata);
-    await AsyncStorage.clear();
-    const kvpairs = Object.keys(kvs).map((k) => [k, kvs[k]]);
+    const existingKeys = await AsyncStorage.getAllKeys();
+    for (let existingKey in existingKeys) {
+      if (keyIsImportable(existingKey)) {
+        await AsyncStorage.removeItem(existingKey);
+      }
+    }
+
+    const kvs: {[k: string]: string} = JSON.parse(metadata);
+    const kvpairs = Object.keys(kvs).filter(keyIsImportable).map((k) => [k, kvs[k]]);
     await AsyncStorage.multiSet(kvpairs);
     dispatcher.dispatch({ type: 'imported-metadata' });
   } catch (error) {

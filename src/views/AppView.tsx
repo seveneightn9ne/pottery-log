@@ -42,6 +42,8 @@ export interface AppViewProps {
   onStartImport: () => void;
   onStartUrlImport: (url: string) => void;
   onCollapse: (section: string) => void;
+  onResumeImport: () => void;
+  onCancelResumeImport: () => void;
 }
 
 function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
@@ -88,6 +90,9 @@ function AppView(props: AppViewProps): React.ReactElement<AppViewProps> {
         onStartExport={props.onStartExport}
         onStartImport={props.onStartImport}
         onStartUrlImport={props.onStartUrlImport}
+        resumeImport={props.ui.resumeImport}
+        onResumeImport={props.onResumeImport}
+        onCancelResumeImport={props.onCancelResumeImport}
       />);
     case 'image':
       return (

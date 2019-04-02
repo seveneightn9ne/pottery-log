@@ -1,8 +1,10 @@
 
+import { AsyncStorage } from 'react-native';
 import * as exports from '../../utils/exports';
 import ImportStore from '../ImportStore';
 
 jest.mock('../../utils/exports');
+jest.mock('AsyncStorage');
 
 describe('ImportStore', () => {
     afterEach(() => jest.clearAllMocks());
@@ -204,16 +206,17 @@ describe('ImportStore', () => {
         expect(state).toHaveProperty('importing', false);
     });
 
-    it('cancels on navigation', () => {
-        const state = ImportStore.reduce({
+    it('doesn\'t cancel on navigation', () => {
+        const prevState = {
             importing: true,
             imagesImported: 0,
             totalImages: 1,
             imageMap: {'a.png': {uri: 'r/a.png', started: true}},
-        }, {
+        };
+        const state = ImportStore.reduce(prevState, {
             type: 'page-settings',
         });
-        expect(state).toEqual({importing: false});
+        expect(state).toEqual(prevState);
     });
 
     it('doesn\'t cancel on list navigation', () => {
@@ -227,5 +230,42 @@ describe('ImportStore', () => {
             type: 'page-list',
         });
         expect(state).toEqual(prevState);
+    });
+
+    it('resumes DOESNT WORK', () => {
+        const existingState = {
+            importing: true,
+            imagesImported: 0,
+            totalImages: 1,
+            imageMap: {'a.png': {uri: 'r/a.png'}},
+        }
+        AsyncStorage.getItem.mockReturnValue(JSON.stringify(existingState));
+        const initialState = ImportStore.getInitialState();
+        expect(initialState).toEqual({importing: false});
+        jest.runAllTimers();
+        expect(dispatcher).toHaveBeenCalledWith({type: 'import-resume'});
+        // Wrong:
+        expect(exports.importImage).toHaveBeenCalledTimes(1);
+        expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
+
+    });
+
+    it('resumes THIS DOES NOT WORK', () => {
+        // TODO: a test that reduces import-resume-affirm and import-resume-cancel
+        const existingState = {
+            importing: true,
+            imagesImported: 1,
+            totalImages: 4,
+            imageMap: {
+                'b.png': {uri: 'r/b.png'},
+                'c.png': {uri: 'r/c.png'},
+                'd.png': {uri: 'r/d.png', started: true},
+            },
+        }
+        AsyncStorage.getItem.mockReturnValue(JSON.stringify(existingState));
+        const initialState = ImportStore.getInitialState();
+        expect(initialState).toEqual({importing: false});
+        jest.runAllTimers();
+        expect(exports.importImage).toHaveBeenCalledTimes(2); // Parallelism
     });
 });

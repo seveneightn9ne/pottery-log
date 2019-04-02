@@ -200,7 +200,9 @@ function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
     onStartUrlImport: (url: string) => dispatcher.dispatch({
       type: 'import-initiate-url',
       url
-    })
+    }),
+    onResumeImport: () => dispatcher.dispatch({type: 'import-resume-affirm'}),
+    onCancelResumeImport: () => dispatcher.dispatch({type: 'import-resume-cancel'}),
   };
 }
 

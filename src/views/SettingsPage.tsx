@@ -12,9 +12,12 @@ interface SettingsPageProps {
   onStartExport: () => void;
   onStartImport: () => void;
   onStartUrlImport: (url: string) => void;
+  onResumeImport: () => void;
+  onCancelResumeImport: () => void;
   fontLoaded: boolean;
   exports: ExportState;
   imports: ImportState;
+  resumeImport: boolean;
 }
 
 interface SettingsPageState {
@@ -63,11 +66,12 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
           <Button title="Export" onPress={this.props.onStartExport} />
           <View style={{height: 20}} />
           <Button title="Import" onPress={this.importPopup} />
-          <Text style={styles.settingsText}>App version: 2.24.5</Text>
+          <Text style={styles.settingsText}>App version: 2.24.6</Text>
       </View>);
     }
 
     const modal = this.renderModal();
+    const resumeImport = this.renderResumeImport();
 
     return (
       <View style={styles.container}>
@@ -76,6 +80,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
           <Text style={[styles.h1, {flex: 1}]}>Settings</Text>
         </View>
         {modal}
+        {resumeImport}
         {body}
     </View>);
   }
@@ -91,6 +96,17 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
   private submitLink = () => {
     this.closeModal();
     this.props.onStartUrlImport(this.state.linkText);
+  }
+
+  private renderResumeImport = () => {
+    if (!this.props.resumeImport) {
+      return null;
+    }
+
+    return Alert.alert('Resume Import', 'There is an import in progress. Would you like to resume importing?', [
+      {text: 'Cancel', style: 'cancel', onPress: this.props.onCancelResumeImport},
+      {text: 'Resume', onPress: this.props.onResumeImport}
+    ], {cancelable: false});
   }
 
   private renderModal() {
@@ -137,9 +153,14 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
     if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
       Alert.alert('Cancel this export?', undefined,
         [{text: 'Stay here', style: 'cancel'},
-        {text: 'Cancel', onPress: this.props.onNavigateToList},
+        {text: 'Cancel export', onPress: this.props.onNavigateToList},
       ]);
-    } else {
+    } /*else if (this.props.imports.importing) {
+        Alert.alert('Cancel this import?', undefined,
+          [{text: 'Stay here', style: 'cancel'},
+          {text: 'Cancel import', onPress: this.props.onNavigateToList},
+        ]);
+    }*/ else {
       this.props.onNavigateToList();
     }
   }

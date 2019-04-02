@@ -23,16 +23,16 @@ describe('exporting', () => {
     afterEach(() => jest.clearAllMocks());
 
     it('startExport', async () => {
-        AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(['@Pots', '@Images']));
+        AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(['@Pots', '@ImageStore', '@DoNotExport']));
         AsyncStorage.multiGet.mockReturnValue(Promise.resolve([
             ['@Pots', '{pots}'],
-            ['@Images', '{images}'],
+            ['@ImageStore', '{images}'],
         ]));
         await exports.startExport(12345);
 
         expect(uploader.startExport).toHaveBeenCalledWith(12345, {
             '@Pots': '{pots}',
-            '@Images': '{images}',
+            '@ImageStore': '{images}',
         });
     });
 

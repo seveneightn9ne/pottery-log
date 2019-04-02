@@ -1,6 +1,7 @@
 import Notes from './models/Notes';
 import { Image2, Pot } from './models/Pot';
 import Status from './models/Status';
+import { ImportStatePersisted } from './stores/ImportStore';
 
 export interface ImageState {
     name: string;
@@ -60,6 +61,9 @@ type ImportAction = (
     | ImageTimeout
     | ImportCancel
     | ImportFailure
+    | ImportResume
+    | ImportResumeAffirm
+    | ImportResumeCancel
 );
 
 type ExportAction = (
@@ -224,6 +228,19 @@ interface ImportFailure {
 interface ImportMetadataAgain {
     type: 'import-metadata-again';
     metadata: string;
+}
+
+interface ImportResume {
+    type: 'import-resume';
+    data: ImportStatePersisted;
+}
+
+interface ImportResumeAffirm {
+    type: 'import-resume-affirm';
+}
+
+interface ImportResumeCancel {
+    type: 'import-resume-cancel';
 }
 
 interface ExportInitiate {
