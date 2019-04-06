@@ -79,7 +79,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       </TouchableHighlight>) : null;
 
     let header;
-    if ('searching' in this.props.ui) {
+    if ('searching' in this.props.ui && this.props.ui.searching) {
       header = (
         <View style={styles.header}>
           {backButton}
@@ -231,7 +231,6 @@ export class ListPage extends React.Component<ListPageProps, {}> {
 
   private renderSectionHeader = (info: {section: SectionListData<SectionT>}): JSX.Element => {
     const section = info.section;
-    console.log(section);
     const content = this.props.fontLoaded ? (
       <Text style={styles.collapse}>
         {this.collapsed(section.title) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}

@@ -93,7 +93,10 @@ class UIStore extends ReduceStore<UIState, Action> {
           },
         };
       case 'list-search-close':
-        return {...state, page: 'list', searching: false, searchTerm: ''};
+        return {
+          page: 'list',
+          list: state.list,
+        };
       case 'list-search-term':
         return {...state, page: 'list', searching: true, searchTerm: action.text};
       case 'list-collapse':
