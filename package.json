@@ -46,6 +46,7 @@
   "dependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/runtime": "^7.2.0",
+    "array-reverse-polyfill": "^1.0.9",
     "exp": "^57.2.1",
     "expo": "^31.0.4",
     "expo-cli": "^2.6.11",

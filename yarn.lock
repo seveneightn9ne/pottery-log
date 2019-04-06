@@ -1325,6 +1325,11 @@ array-reduce@~0.0.0:
   resolved "https://registry.yarnpkg.com/array-reduce/-/array-reduce-0.0.0.tgz#173899d3ffd1c7d9383e4479525dbe278cab5f2b"
   integrity sha1-FziZ0//Rx9k4PkR5Ul2+J4yrXys=
 
+array-reverse-polyfill@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/array-reverse-polyfill/-/array-reverse-polyfill-1.0.9.tgz#44e4f1700361bf215b1f957c5b298e5c76a52516"
+  integrity sha512-hEEff+8X5Is3r9LwGn0+Wv7H+lOMIXGZjCWR94jcBaXGS+RmQ1JHXknbyymWMl5nvna28i4mwnSWEcn9sINipA==
+
 array-slice@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/array-slice/-/array-slice-0.2.3.tgz#dd3cfb80ed7973a75117cdac69b0b99ec86186f5"

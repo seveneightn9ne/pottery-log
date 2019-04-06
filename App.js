@@ -3,6 +3,7 @@ import AppContainer from './src/AppContainer';
 import {AsyncStorage} from 'react-native';
 import {Font} from 'expo';
 import Sentry from 'sentry-expo';
+import "array-reverse-polyfill";
 // import { SentrySeverity, SentryLog } from 'react-native-sentry';
 Sentry.config('https://bad3ce09a6404191b1a0b181bdb36263@sentry.io/1341402').install();
 
