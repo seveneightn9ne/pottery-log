@@ -1,9 +1,5 @@
 
-import { Alert, AsyncStorage } from 'react-native';
 import dispatcher from '../../AppDispatcher';
-import { DocumentPicker } from 'expo';
-import * as exports from '../exports';
-import { ImageStore } from '../../stores/ImageStore';
 import * as uploader from '../uploader';
 
 global.FormData = function() {
@@ -199,6 +195,38 @@ describe('uploader', () => {
         const uri = 'local/data.zip';
 
         await uploader.startImport(uri);
+        expect(dispatcher.dispatch).toBeCalledWith({
+            type: 'import-failure',
+            error: 'something is wrong',
+        });
+    });
+
+    it('startUrlImport', async () => {
+        const fetch = mockFetchJson({
+            status: 'ok',
+            metadata: 'meta-data',
+            image_map: {},
+        });
+        const uri = 'https://pottery-log-exports/data.zip';
+
+        await uploader.startUrlImport(uri);
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch.mock.calls[0][0]).toBe(uploader.IMPORT);
+        expectFormValue(fetch, 'deviceId', '1001');
+        expectFormValue(fetch, 'importURL', uri);
+        expect(dispatcher.dispatch).toBeCalledWith({
+            type: 'import-started',
+            metadata: 'meta-data',
+            imageMap: {},
+        });
+    });
+
+    it('startUrlImport error', async () => {
+        const fetch = mockFetchError();
+        const id = 1;
+        const uri = 'https://pottery-log-exports/data.zip';
+
+        await uploader.startUrlImport(uri);
         expect(dispatcher.dispatch).toBeCalledWith({
             type: 'import-failure',
             error: 'something is wrong',

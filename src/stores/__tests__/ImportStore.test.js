@@ -1,10 +1,18 @@
 
 import { AsyncStorage } from 'react-native';
+import dispatcher from '../../AppDispatcher';
 import * as exports from '../../utils/exports';
 import ImportStore from '../ImportStore';
 
 jest.mock('../../utils/exports');
 jest.mock('AsyncStorage');
+
+function expectPersisted(state) {
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith('@Import', JSON.stringify(state));
+}
+function expectPersistNoImport() {
+    expect(AsyncStorage.deleteItem).toHaveBeenCalledWith('@Import');
+}
 
 describe('ImportStore', () => {
     afterEach(() => jest.clearAllMocks());
@@ -232,7 +240,17 @@ describe('ImportStore', () => {
         expect(state).toEqual(prevState);
     });
 
-    it('resumes DOESNT WORK', () => {
+    it('starts URL import', () => {
+        const url = 'url.com'
+        const state = ImportStore.reduce({importing: false}, {
+            type: 'import-initiate-url',
+            url,
+        });
+        expect(state).toHaveProperty('importing', true);
+        expect(exports.startUrlImport).toHaveBeenCalledWith(url);
+    });
+
+    it('resumes', () => {
         const existingState = {
             importing: true,
             imagesImported: 0,
@@ -245,27 +263,107 @@ describe('ImportStore', () => {
         jest.runAllTimers();
         expect(dispatcher).toHaveBeenCalledWith({type: 'import-resume'});
         // Wrong:
-        expect(exports.importImage).toHaveBeenCalledTimes(1);
-        expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
+        //expect(exports.importImage).toHaveBeenCalledTimes(1);
+        //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
 
     });
 
-    it('resumes THIS DOES NOT WORK', () => {
-        // TODO: a test that reduces import-resume-affirm and import-resume-cancel
-        const existingState = {
+    it('handles resume initiation', () => {
+        const resumableState = {
+            importing: true,
+            imagesImported: 0,
+            totalImages: 1,
+            imageMap: {'a.png': {uri: 'r/a.png'}},
+        };
+        const state = ImportStore.reduce({importing: false}, {
+            type: 'import-resume',
+            data: resumableState,
+        });
+        expect(state).toHaveProperty('importing', false);
+        expect(state).toHaveProperty('resumable', resumableState);
+    });
+
+    it('does resume', () => {
+        const resumableState = {
+            importing: true,
+            imagesImported: 0,
+            totalImages: 1,
+            imageMap: {'a.png': {uri: 'r/a.png'}},
+        };
+        const state = ImportStore.reduce({
+            importing: false,
+            resumable: resumableState,
+        }, {type: 'import-resume-affirm'});
+        const expectedState = {
+            importing: true,
+            imagesImported: 0,
+            totalImageS: 1,
+            imageMap: {'a.png': {uri: 'r/a.png', started: true}},
+        }
+        expect(state).toEqual(expectedState);
+        expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
+        expectPersisted(expectedState);
+    });
+
+    it('does resume with parallelism', () => {
+        const resumableState = {
             importing: true,
             imagesImported: 1,
-            totalImages: 4,
+            totalImages: 3,
             imageMap: {
                 'b.png': {uri: 'r/b.png'},
-                'c.png': {uri: 'r/c.png'},
-                'd.png': {uri: 'r/d.png', started: true},
+                'c.png': {uri: 'r/c.png', started: true},
+            },
+        };
+        const state = ImportStore.reduce({
+            importing: false,
+            resumable: resumableState,
+        }, {type: 'import-resume-affirm'});
+        const expectedState = {
+            importing: true,
+            imagesImported: 1,
+            totalImages: 3,
+            imageMap: {
+                'b.png': {uri: 'r/b.png', started: true},
+                'c.png': {uri: 'r/c.png', started: true},
             },
         }
-        AsyncStorage.getItem.mockReturnValue(JSON.stringify(existingState));
-        const initialState = ImportStore.getInitialState();
-        expect(initialState).toEqual({importing: false});
-        jest.runAllTimers();
-        expect(exports.importImage).toHaveBeenCalledTimes(2); // Parallelism
+        expect(state).toEqual(expectedState);
+        expect(exports.importImage).toHaveBeenCalledWith('r/b.png');
+        expect(exports.importImage).toHaveBeenCalledWith('r/c.png');
+        expectPersisted(expectedState);
     });
+
+    it('aborts resume', () => {
+        // TODO import-resume-cancel
+    })
+    /*
+            case 'import-initiate-url': {
+                startUrlImport(action.url);
+                return {
+                    importing: true,
+                    statusMessage: 'Starting import...',
+                };
+            }
+            case 'import-resume': {
+                return {
+                    importing: false,
+                    resumable: action.data,
+                }
+            }
+            case 'import-resume-affirm': {
+                if (!state.resumable) {
+                    return state;
+                }
+                const newState = this.resume(state.resumable);
+                this.persist(newState);
+                return newState;
+            }
+            case 'import-resume-cancel': {
+                const newState = {
+                    importing: false,
+                };
+                this.persist(newState);
+                return newState;
+            }*/
 });

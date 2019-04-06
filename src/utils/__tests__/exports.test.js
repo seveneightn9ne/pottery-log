@@ -89,6 +89,11 @@ describe('importing', () => {
         expect(uploader.startImport).toHaveBeenCalledWith('a.zip');
     });
 
+    it('startImport', async () => {
+        await exports.startUrlImport();
+        expect(uploader.startUrlImport).toHaveBeenCalledWith('a.zip');
+    });
+
     it('startImport cancelled', async () => {
         DocumentPicker.getDocumentAsync.mockReturnValue(Promise.resolve({type: 'cancel'}));
         await exports.startImport();
@@ -101,11 +106,16 @@ describe('importing', () => {
         Alert.alert.mockImplementation(async (text, whoknows, array) => {
             return array[1].onPress();
         });
-        await exports.importMetadata('{"key": "\\"value\\""}');
+        AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(['@Pots', '@Pot:1', '@ImageStore', '@DoNotExport']));
+        await exports.importMetadata('{"@Pot:5": "\\"value\\""}');
         jest.runAllTimers();
 
-        expect(AsyncStorage.clear).toHaveBeenCalled();
-        expect(AsyncStorage.multiSet).toHaveBeenCalledWith([['key', '"value"']])
+        expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@Pots');
+        expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@Pot:1');
+        expect(AsyncStorage.removeItem).toHaveBeenCalledWith('@ImageStore');
+        expect(AsyncStorage.removeItem).not.toHaveBeenCalledWith('@DoNotExport');
+
+        expect(AsyncStorage.multiSet).toHaveBeenCalledWith([['@Pot:5', '"value"']])
         expect(dispatcher.dispatch).toHaveBeenCalledWith({type: 'imported-metadata'});
     });
 
@@ -114,20 +124,6 @@ describe('importing', () => {
         await exports.importMetadata('this is not JSON');
         jest.runAllTimers();
         expect(dispatcher.dispatch.mock.calls[0][0]).toHaveProperty('type', 'import-failure');
-    });
-
-    it('importMetadata declined', async () => {
-        jest.useFakeTimers();
-        Alert.alert.mockImplementation(async (text, whoknows, array) => {
-            return array[0].onPress();
-        });
-        await exports.importMetadata('{"key": "\\"value\\""}');
-        jest.runAllTimers();
-
-        expect(AsyncStorage.clear).not.toHaveBeenCalled();
-        expect(AsyncStorage.multiSet).not.toHaveBeenCalled();
-        expect(dispatcher.dispatch).not.toHaveBeenCalledWith({type: 'imported-metadata'});
-        expect(dispatcher.dispatch).toHaveBeenCalledWith({type: 'import-cancel'});
     });
 
     it('importImage', () => {
