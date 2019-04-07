@@ -82,7 +82,6 @@ export default StyleSheet.create({
         paddingLeft: 16,
         paddingTop: 16,
         color: '#fff',
-        // backgroundColor: "#000",
     },
     listMessage: {
         alignSelf: 'center',

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Dimensions, FlatList, SectionList, SectionListData, Text, TextInput,
-  TouchableHighlight, View } from 'react-native';
+  TouchableOpacity, View } from 'react-native';
 import { Pot } from '../models/Pot';
 import Status, { capitalize, StatusString } from '../models/Status';
 import { PotsStoreState } from '../stores/PotsStore';
@@ -74,9 +74,9 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     const potsLoaded = this.props.pots.hasLoaded;
 
     const backButton = this.props.fontLoaded ? (
-      <TouchableHighlight onPress={this.props.onCloseSearch}>
+      <TouchableOpacity onPress={this.props.onCloseSearch}>
         <Text style={styles.searchBack}>arrow_back</Text>
-      </TouchableHighlight>) : null;
+      </TouchableOpacity>) : null;
 
     let header;
     if ('searching' in this.props.ui && this.props.ui.searching) {
@@ -96,15 +96,15 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       );
     } else {
       const searchButton = this.props.fontLoaded && potsLoaded ? (
-        <TouchableHighlight onPress={this.props.onOpenSearch}>
+        <TouchableOpacity onPress={this.props.onOpenSearch}>
           <Text style={[styles.search, {paddingRight: 8}]}>search</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       ) : null;
 
       const settingsButton = this.props.fontLoaded && potsLoaded ? (
-        <TouchableHighlight onPress={this.props.onNavigateToSettings}>
+        <TouchableOpacity onPress={this.props.onNavigateToSettings}>
           <Text style={[styles.search, {paddingLeft: 8}]}>settings</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       ) : null;
 
       header = (
@@ -237,15 +237,14 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       </Text>
      ) : null;
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         onPress={this.collapseSection(section.title)}
-        underlayColor="#fff"
       >
         <View style={styles.lh}>
           <Text style={styles.lhText}>{section.title}</Text>
           {content}
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 
