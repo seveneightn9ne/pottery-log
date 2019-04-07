@@ -419,6 +419,7 @@ export default StyleSheet.create({
         justifyContent: 'flex-end',
         padding: 4,
         paddingRight: 8,
+        paddingBottom: 12,
     },
     bottomBarWithContent: {
         elevation: 8,
