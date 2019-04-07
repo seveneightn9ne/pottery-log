@@ -1,10 +1,8 @@
 import React from 'react';
-import ElevatedView from 'react-native-elevated-view';
-import { Modal, Text, View } from 'react-native';
-import Button from 'react-native-button';
 import Status, { capitalize, StatusString } from '../../models/Status';
 import styles from '../../style';
 import { ExpandingTextInput } from './ExpandingTextInput';
+import Modal from './Modal';
 
 interface NoteModalProps {
   potId: string;
@@ -25,33 +23,21 @@ export default class NoteModal extends React.Component<NoteModalProps, {open: bo
     this.setState({open: false});
   }
   public render() {
-    return (
-    <Modal
-      animationType={'slide'}
-      transparent={true}
-      visible={this.state.open}
-      onRequestClose={this.close}
-    >
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ElevatedView style={styles.noteModal} elevation={24}>
-          <Text style={styles.modalHeader}>
-          {capitalize(Status.progressive(this.props.status))} Note
-          </Text>
-          <ExpandingTextInput
-            value={this.props.note}
-            multiline={true}
-            numberOfLines={4}
-            style={styles.modalInput}
-            onChangeText={this.onChangeNote}
-            autoFocus={true}
-            onSubmit={this.close}
-          />
-          <Button onPress={this.close} style={[styles.button3, styles.modalButton]}>
-            DONE
-          </Button>
-        </ElevatedView>
-      </View>
-    </Modal>);
+    return (<Modal
+      header={capitalize(Status.progressive(this.props.status)) + ' Note'}
+      body={<ExpandingTextInput
+        value={this.props.note}
+        multiline={true}
+        numberOfLines={4}
+        style={styles.modalInput}
+        onChangeText={this.onChangeNote}
+        autoFocus={true}
+        onSubmit={this.close}
+      />}
+      buttons={[{text: 'DONE'}]}
+      open={this.state.open}
+      close={this.close} />
+    );
   }
 
   private onChangeNote = (t: string) => {

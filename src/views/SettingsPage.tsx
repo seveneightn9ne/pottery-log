@@ -1,12 +1,13 @@
 import React from 'react';
 import ElevatedView from 'react-native-elevated-view';
-import { ActivityIndicator, Alert, Button, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, Text, TouchableOpacity, View } from 'react-native';
 import RNButton from 'react-native-button';
 import { ExportState } from '../stores/ExportStore';
 import { ImportState } from '../stores/ImportStore';
 import styles from '../style';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
+import Modal from './components/Modal';
 
 interface SettingsPageProps {
   onNavigateToList: () => void;
@@ -94,10 +95,6 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
 
   private openModal = () => this.setState({linkModalOpen: true, linkText: ""});
   private closeModal = () => this.setState({linkModalOpen: false});
-  private submitLink = () => {
-    this.closeModal();
-    this.props.onStartUrlImport(this.state.linkText);
-  }
 
   private renderResumeImport = () => {
     if (!this.props.resumeImport) {
@@ -111,30 +108,28 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
   }
 
   private renderModal() {
-    const belowInput = (this.state.linkText ?
-      (this.state.linkText.indexOf("https://pottery-log-exports.s3.amazonaws.com/") === 0 ?
-        // Valid link!
-        <RNButton onPress={this.submitLink} style={[styles.button3, styles.modalButton]}>
-            IMPORT
-        </RNButton>
-      : // Something that isn't a valid link
-        <Text style={{color: 'red'}}>
+    let belowInput: JSX.Element | null = null;
+    const buttons = [
+      {text: 'CANCEL'},
+      {text: 'IMPORT', onPress: () => {
+        this.props.onStartUrlImport(this.state.linkText);
+      }, disabled: true}
+    ];
+    if (this.state.linkText) {
+      if (this.state.linkText.indexOf("https://pottery-log-exports.s3.amazonaws.com/") !== 0) {
+         // Something that isn't a valid link
+        belowInput = (<Text style={{color: 'red'}}>
           The link should start with https://pottery-log-exports.s3.amazonaws.com/
-        </Text>
-      ) : // Nothing in the input yet
-        null
-      );
+        </Text>);
+      } else {
+        // valid link
+        buttons[1].disabled = false;
+      }
+    }
     return (
-    <Modal
-      transparent={true}
-      visible={this.state.linkModalOpen}
-      onRequestClose={this.closeModal}
-    >
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ElevatedView style={styles.noteModal} elevation={24}>
-          <Text style={styles.modalHeader}>
-          Paste link to export
-          </Text>
+      <Modal
+        header={'Paste link'}
+        body={<View>
           <ExpandingTextInput
             value={this.state.linkText}
             multiline={true}
@@ -142,12 +137,14 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
             style={styles.modalInput}
             onChangeText={(text) => this.setState({linkText: text})}
             autoFocus={true}
-            onSubmit={this.submitLink}
+            onSubmit={() => {}}
           />
           {belowInput}
-        </ElevatedView>
-      </View>
-    </Modal>);
+        </View>}
+        buttons={buttons}
+        open={this.state.linkModalOpen}
+        close={this.closeModal}
+      />);
   }
 
   private onBack = () => {

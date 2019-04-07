@@ -384,11 +384,11 @@ export default StyleSheet.create({
         textAlign: 'center',
         padding: 20,
     },
-    noteModal: {
-        width: 280,
+    modal: {
+        width: 300,
         padding: 24,
         backgroundColor: 'white',
-        borderRadius: 8,
+        borderRadius: 4,
     },
     modalHeader: {
         fontSize: 20,
@@ -407,8 +407,12 @@ export default StyleSheet.create({
         color: DARK_GREEN,
         fontSize: 14,
     },
+    disabledButton: {
+        color: GRAY,
+    },
     modalButton: {
         alignSelf: 'flex-end',
+        marginLeft: 16,
     },
     bgGreen: {
         // backgroundColor: LIGHT_GREEN,

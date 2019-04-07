@@ -1,8 +1,9 @@
 import React from 'react';
+import Button from 'react-native-button';
 import {
   DatePickerAndroid,
   DatePickerIOS,
-  Modal,
+  Modal as RNModal,
   Platform,
   Text,
   TouchableOpacity,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 import Status from '../../models/Status';
 import styles from '../../style';
+import Modal from './Modal';
 
 interface DatePickerProps {
   value: Date;
@@ -17,22 +19,26 @@ interface DatePickerProps {
   onPickDate: (date: Date) => void;
 }
 
+const renderButton = (props: DatePickerProps, onPress: () => void) => {
+  const today = props.fontLoaded ?
+    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text> : null;
+  return (
+  <View style={[styles.chipOuter, styles.chipInner]}>
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.chipInner}>
+        {today}
+        <Text style={styles.chipText}>
+          {Status.dateText(props.value)}
+        </Text>
+        <View style={styles.chipArrow} />
+      </View>
+    </TouchableOpacity>
+  </View>);
+}
+
 class ImplAndroid extends React.Component<DatePickerProps, {}> {
   public render() {
-    const today = this.props.fontLoaded ?
-      <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text> : null;
-    return (
-    <View style={[styles.chipOuter, styles.chipInner]}>
-      <TouchableOpacity onPress={this.pickDateAndroid}>
-        <View style={styles.chipInner}>
-          {today}
-          <Text style={styles.chipText}>
-            {Status.dateText(this.props.value)}
-          </Text>
-          <View style={styles.chipArrow} />
-        </View>
-      </TouchableOpacity>
-    </View>);
+    return renderButton(this.props, this.pickDateAndroid)
   }
 
   public pickDateAndroid = async () => {
@@ -51,36 +57,36 @@ class ImplAndroid extends React.Component<DatePickerProps, {}> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class ImplIOS extends React.Component<DatePickerProps, {modalVisible: boolean}> {
+class ImplIOS extends React.Component<DatePickerProps, {modalVisible: boolean, datePicked: Date}> {
   public state = {
     modalVisible: false,
+    datePicked: this.props.value,
   };
 
   public render() {
+    const button = renderButton(this.props, this.openModal);
     return (
     <View>
       <Modal
-        animationType={'slide'}
-        transparent={false}
-        visible={this.state.modalVisible}
-        onRequestClose={this.closeModal}
-      >
-        <DatePickerIOS
-          date={this.props.value}
+        header="Choose Date"
+        body={<DatePickerIOS
+          date={this.state.datePicked}
           mode="date"
           onDateChange={this.onChangeDate}
-        />
-      </Modal>
-    <TouchableOpacity onPress={this.openModal}>
-      <Text>{Status.dateText(this.props.value)}</Text>
-    </TouchableOpacity>
+        />}
+        buttons={[
+          {text: 'CANCEL'},
+          {text: 'SAVE', onPress: () => this.props.onPickDate(this.state.datePicked)},
+        ]}
+        close={this.closeModal}
+        open={this.state.modalVisible}
+      />
+      {button}
     </View>);
   }
 
-  private onChangeDate = (date: Date) => {
-    this.closeModal();
-    this.props.onPickDate(date);
-  }
+  private onChangeDate = (date: Date) =>
+    this.setState({datePicked: date});
 
   private openModal = () => {
     this.setState({modalVisible: true});
