@@ -1,4 +1,5 @@
 import React from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Status, { StatusString } from '../../models/Status';
 import styles from '../../style';
@@ -79,10 +80,10 @@ export default class StatusSwitcher extends React.Component<StatusSwitcherProps>
         />
         {editButton}
       </View>
-      <View style={styles.statusArrows}>
+      <ElevatedView style={styles.statusArrows} elevation={4}>
         {upArrow}
         {downArrow}
-      </View>
+      </ElevatedView>
       {noteModal}
       {mainNote}
     </View>);

@@ -1,4 +1,5 @@
 import React from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { Dimensions, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Button from 'react-native-button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -69,13 +70,9 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
       />
     ));
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
-    const bottomBarStyle: ViewStyle[] = [styles.bottomBar as ViewStyle];
-    if (details.length) {
-      bottomBarStyle.push(styles.bottomBarWithContent as ViewStyle);
-    }
     return (
     <View style={styles.container}>
-      <View style={[styles.header, { elevation: 8 }]}>
+      <ElevatedView style={styles.header} elevation={8}>
         {backButton}
         <TextInput
           style={styles.searchBox}
@@ -88,7 +85,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
           autoFocus={this.props.ui.new}
         />
         {editButton}
-      </View>
+      </ElevatedView>
       <KeyboardAwareScrollView extraHeight={100}>
         <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
           <ImageList
@@ -112,10 +109,10 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         {details}
         <View style={styles.detailPadding} />
       </KeyboardAwareScrollView>
-      <View style={bottomBarStyle}>
+      <ElevatedView style={styles.bottomBar} elevation={details.length ? 8 : 0}>
         <Button onPress={this.props.onDelete} style={[styles.button3, styles.bbb]}>DELETE POT</Button>
         <Button onPress={this.props.onCopy} style={[styles.button3, styles.bbb]}>COPY POT</Button>
-      </View>
+      </ElevatedView>
     </View>
     );
   }

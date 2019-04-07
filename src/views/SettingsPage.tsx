@@ -1,4 +1,5 @@
 import React from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { ActivityIndicator, Alert, Button, Modal, Text, TouchableOpacity, View } from 'react-native';
 import RNButton from 'react-native-button';
 import { ExportState } from '../stores/ExportStore';
@@ -75,10 +76,10 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
 
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <ElevatedView style={styles.header} elevation={4}>
           {backButton}
           <Text style={[styles.h1, {flex: 1}]}>Settings</Text>
-        </View>
+        </ElevatedView>
         {modal}
         {resumeImport}
         {body}
@@ -130,7 +131,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
       onRequestClose={this.closeModal}
     >
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <View style={styles.noteModal}>
+        <ElevatedView style={styles.noteModal} elevation={24}>
           <Text style={styles.modalHeader}>
           Paste link to export
           </Text>
@@ -144,7 +145,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
             onSubmit={this.submitLink}
           />
           {belowInput}
-        </View>
+        </ElevatedView>
       </View>
     </Modal>);
   }

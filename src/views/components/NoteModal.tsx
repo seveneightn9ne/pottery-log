@@ -1,4 +1,5 @@
 import React from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { Modal, Text, View } from 'react-native';
 import Button from 'react-native-button';
 import Status, { capitalize, StatusString } from '../../models/Status';
@@ -32,7 +33,7 @@ export default class NoteModal extends React.Component<NoteModalProps, {open: bo
       onRequestClose={this.close}
     >
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <View style={styles.noteModal}>
+        <ElevatedView style={styles.noteModal} elevation={24}>
           <Text style={styles.modalHeader}>
           {capitalize(Status.progressive(this.props.status))} Note
           </Text>
@@ -48,7 +49,7 @@ export default class NoteModal extends React.Component<NoteModalProps, {open: bo
           <Button onPress={this.close} style={[styles.button3, styles.modalButton]}>
             DONE
           </Button>
-        </View>
+        </ElevatedView>
       </View>
     </Modal>);
   }

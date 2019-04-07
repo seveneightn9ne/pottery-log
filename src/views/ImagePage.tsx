@@ -1,4 +1,5 @@
 import React from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import {Pot} from '../models/Pot';
 import { ImageStore } from '../stores/ImageStore';
@@ -38,13 +39,13 @@ export default class ImagePage extends React.Component<ImagePageProps> {
     const imageState = ImageStore.imageState(this.props.image);
     return (
     <View style={[styles.container, styles.imagePage]}>
-      <View style={styles.imageBar}>
+      <ElevatedView style={styles.imageBar} elevation={4}>
         {backButton}
         <View style={{flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
           {starButton}
           {deleteButton}
         </View>
-      </View>
+      </ElevatedView>
       <Image3 image={imageState} key={Image3.key(imageState)} style={{width, height: width}} />
     </View>
     );

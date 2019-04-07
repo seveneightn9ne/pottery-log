@@ -20,11 +20,13 @@ export default StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#000',
     },
-    newPotButton: {
-        backgroundColor: ORANGE,
-        elevation: 5,
+    newPotWrapper: {
         position: 'absolute',
         bottom: 16, right: 16,
+        width: 56, height: 56,
+    },
+    newPotButton: {
+        backgroundColor: ORANGE,
         alignItems: 'center',
         justifyContent: 'center',
         width: 56, height: 56,
@@ -45,7 +47,6 @@ export default StyleSheet.create({
         backgroundColor: GREEN,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        elevation: 4,
         paddingTop: 20,
         // marginBottom: 16,
         // position: 'relative'
@@ -204,7 +205,6 @@ export default StyleSheet.create({
         // alignContent: 'space-between',
         justifyContent: 'space-between',
         backgroundColor: '#000',
-        elevation: 4,
         position: 'absolute',
         top: 20,
         left: 0,
@@ -213,7 +213,7 @@ export default StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
-        backgroundColor: '#fff',
+        //backgroundColor: '#fff',
         paddingRight: 16,
         height: 28 * 2 - 8,
     },
@@ -229,7 +229,6 @@ export default StyleSheet.create({
         top: 4, left: 8,
         borderRadius: 14,
         backgroundColor: ORANGE,
-        elevation: 4,
         height: 2 * 28,
     },
     statusArrow: {},
@@ -256,6 +255,7 @@ export default StyleSheet.create({
         marginTop: -12,
         borderLeftWidth: 12,
         borderColor: ORANGE,
+        zIndex: -1,
     },
     mainNoteNoBar: {
         borderColor: '#ffffff',
@@ -388,7 +388,6 @@ export default StyleSheet.create({
         padding: 24,
         backgroundColor: 'white',
         borderRadius: 8,
-        elevation: 24,
     },
     modalHeader: {
         fontSize: 20,
@@ -420,9 +419,6 @@ export default StyleSheet.create({
         padding: 4,
         paddingRight: 8,
         paddingBottom: 12,
-    },
-    bottomBarWithContent: {
-        elevation: 8,
     },
     bbb: { // bottom bar button
         padding: 8,

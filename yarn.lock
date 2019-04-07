@@ -1005,6 +1005,14 @@
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.5.1.tgz#a38f69c62528d56ba7bd1f91335a8004988d72f7"
   integrity sha512-mNhVdZHdtKHMMxbqzNK3RzkBcN1cux3AvuCYGTvjEIQT2uheH3eCAyYsbMbh2Bq8nXkeOWs1kyDiF7geWRFQ4Q==
 
+"@types/react-native-elevated-view@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@types/react-native-elevated-view/-/react-native-elevated-view-0.0.2.tgz#e1b60e4c52c20218598235e9d4b98c5e0888dba8"
+  integrity sha512-0v8FmBB4x58xCOalm1RdTu5hUx1+alTdavInEhK0iBSbLDNxuy4gPVRQv3fkvqPWbr3aV4878gKRErfhndNVWg==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
 "@types/react-native@*", "@types/react-native@^0.57.19":
   version "0.57.22"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.57.22.tgz#139907ee6cf9512c8e7931dc268cc83d2a51c924"
@@ -7899,6 +7907,11 @@ react-native-button@^2.3.0:
   integrity sha512-NZet4juC9+yNN/ql4WYfrjRp/cyuN9zwYwMb/0yllwGCzxfAVqMU59oNCaMQvkMkgV/S52RcwER1QWZH7k1AQg==
   dependencies:
     prop-types "^15.5.10"
+
+react-native-elevated-view@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-elevated-view/-/react-native-elevated-view-0.0.6.tgz#560cc9ab16cfd5cb5ea821521558fc711e57e231"
+  integrity sha512-4Yna9tmdvzE7Ffl7IWut8/a2MBkb1s9S9jK0qfQZXMR9ZCeVQb0fZbzyYX9Sfaj1/3k+u7AlkEnl2ptCnQ/PbQ==
 
 react-native-gesture-handler@1.0.9:
   version "1.0.9"

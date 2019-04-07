@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, TouchableHighlight, View } from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
+import { Text, TouchableOpacity, View } from 'react-native';
 import styles from '../../style';
 
 interface NewPotButtonProps {
@@ -8,7 +9,7 @@ interface NewPotButtonProps {
 }
 export default function(props: NewPotButtonProps) {
   return (
-  <TouchableHighlight onPress={props.onPress} style={styles.newPotButton}><View>
+  <TouchableOpacity onPress={props.onPress} style={styles.newPotWrapper}><ElevatedView style={styles.newPotButton} elevation={5}>
     {props.fontLoaded ? <Text style={styles.newPotButtonText}>add</Text> : null}
-  </View></TouchableHighlight>);
+  </ElevatedView></TouchableOpacity>);
 }

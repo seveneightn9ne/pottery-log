@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import ElevatedView from 'react-native-elevated-view';
 import { Dimensions, FlatList, SectionList, SectionListData, Text, TextInput,
   TouchableOpacity, View } from 'react-native';
 import { Pot } from '../models/Pot';
@@ -81,7 +82,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     let header;
     if ('searching' in this.props.ui && this.props.ui.searching) {
       header = (
-        <View style={styles.header}>
+        <ElevatedView style={styles.header} elevation={4}>
           {backButton}
           <TextInput
             style={styles.searchBox}
@@ -92,7 +93,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
             placeholder={'search'}
             value={this.props.ui.searchTerm || ''}
           />
-        </View>
+        </ElevatedView>
       );
     } else {
       const searchButton = this.props.fontLoaded && potsLoaded ? (
@@ -108,13 +109,13 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       ) : null;
 
       header = (
-        <View style={styles.header}>
+        <ElevatedView style={styles.header} elevation={4}>
           <Text style={[styles.h1, {flex: 1}]}>Pottery Log</Text>
           <View style={{ flexDirection: 'row' }}>
             {searchButton}
             {settingsButton}
           </View>
-        </View>
+        </ElevatedView>
       );
     }
 
