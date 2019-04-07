@@ -341,6 +341,7 @@ export default StyleSheet.create({
     },
     timeline: {
         backgroundColor: ORANGE,
+        zIndex: -1,
         marginLeft: 16,
         paddingTop: 22,
     },
