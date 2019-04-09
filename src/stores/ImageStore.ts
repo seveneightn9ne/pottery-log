@@ -7,9 +7,11 @@ import dispatcher from '../AppDispatcher';
 import * as utils from '../utils/imageutils';
 import {StorageWriter} from '../utils/sync';
 import * as ImageUploader from '../utils/uploader';
+import PotsStore from './PotsStore';
 
 export interface ImageStoreState {
   images: {[name: string]: ImageState};
+  loaded: boolean;
 }
 
 class CImageStore extends ReduceStore<ImageStoreState, Action> {
@@ -20,10 +22,39 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
     this._loadInitial(!!isImport);
     return {
       images: {},
+      loaded: false,
     };
   }
 
   public reduce(state: ImageStoreState, action: Action): ImageStoreState {
+    if (action.type == 'image-state-loaded') {
+      // PotsStore also listens for this event, to do the corresponding deletions from the pots
+      let newState = {loaded: true, images: {...action.images}};
+      if (action.isImport) {
+        // Can skip persist if we aren't processing them.
+        return newState;
+      }
+      _.forOwn(newState.images, (image, imageName) => {
+        if (!image.remoteUri && !image.fileUri && !image.localUri) {
+          // the cached image was deleted before we could move it somewhere permanent :'(
+          // If any pots refer to this image then the pot store must handle that
+          delete newState.images[imageName];
+        }
+        newState = this.deleteImageIfUnused(newState, imageName);
+        if (!image.fileUri && image.remoteUri) {
+          utils.saveToFile(image.remoteUri, true /* isRemote */);
+        } else if (!image.fileUri && image.localUri) {
+          utils.saveToFile(image.localUri);
+        }
+      });
+      this.persist(newState);
+      return newState;
+    }
+    if (!state.loaded) {
+      // Nothing else can act on an unloaded imagestore
+      console.log("imagestore ignores " + action.type + " because it has not loaded");
+      return state;
+    }
     switch (action.type) {
       case 'image-delete-from-pot': {
         const im = state.images[action.imageName];
@@ -31,76 +62,29 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
           console.log('Deleting ' + action.imageName + " from pot but it's nowhere");
           return state;
         }
-        const newState = {images: {...state.images,
+        let newState = {loaded: true, images: {...state.images,
                                    [action.imageName]:
             {...im, pots: im.pots.filter((p) => p !== action.potId)},
         }};
-        if (newState.images[action.imageName].pots.length === 0) {
-          if (im.remoteUri) {
-            ImageUploader.remove(im.remoteUri);
-          }
-          if (im.fileUri) {
-            utils.deleteFile(im.fileUri);
-          }
-          delete newState.images[action.imageName];
-        }
+        newState = this.deleteImageIfUnused(newState, action.imageName, action.potId);
         this.persist(newState);
         return newState;
       }
       case 'pot-delete': {
-        const newState = {images: {...state.images}};
+        let newState = {loaded: true, images: {...state.images}};
         for (const name of action.imageNames) {
           const oldI = newState.images[name];
           if (!oldI) { continue; }
           const newI = {...oldI, pots: oldI.pots.filter((p) => p !== action.potId)};
           newState.images[name] = newI;
-          if (newI.pots.length === 0) {
-            if (newI.remoteUri) {
-              ImageUploader.remove(newI.remoteUri);
-            }
-            if (newI.fileUri) {
-              utils.deleteFile(newI.fileUri);
-            }
-            delete newState.images[newI.name];
-          }
+          newState = this.deleteImageIfUnused(newState, name, action.potId);
         }
-        this.persist(newState);
-        return newState;
-      }
-      case 'image-state-loaded': {
-        // PotsStore also listens for this event, to do the corresponding deletions from the pots
-        const newState = {images: {...action.images}};
-        if (action.isImport) {
-          // Can skip persist if we aren't processing them.
-          return newState;
-        }
-        _.forOwn(newState.images, (image, imageName) => {
-          if (!image.remoteUri && !image.fileUri && !image.localUri) {
-            // the cached image was deleted before we could move it somewhere permanent :'(
-            // If any pots refer to this image then the pot store must handle that
-            delete newState.images[imageName];
-          }
-          if (image.pots && image.pots.length === 0) {
-            if (image.remoteUri) {
-              ImageUploader.remove(image.remoteUri);
-            }
-            if (image.fileUri) {
-              utils.deleteFile(image.fileUri);
-            }
-            delete newState.images[imageName];
-          }
-          if (!image.fileUri && image.remoteUri) {
-            utils.saveToFile(image.remoteUri, true /* isRemote */);
-          } else if (!image.fileUri && image.localUri) {
-            utils.saveToFile(image.localUri);
-          }
-        });
         this.persist(newState);
         return newState;
       }
       case 'image-add': {
         const name = utils.nameFromUri(action.localUri);
-        const newState = {images: {...state.images, [name]: {
+        const newState = {loaded: true, images: {...state.images, [name]: {
           name,
           localUri: action.localUri,
           pots: [action.potId],
@@ -110,7 +94,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         return newState;
       }
       case 'pot-copy': {
-        const newState = {images: {...state.images}};
+        const newState = {loaded: true, images: {...state.images}};
         for (const name of action.imageNames) {
           newState.images[name] = {
             ...newState.images[name],
@@ -121,7 +105,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         return newState;
       }
       case 'migrate-from-images2': {
-        const newState = {images: {...state.images}};
+        const newState = {loaded: true, images: {...state.images}};
         for (const image of action.images2) {
           const localUri = image.localUri;
           const remoteUri = image.remoteUri;
@@ -150,38 +134,17 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         if (action.isImport) {
           return state;
         }
-        const newState = {images: {...state.images}};
-        let modified = false;
+        const newState = {loaded: true, images: {...state.images}};
         _.forOwn(state.images, (image, imageName) => {
           const newImage = {...image};
           if (newImage.pots === undefined) {
-            modified = true;
             newImage.pots = [];
           }
-          const newPots = [];
-          for (const pot of newImage.pots) {
-            if (action.potIds.indexOf(pot) >= 0 && newPots.indexOf(pot) === -1) {
-              newPots.push(pot);
-            }
-          }
-          // this might modify the state but we won't mark it modified
-          newImage.pots = newPots;
-          if (newPots.length === 0) {
-            console.log('Uh, an unused image: ' + imageName);
-            if (newImage.remoteUri) {
-              ImageUploader.remove(newImage.remoteUri);
-            }
-            if (newImage.fileUri) {
-              utils.deleteFile(newImage.fileUri);
-            }
-            delete newState.images[imageName];
-            modified = true;
-          }
+          newImage.pots = this.potsUsingImage(imageName);
+          this.deleteImageIfUnused(newState, imageName);
           newState.images[imageName] = newImage;
         });
-        if (modified) {
-          this.persist(newState);
-        }
+        this.persist(newState);
         return newState;
       }
       case 'reload': {
@@ -194,15 +157,16 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
       case 'image-error-local': {
         const i = state.images[action.name];
         const newImage = {...i};
-        const newState = {images: {...state.images,
+        const newState = {loaded: true, images: {...state.images,
                                    [action.name]: newImage}};
-        console.log('Fixing image ' + i.name);
+        console.log('Removing failed local URI for image ' + i.name);
         delete newImage.localUri;
         return newState;
       }
       case 'image-remote-failed': {
         // TODO(jessk) handle... by deleting the image
         // and removing it from its pot(s)
+        // OR... who cares since we use files now
         return state;
       }
       case 'image-loaded': {
@@ -230,15 +194,8 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
           delete newImage.remoteUri;
         }
         delete newImage.localUri;
-        const newState = {images: {...state.images,
+        const newState = {loaded: true, images: {...state.images,
                                    [action.name]: newImage}};
-
-        // I don't think we really need to handle this here.
-        // Maybe a checkRep or general cleanup function instead?
-        /*if (newImage.pots.length == 0) {
-          delete newState.images[action.name];
-          this.deleteFile(action.fileUri);
-        }*/
         this.persist(newState);
         return newState;
       }
@@ -263,8 +220,61 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
 
   /* Private Helpers */
 
+  // modifies state.
+  // exceptForPot is a pot that's being deleted; or a pot from which this image is being explicitly deleted.
+  private deleteImageIfUnused(state: ImageStoreState, imageName: string, exceptForPot?: string): ImageStoreState {
+    const image = state.images[imageName];
+    if (!image || !image.pots) {
+      return state;
+    }
+    if (!PotsStore.getState().hasLoaded) {
+      // Do nothing before pot store loaded
+      return state;
+    }
+    if (image.pots.length === 0) {
+      // Note: We have seen a case where the saved state shows that only one pot uses an image,
+      // but 2 pots are using the image. This makes sure we don't delete an image that is still
+      // being used.
+      const potsUsingImage = this.potsUsingImage(imageName).filter((p) => p !== exceptForPot); // double check
+      if (potsUsingImage.length !== 0) {
+        console.log("Image was missing a pot, adding it instead of deleting image", imageName);
+        image.pots = potsUsingImage;
+      } else {
+        // Really no one is using this image
+        console.log("Deleting unused image", imageName);
+        if (image.remoteUri) {
+          ImageUploader.remove(image.remoteUri);
+        }
+        if (image.fileUri) {
+          utils.deleteFile(image.fileUri);
+        }
+        delete state.images[imageName];
+      }
+    }
+    return state;
+  }
+
+  private potsUsingImage(image: string): string[] {
+    const potState = PotsStore.getState();
+    if (!potState.hasLoaded) {
+      throw new Error("Cannot call potsUsingImage before pot store loaded");
+    }
+    const potsUsingImage: string[] = [];
+    _.values(potState.pots).map((pot) => {
+      pot.images3.forEach((img) => {
+        if (img === image) {
+          potsUsingImage.push(img);
+        }
+      });
+    });
+    return potsUsingImage;
+  }
+
   private persist(state: ImageStoreState) {
     // console.log("Persisting ImageStore");
+    if (!state.loaded) {
+      throw new Error("Cannot persist state before it's loaded");
+    }
     StorageWriter.put('@ImageStore', JSON.stringify(state));
   }
 
@@ -274,19 +284,20 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
 
     if (!json) {
       console.log('There was no ImageStore to load.');
-      return;
-    }
-    try {
-      const parsed = JSON.parse(json);
       dispatcher.dispatch({
         type: 'image-state-loaded',
-        images: parsed.images || {},
+        images: {},
         isImport: !!isImport,
       });
-    } catch (e) {
-      console.log('Failed to parse: ' + json);
-      console.warn(e);
+      return;
     }
+    // Don't catch this because we would rather throw to see wtf happened here
+    const parsed = JSON.parse(json);
+    dispatcher.dispatch({
+      type: 'image-state-loaded',
+      images: parsed.images || {}, // is || {} a horrible idea?
+      isImport: !!isImport,
+    });
   }
 
 }

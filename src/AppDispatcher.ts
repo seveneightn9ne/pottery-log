@@ -1,9 +1,14 @@
 import {Dispatcher} from 'flux';
 import * as types from './action';
+import { Constants } from 'expo';
 
 const dispatcher = new Dispatcher<types.Action>();
 
 function logDispatch(action: types.Action) {
+  if (Constants.appOwnership === 'standalone') {
+    // Skip logs in prod, for great speed
+    return;
+  }
   switch (action.type) {
     case 'loaded':
       console.log('Action: loaded (body omitted)');
