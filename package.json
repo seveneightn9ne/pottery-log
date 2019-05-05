@@ -58,7 +58,7 @@
     "react-native-button": "^2.3.0",
     "react-native-elevated-view": "^0.0.6",
     "react-native-keyboard-aware-scroll-view": "^0.4.0",
-    "sentry-expo": "~1.9.0",
+    "sentry-expo": "~1.10.0",
     "tslib": "^1.9.3",
     "whatwg-fetch": "^2.0.4"
   },

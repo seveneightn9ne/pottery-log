@@ -33,8 +33,7 @@
           "file": "sentry-expo/upload-sourcemaps",
           "config": {
             "organization": "jess-kenney",
-            "project": "pottery-log",
-            "authToken": "[redacted]"
+            "project": "pottery-log"
           }
         }
       ]

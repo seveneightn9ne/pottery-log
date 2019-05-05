@@ -5,7 +5,6 @@ npm-debug.*
 assets/*.apk
 assets/*.ipa
 exp
-app.json
 expo-cli
 .jest/
 .envrc
