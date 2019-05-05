@@ -17,7 +17,14 @@
       "versionCode": 6
     },
     "ios": {
-      "bundleIdentifier": "org.rnplay.exp"
+      "bundleIdentifier": "com.jesskenney.potterylog",
+      "buildNumber": "1.0.1",
+      "icon": "./assets/launcher_ios_1024.png",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow Pottery Log to use the camera to take photos of your pots.",
+        "NSPhotoLibraryAddUsageDescription": "Allow Pottery Log to store your pot photos.",
+        "NSPhotoLibraryUsageDescription": "Allow Pottery Log to use photos from your Camera Roll."
+      }
     },
     "primaryColor": "#4caf50",
     "hooks": {
