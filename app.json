@@ -4,8 +4,12 @@
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.0.24",
+    "version": "2.0.25",
     "privacy": "public",
+    "assetBundlePatterns": [
+      "./assets/*.png",
+      "./assets/*.ttf"
+    ],
     "android": {
       "package": "com.jesskenney.pottery_log",
       "permissions": [
@@ -18,8 +22,9 @@
     },
     "ios": {
       "bundleIdentifier": "com.jesskenney.potterylog",
-      "buildNumber": "1.0.1",
+      "buildNumber": "1.0.2",
       "icon": "./assets/launcher_ios_1024.png",
+      "usesIcloudStorage": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Allow Pottery Log to use the camera to take photos of your pots.",
         "NSPhotoLibraryAddUsageDescription": "Allow Pottery Log to store your pot photos.",
