@@ -22,6 +22,7 @@ type ImageAction = (
     | ImageDeleteFromPot
     | ImageErrorRemote
     | ImageErrorLocal
+    | ImageErrorFile
     | ImageRemoteFailed
     | ImageFileCreated
     | ImageFileFailed
@@ -174,6 +175,11 @@ interface ImageErrorRemote {
 interface ImageErrorLocal {
     type: 'image-error-local';
     name: string;
+}
+
+interface ImageErrorFile {
+    type: 'image-error-file';
+    uri: string;
 }
 
 interface ImageRemoteFailed {

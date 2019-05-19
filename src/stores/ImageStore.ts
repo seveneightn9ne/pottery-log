@@ -1,16 +1,17 @@
 
-import {ReduceStore} from 'flux/utils';
+import { FileSystem } from 'expo';
+import { ReduceStore } from 'flux/utils';
 import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
 import { Action, ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
 import * as utils from '../utils/imageutils';
-import {StorageWriter} from '../utils/sync';
+import { StorageWriter } from '../utils/sync';
 import * as ImageUploader from '../utils/uploader';
 import PotsStore from './PotsStore';
 
 export interface ImageStoreState {
-  images: {[name: string]: ImageState};
+  images: { [name: string]: ImageState };
   loaded: boolean;
 }
 
@@ -29,7 +30,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
   public reduce(state: ImageStoreState, action: Action): ImageStoreState {
     if (action.type == 'image-state-loaded') {
       // PotsStore also listens for this event, to do the corresponding deletions from the pots
-      let newState = {loaded: true, images: {...action.images}};
+      let newState = { loaded: true, images: { ...action.images } };
       if (action.isImport) {
         // Can skip persist if we aren't processing them.
         return newState;
@@ -62,20 +63,23 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
           console.log('Deleting ' + action.imageName + " from pot but it's nowhere");
           return state;
         }
-        let newState = {loaded: true, images: {...state.images,
-                                   [action.imageName]:
-            {...im, pots: im.pots.filter((p) => p !== action.potId)},
-        }};
+        let newState = {
+          loaded: true, images: {
+            ...state.images,
+            [action.imageName]:
+              { ...im, pots: im.pots.filter((p) => p !== action.potId) },
+          }
+        };
         newState = this.deleteImageIfUnused(newState, action.imageName, action.potId);
         this.persist(newState);
         return newState;
       }
       case 'pot-delete': {
-        let newState = {loaded: true, images: {...state.images}};
+        let newState = { loaded: true, images: { ...state.images } };
         for (const name of action.imageNames) {
           const oldI = newState.images[name];
           if (!oldI) { continue; }
-          const newI = {...oldI, pots: oldI.pots.filter((p) => p !== action.potId)};
+          const newI = { ...oldI, pots: oldI.pots.filter((p) => p !== action.potId) };
           newState.images[name] = newI;
           newState = this.deleteImageIfUnused(newState, name, action.potId);
         }
@@ -84,17 +88,21 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
       }
       case 'image-add': {
         const name = utils.nameFromUri(action.localUri);
-        const newState = {loaded: true, images: {...state.images, [name]: {
-          name,
-          localUri: action.localUri,
-          pots: [action.potId],
-        }}};
+        const newState = {
+          loaded: true, images: {
+            ...state.images, [name]: {
+              name,
+              localUri: action.localUri,
+              pots: [action.potId],
+            }
+          }
+        };
         utils.saveToFile(action.localUri);
         this.persist(newState);
         return newState;
       }
       case 'pot-copy': {
-        const newState = {loaded: true, images: {...state.images}};
+        const newState = { loaded: true, images: { ...state.images } };
         for (const name of action.imageNames) {
           newState.images[name] = {
             ...newState.images[name],
@@ -105,7 +113,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         return newState;
       }
       case 'migrate-from-images2': {
-        const newState = {loaded: true, images: {...state.images}};
+        const newState = { loaded: true, images: { ...state.images } };
         for (const image of action.images2) {
           const localUri = image.localUri;
           const remoteUri = image.remoteUri;
@@ -134,9 +142,9 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         if (action.isImport) {
           return state;
         }
-        const newState = {loaded: true, images: {...state.images}};
+        const newState = { loaded: true, images: { ...state.images } };
         _.forOwn(state.images, (image, imageName) => {
-          const newImage = {...image};
+          const newImage = { ...image };
           if (newImage.pots === undefined) {
             newImage.pots = [];
           }
@@ -156,12 +164,22 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
       }
       case 'image-error-local': {
         const i = state.images[action.name];
-        const newImage = {...i};
-        const newState = {loaded: true, images: {...state.images,
-                                   [action.name]: newImage}};
+        const newImage = { ...i };
+        const newState = {
+          loaded: true, images: {
+            ...state.images,
+            [action.name]: newImage
+          }
+        };
         console.log('Removing failed local URI for image ' + i.name);
         delete newImage.localUri;
         return newState;
+      }
+      case 'image-error-file': {
+        const uri = action.uri;
+        const documentDirectory = FileSystem.documentDirectory;
+        ImageUploader.debug('image-error-file', { uri, documentDirectory });
+        return state;
       }
       case 'image-remote-failed': {
         // TODO(jessk) handle... by deleting the image
@@ -187,15 +205,21 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
           console.warn('Image file created, but no image exists for it! This is quite bad, probably.');
           return state;
         }
-        const newImage = {...state.images[action.name],
-                          fileUri: action.fileUri};
+        const newImage = {
+          ...state.images[action.name],
+          fileUri: action.fileUri
+        };
         if (newImage.remoteUri) {
           ImageUploader.remove(newImage.remoteUri);
           delete newImage.remoteUri;
         }
         delete newImage.localUri;
-        const newState = {loaded: true, images: {...state.images,
-                                   [action.name]: newImage}};
+        const newState = {
+          loaded: true, images: {
+            ...state.images,
+            [action.name]: newImage
+          }
+        };
         this.persist(newState);
         return newState;
       }

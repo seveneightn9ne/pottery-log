@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
+import { Dimensions, FlatList, SectionList, SectionListData, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
-import { Dimensions, FlatList, SectionList, SectionListData, Text, TextInput,
-  TouchableOpacity, View } from 'react-native';
 import { Pot } from '../models/Pot';
 import Status, { capitalize, StatusString } from '../models/Status';
 import { PotsStoreState } from '../stores/PotsStore';
@@ -98,19 +97,19 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     } else {
       const searchButton = this.props.fontLoaded && potsLoaded ? (
         <TouchableOpacity onPress={this.props.onOpenSearch}>
-          <Text style={[styles.search, {paddingRight: 8}]}>search</Text>
+          <Text style={[styles.search, { paddingRight: 8 }]}>search</Text>
         </TouchableOpacity>
       ) : null;
 
       const settingsButton = this.props.fontLoaded && potsLoaded ? (
         <TouchableOpacity onPress={this.props.onNavigateToSettings}>
-          <Text style={[styles.search, {paddingLeft: 8}]}>settings</Text>
+          <Text style={[styles.search, { paddingLeft: 8 }]}>settings</Text>
         </TouchableOpacity>
       ) : null;
 
       header = (
         <ElevatedView style={styles.header} elevation={4}>
-          <Text style={[styles.h1, {flex: 1}]}>Pottery Log</Text>
+          <Text style={[styles.h1, { flex: 1 }]}>Pottery Log</Text>
           <View style={{ flexDirection: 'row' }}>
             {searchButton}
             {settingsButton}
@@ -139,7 +138,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     }
 
     const allPots = this.props.pots.potIds.map((id) => this.props.pots.pots[id]);
-    const searchTerm =  ('searching' in this.props.ui && this.props.ui.searchTerm) || '';
+    const searchTerm = ('searching' in this.props.ui && this.props.ui.searchTerm) || '';
 
     const sections: SectionT[] = Status.ordered().reverse().map((status) => {
       return {
@@ -201,7 +200,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     };
   }
 
-  private renderPotListItem = (data: {item: Pot}): JSX.Element => {
+  private renderPotListItem = (data: { item: Pot }): JSX.Element => {
     return (
       <PotListItem
         fontLoaded={this.props.fontLoaded}
@@ -216,7 +215,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     return () => this.props.onClickPot(pot.uuid);
   }
 
-  private renderSection = (data: {item: SectionData}): JSX.Element => {
+  private renderSection = (data: { item: SectionData }): JSX.Element => {
     return (
       <FlatList
         numColumns={2}
@@ -230,13 +229,13 @@ export class ListPage extends React.Component<ListPageProps, {}> {
 
   private potKeyExtractor = (pot: Pot, index: number) => pot.uuid;
 
-  private renderSectionHeader = (info: {section: SectionListData<SectionT>}): JSX.Element => {
+  private renderSectionHeader = (info: { section: SectionListData<SectionT> }): JSX.Element => {
     const section = info.section;
     const content = this.props.fontLoaded ? (
       <Text style={styles.collapse}>
         {this.collapsed(section.title) ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}
       </Text>
-     ) : null;
+    ) : null;
     return (
       <TouchableOpacity
         onPress={this.collapseSection(section.title)}

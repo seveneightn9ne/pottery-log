@@ -2,14 +2,14 @@
 import dispatcher from '../../AppDispatcher';
 import * as uploader from '../uploader';
 
-global.FormData = function() {
+global.FormData = function () {
     this.append = jest.fn();
 };
 
 function mockFetchJson(val) {
     global.fetch = jest.fn().mockImplementation((path, options) => {
         return Promise.resolve({
-            json: function() {
+            json: function () {
                 return Promise.resolve(val);
             },
             ok: true,
@@ -39,7 +39,7 @@ function expectFormValue(fetch, field, val) {
 }
 
 jest.mock('../../AppDispatcher');
-jest.mock('expo', ()=>({
+jest.mock('expo', () => ({
     Constants: {
         deviceId: '1001',
     },
@@ -49,7 +49,7 @@ describe('uploader', () => {
     afterEach(() => jest.clearAllMocks());
 
     it('remove', () => {
-        const fetch = mockFetchJson({status: "ok"});
+        const fetch = mockFetchJson({ status: "ok" });
         const uri = 'my-image-uri';
         uploader.remove(uri);
         expect(fetch).toHaveBeenCalled();
@@ -58,9 +58,9 @@ describe('uploader', () => {
     });
 
     it('startExport', async () => {
-        const fetch = mockFetchJson({status: "ok"});
+        const fetch = mockFetchJson({ status: "ok" });
         const id = 1;
-        const metadata = {whatever: 'whatever'};
+        const metadata = { whatever: 'whatever' };
         const metadataJSON = JSON.stringify(metadata);
 
         await uploader.startExport(id, metadata);
@@ -78,7 +78,7 @@ describe('uploader', () => {
     it('startExport error', async () => {
         const fetch = mockFetchError();
         const id = 1;
-        const metadata = {whatever: 'whatever'};
+        const metadata = { whatever: 'whatever' };
 
         await uploader.startExport(id, metadata);
         expect(dispatcher.dispatch).toBeCalledWith({
@@ -91,7 +91,7 @@ describe('uploader', () => {
     it('startExport error2', async () => {
         const fetch = mockFetchError2();
         const id = 1;
-        const metadata = {whatever: 'whatever'};
+        const metadata = { whatever: 'whatever' };
 
         await uploader.startExport(id, metadata);
         expect(dispatcher.dispatch).toBeCalledWith({
@@ -102,7 +102,7 @@ describe('uploader', () => {
     });
 
     it('exportImage', async () => {
-        const fetch = mockFetchJson({status: "ok"});
+        const fetch = mockFetchJson({ status: "ok" });
         const id = 1;
         const uri = 'local/image.png';
         const onError = jest.fn();
@@ -236,5 +236,19 @@ describe('uploader', () => {
             type: 'import-failure',
             error: 'something is wrong',
         });
+    });
+
+    it('debug', async () => {
+        const fetch = mockFetchJson({
+            status: 'ok',
+        });
+        const logName = "logName";
+        const data = { a: 'b' };
+        await uploader.debug(logName, data);
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch.mock.calls[0][0]).toBe(uploader.DEBUG);
+        expectFormValue(fetch, 'deviceId', '1001');
+        expectFormValue(fetch, 'name', logName);
+        expectFormValue(fetch, 'data', JSON.stringify(data));
     });
 });
