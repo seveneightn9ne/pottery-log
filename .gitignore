@@ -2,6 +2,7 @@
 node_modules/
 .expo/
 npm-debug.*
+yarn-error.log
 assets/*.apk
 assets/*.ipa
 exp
