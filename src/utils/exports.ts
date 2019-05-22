@@ -1,5 +1,5 @@
-import { DocumentPicker } from 'expo';
-import { AsyncStorage } from 'react-native';
+import { DocumentPicker, FileSystem } from 'expo';
+import { AsyncStorage, Alert } from 'react-native';
 import { ImageState } from '../action';
 import dispatcher from '../AppDispatcher';
 import { saveToFile } from './imageutils';
@@ -41,7 +41,31 @@ function exportImage(id: number, imageState: Partial<ImageState>) {
     }
     return false;
   }
-  uploader.exportImage(id, imageState.fileUri);
+
+  const onImageError = (e: any, ctx: string) => {
+    let eStr = 'unknown error';
+    if (typeof e === "string") {
+      eStr = e;
+    } else if ("message" in e) {
+      eStr = e.message;
+    }
+    if (ctx !== "") {
+      eStr = ctx + ": " + eStr;
+    }
+    dispatcher.dispatch({
+      type: 'export-image-failure',
+      exportId: id,
+      uri: imageState.fileUri as string,
+      reason: eStr,
+    });
+  }
+  FileSystem.getInfoAsync(imageState.fileUri).then((i) => {
+    if (i.exists) {
+      uploader.exportImage(id, imageState.fileUri as string, onImageError);
+    } else {
+      onImageError("Image file does not exist", "");
+    }
+  }).catch((e) => onImageError(e, 'getInfoAsync'));
   return true;
 }
 

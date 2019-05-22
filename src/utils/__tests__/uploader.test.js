@@ -105,8 +105,9 @@ describe('uploader', () => {
         const fetch = mockFetchJson({status: "ok"});
         const id = 1;
         const uri = 'local/image.png';
+        const onError = jest.fn();
 
-        await uploader.exportImage(id, uri);
+        await uploader.exportImage(id, uri, onError);
         expect(fetch).toHaveBeenCalled();
         expect(fetch.mock.calls[0][0]).toBe(uploader.EXPORT_IMAGE);
         expectFormValue(fetch, 'deviceId', '1001');
@@ -126,13 +127,17 @@ describe('uploader', () => {
         const fetch = mockFetchError();
         const id = 1;
         const uri = 'local/image.png';
+        const onError = jest.fn();
 
-        await uploader.exportImage(id, uri);
+        await uploader.exportImage(id, uri, onError);
+        expect(onError).toHaveBeenCalled();
+        expect(onError)
         expect(dispatcher.dispatch).toBeCalledWith({
             type: 'export-failure',
             exportId: id,
             error: 'something is wrong',
         });
+
     });
 
     it('finishExport', async () => {

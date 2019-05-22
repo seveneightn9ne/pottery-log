@@ -70,6 +70,7 @@ type ExportAction = (
     ExportInitiate
     | ExportStarted
     | ExportImage
+    | ExportImageFailure
     | ExportFinished
     | ExportFailure
 );
@@ -256,6 +257,13 @@ interface ExportImage {
     type: 'export-image';
     exportId: number;
     uri: string;
+}
+
+interface ExportImageFailure {
+    type: 'export-image-failure';
+    exportId: number;
+    uri: string;
+    reason: string;
 }
 
 interface ExportFinished {

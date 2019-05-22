@@ -1,7 +1,7 @@
 
 import { Alert, AsyncStorage } from 'react-native';
 import dispatcher from '../../AppDispatcher';
-import { DocumentPicker } from 'expo';
+import { DocumentPicker, FileSystem } from 'expo';
 import * as exports from '../exports';
 import * as uploader from '../uploader';
 import * as imageutils from '../imageutils';
@@ -17,6 +17,9 @@ jest.mock('expo', ()=>({
 }));
 jest.mock('Alert', () => ({
     alert: jest.fn(),
+}));
+jest.mock('FileSystem', () => ({
+    getInfoAsync: Promise.resolve({exists: true}),
 }));
 
 describe('exporting', () => {
@@ -73,6 +76,8 @@ describe('exporting', () => {
         expect(uploader.exportImage).not.toHaveBeenCalled();
         expect(imageutils.saveToFile).not.toHaveBeenCalled();
     });
+
+    // TODO(jessk) test for exportImage when file not exists
 
     it('finishExport', () => {
         exports.finishExport(12345);

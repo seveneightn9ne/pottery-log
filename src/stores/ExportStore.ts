@@ -4,6 +4,7 @@ import { Action } from '../action';
 import dispatcher from '../AppDispatcher';
 import { exportImage, finishExport, startExport } from '../utils/exports';
 import { ImageStore } from './ImageStore';
+//import { debug } from '../utils/uploader';
 
 export type ExportState = PreExportingState | StartExportingState | ExportingImagesState | PostExportingState;
 
@@ -129,6 +130,13 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 finishExport(state.exportId);
             }
             return newState;
+        }
+        case 'export-image-failure': {
+            // uploader.debug
+            return {
+                exporting: false,
+                statusMessage: 'Export failed.\n' + action.reason,
+            };
         }
         case 'export-finished': {
             return {

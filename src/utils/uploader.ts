@@ -74,7 +74,7 @@ export async function startExport(id: number, metadata: any) {
     (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
 }
 
-export async function exportImage(id: number, uri: string) {
+export async function exportImage(id: number, uri: string, onError: (reason: any, ctx: string) => void) {
   return post(EXPORT_IMAGE, {
     deviceId: Constants.deviceId,
     image: {
@@ -84,7 +84,7 @@ export async function exportImage(id: number, uri: string) {
     },
   },
   () => dispatcher.dispatch({type: 'export-image', exportId: id, uri}),
-  (e) => dispatcher.dispatch({type: 'export-failure', exportId: id, error: e}));
+  (e) => onError(e, 'uploader.exportImage'));
 }
 
 export async function finishExport(id: number) {
