@@ -125,6 +125,7 @@ const handleImportFailure = (e: string | Error) => dispatcher.dispatch({ type: '
 
 export async function debug(name: string, data: any) {
   return post(DEBUG, {
+    appOwnership: Constants.appOwnership,
     deviceId: Constants.deviceId,
     data: JSON.stringify(data),
     name,
