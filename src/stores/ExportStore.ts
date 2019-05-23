@@ -54,6 +54,14 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             statusMessage: 'Starting export...',
         };
     }
+
+    if (action.type === 'page-list') {
+        return this.getInitialState();
+    }
+    if (action.type === 'page-settings') {
+        // Make sure it's re-initialized when you navigate here
+        return this.getInitialState();
+    }
     if (!state.exporting || ('exportId' in action && action.exportId !== state.exportId)) {
         return state;
     }
@@ -150,13 +158,6 @@ class ExportStore extends ReduceStore<ExportState, Action> {
                 exporting: false,
                 statusMessage: 'Export failed.\n' + action.error,
             };
-        }
-        case 'page-list': {
-            return this.getInitialState();
-        }
-        case 'page-settings': {
-            // Make sure it's re-initialized when you navigate here
-            return this.getInitialState();
         }
         default:
             return state;

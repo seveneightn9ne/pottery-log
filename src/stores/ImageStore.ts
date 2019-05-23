@@ -142,15 +142,15 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
         if (action.isImport) {
           return state;
         }
-        const newState = { loaded: true, images: { ...state.images } };
+        let newState = { loaded: true, images: { ...state.images } };
         _.forOwn(state.images, (image, imageName) => {
           const newImage = { ...image };
           if (newImage.pots === undefined) {
             newImage.pots = [];
           }
           newImage.pots = this.potsUsingImage(imageName);
-          this.deleteImageIfUnused(newState, imageName);
           newState.images[imageName] = newImage;
+          newState = this.deleteImageIfUnused(newState, imageName);
         });
         this.persist(newState);
         return newState;
@@ -287,7 +287,7 @@ class CImageStore extends ReduceStore<ImageStoreState, Action> {
     _.values(potState.pots).map((pot) => {
       pot.images3.forEach((img) => {
         if (img === image) {
-          potsUsingImage.push(img);
+          potsUsingImage.push(pot.uuid);
         }
       });
     });
