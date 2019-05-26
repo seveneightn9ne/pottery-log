@@ -3,7 +3,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { ImageStore } from '../../stores/ImageStore';
+import { ImageStore, getImageState } from '../../stores/ImageStore';
 import Image3 from './Image3';
 import ImagePicker from './ImagePicker';
 
@@ -17,7 +17,7 @@ interface ImageListProps {
 
 export default function ImageList(props: ImageListProps) {
   const images = props.images.map((name) => {
-    const imageState = ImageStore.imageState(name);
+    const imageState = getImageState(ImageStore.getState(), name);
     return (
     <TouchableOpacity
       onPress={onClickImage(props, name)}

@@ -1,9 +1,8 @@
-import {ReduceStore} from 'flux/utils';
 import _ from 'lodash';
 import { Action } from '../action';
-import dispatcher from '../AppDispatcher';
 import { exportImage, finishExport, startExport } from '../utils/exports';
 import { ImageStore } from './ImageStore';
+import makeFluxStore from './makeFluxStore';
 //import { debug } from '../utils/uploader';
 
 export type ExportState = PreExportingState | StartExportingState | ExportingImagesState | PostExportingState;
@@ -35,15 +34,11 @@ interface PostExportingState {
     statusMessage: string;
 }
 
-class ExportStore extends ReduceStore<ExportState, Action> {
-  constructor() {
-    super(dispatcher);
-  }
-  public getInitialState(): ExportState {
-    return {exporting: false};
-  }
+function getInitialState(): ExportState {
+return {exporting: false};
+}
 
-  public reduce(state: ExportState, action: Action): ExportState {
+function reduce(state: ExportState, action: Action): ExportState {
     // console.log("will check: " + action.type);
     if (action.type === 'export-initiate') {
         const id = Date.now();
@@ -56,11 +51,11 @@ class ExportStore extends ReduceStore<ExportState, Action> {
     }
 
     if (action.type === 'page-list') {
-        return this.getInitialState();
+        return getInitialState();
     }
     if (action.type === 'page-settings') {
         // Make sure it's re-initialized when you navigate here
-        return this.getInitialState();
+        return getInitialState();
     }
     if (!state.exporting || ('exportId' in action && action.exportId !== state.exportId)) {
         return state;
@@ -71,12 +66,12 @@ class ExportStore extends ReduceStore<ExportState, Action> {
             let totalImages = 0;
             // let awaitingFile = 0;
             _.forOwn(images, (imageState) => {
-               const willExport = exportImage(state.exportId, imageState);
-               if (willExport) {
-                   totalImages += 1;
-               } else {
-                   // awaitingFile += 1;
-               }
+                const willExport = exportImage(state.exportId, imageState);
+                if (willExport) {
+                    totalImages += 1;
+                } else {
+                    // awaitingFile += 1;
+                }
             });
             if (totalImages > 0) {
                 return {
@@ -162,7 +157,6 @@ class ExportStore extends ReduceStore<ExportState, Action> {
         default:
             return state;
     }
-  }
 }
 
-export default new ExportStore();
+export default makeFluxStore(getInitialState, reduce);

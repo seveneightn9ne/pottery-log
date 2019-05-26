@@ -2,7 +2,7 @@ import React from 'react';
 import ElevatedView from 'react-native-elevated-view';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import {Pot} from '../models/Pot';
-import { ImageStore } from '../stores/ImageStore';
+import { ImageStore, getImageState } from '../stores/ImageStore';
 import styles from '../style';
 import Image3 from './components/Image3';
 
@@ -36,7 +36,7 @@ export default class ImagePage extends React.Component<ImagePageProps> {
         <Text style={styles.search}>delete</Text>
       </TouchableOpacity>
      ) : null;
-    const imageState = ImageStore.imageState(this.props.image);
+    const imageState = getImageState(ImageStore.getState(), this.props.image);
     return (
     <View style={[styles.container, styles.imagePage]}>
       <ElevatedView style={styles.imageBar} elevation={4}>

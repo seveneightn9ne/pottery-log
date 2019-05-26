@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
 import {Pot} from '../../models/Pot';
-import { ImageStore } from '../../stores/ImageStore';
+import { ImageStore, getImageState } from '../../stores/ImageStore';
 import styles from '../../style';
 import Image3 from './Image3';
 
@@ -14,7 +14,7 @@ interface PotListItemProps {
 export default function(props: PotListItemProps) {
   const { width } = Dimensions.get('window');
   const imgstate = props.pot.images3.length ?
-    ImageStore.imageState(props.pot.images3[0]) : null;
+    getImageState(ImageStore.getState(), props.pot.images3[0]) : null;
   const size = {width: width / 2 - 6, height: width / 2 - 6};
   const img = props.pot.images3.length ?
     <Image3 image={imgstate} style={size} key={Image3.key(imgstate)} /> : (
