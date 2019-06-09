@@ -1,209 +1,246 @@
-import {Container} from 'flux/utils';
-import {Alert, BackHandler} from 'react-native';
-import dispatcher from './AppDispatcher';
-import { StatusString } from './models/Status';
-import ExportStore from './stores/ExportStore';
-import {ImageStore} from './stores/ImageStore';
-import ImportStore from './stores/ImportStore';
-import PotsStore from './stores/PotsStore';
-import UIStore from './stores/UIStore';
-import { nameFromUri } from './utils/imageutils';
-import AppView, { AppViewProps } from './views/AppView';
+import { Alert, BackHandler } from "react-native";
+import { StatusString } from "./models/Status";
+import { nameFromUri } from "./utils/imageutils";
+import AppView, {
+  AppViewStateProps,
+  AppViewDispatchProps
+} from "./views/AppView";
+import { connect } from "react-redux";
+import { Pot } from "./models/Pot";
+import * as types from "./action";
+import { loadInitialImages } from "./reducers/ImageStore";
+import { ThunkDispatch } from "redux-thunk";
+import { loadInitialImport } from "./reducers/ImportStore";
+import { loadInitialPots } from "./reducers/PotsStore";
+import { FullState } from "./reducers/types";
 
-function getStores() {
-  return [
-    PotsStore,
-    UIStore,
-    ImageStore,
-    ExportStore,
-    ImportStore,
-  ];
-}
-
-function currentPot() {
-  const uiState = UIStore.getState();
-  if (!('editPotId' in uiState)) {
-    throw Error('currentPot called without a pot on page: ' + uiState.page);
-  }
-  return PotsStore.getState().pots[uiState.editPotId];
-}
-
-BackHandler.addEventListener('hardwareBackPress', () => {
-  const uiState = UIStore.getState();
-  if (uiState.page === 'list') {
-    if ('searching' in uiState) {
-      dispatcher.dispatch({
-        type: 'list-search-close',
-      });
-      return true;
-    }
-    return false;
-  }
-  if (uiState.page === 'image') {
-    dispatcher.dispatch({
-      type: 'page-edit-pot',
-      potId: uiState.editPotId,
-    });
-    return true;
-  }
-  const exportState = ExportStore.getState();
-  if (exportState.exporting && !('exportUri' in exportState)) {
-    Alert.alert('Cancel this export?', undefined,
-       [{text: 'Stay here', style: 'cancel'},
-        {text: 'Cancel', onPress: () =>
-          dispatcher.dispatch({type: 'page-list'})},
-      ]);
-    return true;
-  }
-  dispatcher.dispatch({
-    type: 'page-list',
-  });
-  return true;
+const mapStateToProps = (
+  state: FullState,
+  props?: { fontLoaded: boolean }
+): AppViewStateProps => ({
+  ...state,
+  fontLoaded: !!(props && props.fontLoaded)
 });
 
-function getState(prevState?: AppViewProps, props?: {fontLoaded: boolean}) {
-  return {
-    pots: PotsStore.getState(),
-    ui: UIStore.getState(),
-    images: ImageStore.getState(),
-    exports: ExportStore.getState(),
-    imports: ImportStore.getState(),
-    fontLoaded: !!(props && props.fontLoaded),
-
-    onNew: () => dispatcher.dispatch({
-      type: 'new',
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<FullState, never, types.Action>
+): AppViewDispatchProps => ({
+  onNew: () =>
+    dispatch({
+      type: "new"
     }),
-    onEdit: (potId: string) => dispatcher.dispatch({
-      type: 'page-edit-pot',
-      potId,
+  onEdit: (potId: string) =>
+    dispatch({
+      type: "page-edit-pot",
+      potId
     }),
-    onChangeTitle: (potId: string, newTitle: string) => dispatcher.dispatch({
-      type: 'pot-edit-field',
-      field: 'title',
+  onChangeTitle: (potId: string, newTitle: string) =>
+    dispatch({
+      type: "pot-edit-field",
+      field: "title",
       value: newTitle,
-      potId,
+      potId
     }),
-    onChangeNote: (potId: string, statusText: StatusString, noteText: string) => dispatcher.dispatch({
-        type: 'pot-edit-field',
-        field: 'notes2',
-        value: currentPot().notes2.withNoteForStatus(statusText, noteText),
-        potId,
+  onChangeNote: (currentPot: Pot, statusText: StatusString, noteText: string) =>
+    dispatch({
+      type: "pot-edit-field",
+      field: "notes2",
+      value: currentPot.notes2.withNoteForStatus(statusText, noteText),
+      potId: currentPot.uuid
     }),
-    onNavigateToList: () => dispatcher.dispatch({
-      type: 'page-list',
+  onNavigateToList: () =>
+    dispatch({
+      type: "page-list"
     }),
-    onNavigateToSettings: () => dispatcher.dispatch({
-      type: 'page-settings',
+  onNavigateToSettings: () =>
+    dispatch({
+      type: "page-settings"
     }),
-    onOpenSearch: () => dispatcher.dispatch({
-      type: 'list-search-open',
+  onOpenSearch: () =>
+    dispatch({
+      type: "list-search-open"
     }),
-    onCloseSearch: () => dispatcher.dispatch({
-      type: 'list-search-close',
+  onCloseSearch: () =>
+    dispatch({
+      type: "list-search-close"
     }),
-    onSearch: (text: string) => {
-      console.log('search', text);
-      dispatcher.dispatch({
-        type: 'list-search-term',
-        text,
-      });
-    },
-    onAddImage: (potId: string, localUri: string) => {
-      dispatcher.dispatch({
-        type: 'image-add',
-        localUri,
-        potId,
-      });
-      dispatcher.dispatch({
-        type: 'pot-edit-field',
-        field: 'images3',
-        value: [nameFromUri(localUri), ...PotsStore.getState().pots[potId].images3],
-        potId,
-      });
-    },
-    onSetMainImage: (potId: string, name: string) => dispatcher.dispatch({
-      type: 'pot-edit-field',
-      field: 'images3',
-      value: [name, ...PotsStore.getState().pots[potId].images3.filter((i) => i !== name)],
-      potId,
+  onSearch: (text: string) => {
+    console.log("search", text);
+    dispatch({
+      type: "list-search-term",
+      text
+    });
+  },
+  onAddImage: (currentPot: Pot, localUri: string) => {
+    dispatch({
+      type: "image-add",
+      localUri,
+      potId: currentPot.uuid
+    });
+    dispatch({
+      type: "pot-edit-field",
+      field: "images3",
+      value: [nameFromUri(localUri), ...currentPot.images3],
+      potId: currentPot.uuid
+    });
+  },
+  onSetMainImage: (currentPot: Pot, name: string) =>
+    dispatch({
+      type: "pot-edit-field",
+      field: "images3",
+      value: [name, ...currentPot.images3.filter(i => i !== name)],
+      potId: currentPot.uuid
     }),
-    onExpandImage: (name: string) => dispatcher.dispatch({
-      type: 'page-image',
-      imageId: name,
+  onExpandImage: (name: string) =>
+    dispatch({
+      type: "page-image",
+      imageId: name
     }),
-    setStatus: (newStatus: StatusString) => {
-      const newFullStatus = currentPot().status.withStatus(newStatus);
-      dispatcher.dispatch({
-        type: 'pot-edit-field',
-        field: 'status',
-        value: newFullStatus,
-        potId: currentPot().uuid,
-      });
-    },
-    setStatusDate: (date: Date) => {
-      const currentStatus = currentPot().status.currentStatus();
-      if (!currentStatus) {
-        throw Error("Cannot set date when there's no status");
+  setStatus: (currentPot: Pot, newStatus: StatusString) => {
+    const newFullStatus = currentPot.status.withStatus(newStatus);
+    dispatch({
+      type: "pot-edit-field",
+      field: "status",
+      value: newFullStatus,
+      potId: currentPot.uuid
+    });
+  },
+  setStatusDate: (currentPot: Pot, date: Date) => {
+    const currentStatus = currentPot.status.currentStatus();
+    if (!currentStatus) {
+      throw Error("Cannot set date when there's no status");
+    }
+    const newFullStatus = currentPot.status.withStatus(currentStatus, date);
+    dispatch({
+      type: "pot-edit-field",
+      field: "status",
+      value: newFullStatus,
+      potId: currentPot.uuid
+    });
+  },
+  onDelete: (currentPot: Pot) => {
+    Alert.alert("Delete this pot?", undefined, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        onPress: () => {
+          dispatch({
+            type: "pot-delete",
+            potId: currentPot.uuid,
+            imageNames: currentPot.images3
+          });
+        }
       }
-      const newFullStatus = currentPot().status.withStatus(currentStatus, date);
-      dispatcher.dispatch({
-        type: 'pot-edit-field',
-        field: 'status',
-        value: newFullStatus,
-        potId: currentPot().uuid,
-      });
-    },
-    onDelete: () => {
-      Alert.alert('Delete this pot?', undefined,
-       [{text: 'Cancel', style: 'cancel'},
-        {text: 'Delete', onPress: () => {
-          dispatcher.dispatch({
-            type: 'pot-delete',
-            potId: currentPot().uuid,
-            imageNames: currentPot().images3,
+    ]);
+  },
+  onDeleteImage: (currentPot: Pot, name: string) => {
+    Alert.alert("Delete this image?", undefined, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        onPress: () => {
+          dispatch({
+            type: "pot-edit-field",
+            field: "images3",
+            value: currentPot.images3.filter(i => i !== name),
+            potId: currentPot.uuid
           });
-        }},
-      ]);
-    },
-    onDeleteImage: (name: string) => {
-      Alert.alert('Delete this image?', undefined,
-       [{text: 'Cancel', style: 'cancel'},
-        {text: 'Delete', onPress: () => {
-          dispatcher.dispatch({
-            type: 'pot-edit-field',
-            field: 'images3',
-            value: currentPot().images3.filter((i) => i !== name),
-            potId: currentPot().uuid,
-          });
-          dispatcher.dispatch({
-            type: 'image-delete-from-pot',
+          dispatch({
+            type: "image-delete-from-pot",
             imageName: name,
-            potId: currentPot().uuid,
+            potId: currentPot.uuid
           });
-        }},
-      ]);
-    },
-    onCopy: () => dispatcher.dispatch({
-      type: 'pot-copy',
-      potId: currentPot().uuid,
-      imageNames: currentPot().images3,
+        }
+      }
+    ]);
+  },
+  onCopy: (currentPot: Pot) =>
+    dispatch({
+      type: "pot-copy",
+      potId: currentPot.uuid,
+      imageNames: currentPot.images3
     }),
-    onCollapse: (section: string) => dispatcher.dispatch({
-      type: 'list-collapse', section,
+  onCollapse: (section: string) =>
+    dispatch({
+      type: "list-collapse",
+      section
     }),
-    onScrollTo: (y: number) => dispatcher.dispatch({
-      type: 'list-scroll', y,
-    }),
+  /*onScrollTo: (y: number) => dispatch({
+    type: 'list-scroll', y,
+  }),*/
 
-    onStartExport: () => dispatcher.dispatch({type: 'export-initiate'}),
-    onStartImport: () => dispatcher.dispatch({type: 'import-initiate'}),
-    onStartUrlImport: (url: string) => dispatcher.dispatch({
-      type: 'import-initiate-url',
+  onStartExport: () => dispatch({ type: "export-initiate" }),
+  onStartImport: () => dispatch({ type: "import-initiate" }),
+  onStartUrlImport: (url: string) =>
+    dispatch({
+      type: "import-initiate-url",
       url
     }),
-    onResumeImport: () => dispatcher.dispatch({type: 'import-resume-affirm'}),
-    onCancelResumeImport: () => dispatcher.dispatch({type: 'import-resume-cancel'}),
-  };
-}
+  onResumeImport: () => dispatch({ type: "import-resume-affirm" }),
+  onCancelResumeImport: () => dispatch({ type: "import-resume-cancel" }),
+  onImageLoad: (name: string) => dispatch({ type: "image-loaded", name }),
+  onImageLoadFailure: (
+    nameOrUri: string,
+    type: "local" | "file" | "remote"
+  ) => {
+    if (type === "file") {
+      dispatch({
+        type: "image-error-file",
+        uri: nameOrUri
+      });
+    } else if (type === "local") {
+      dispatch({
+        type: "image-error-local",
+        name: nameOrUri
+      });
+    } else {
+      dispatch({
+        type: "image-error-remote",
+        name: nameOrUri
+      });
+    }
+  },
+  addBackButtonHandler: (state: FullState) => {
+    const { ui, exports } = state;
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      if (ui.page === "list") {
+        if ("searching" in ui) {
+          dispatch({
+            type: "list-search-close"
+          });
+          return true;
+        }
+        return false;
+      }
+      if (ui.page === "image") {
+        dispatch({
+          type: "page-edit-pot",
+          potId: ui.editPotId
+        });
+        return true;
+      }
+      if (exports.exporting && !("exportUri" in exports)) {
+        Alert.alert("Cancel this export?", undefined, [
+          { text: "Stay here", style: "cancel" },
+          { text: "Cancel", onPress: () => dispatch({ type: "page-list" }) }
+        ]);
+        return true;
+      }
+      dispatch({
+        type: "page-list"
+      });
+      return true;
+    });
+  },
+  loadInitial: () => {
+    dispatch(loadInitialImages());
+    dispatch(loadInitialImport());
+    dispatch(loadInitialPots(false));
+  }
+});
 
-export default Container.createFunctional(AppView, getStores, getState, {withProps: true});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AppView);
+//export default Container.createFunctional(AppView, getStores, getState, {withProps: true});

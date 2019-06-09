@@ -1,6 +1,6 @@
 import React from 'react';
 import ElevatedView from 'react-native-elevated-view';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 import styles from '../../style';
 
 interface NewPotButtonProps {

@@ -1,31 +1,43 @@
-import React from 'react';
-import ElevatedView from 'react-native-elevated-view';
-import { Dimensions, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
-import Button from 'react-native-button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Pot } from '../models/Pot';
-import Status, { StatusString } from '../models/Status';
-import { EditUiState } from '../stores/UIStore';
-import styles from '../style';
-import ImageList from './components/ImageList';
-import StatusDetail from './components/StatusDetail';
-import StatusSwitcher from './components/StatusSwitcher';
+import React from "react";
+import ElevatedView from "react-native-elevated-view";
+import {
+  Dimensions,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import Button from "react-native-button";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Pot } from "../models/Pot";
+import Status, { StatusString } from "../models/Status";
+import styles from "../style";
+import ImageList from "./components/ImageList";
+import StatusDetail from "./components/StatusDetail";
+import StatusSwitcher from "./components/StatusSwitcher";
+import { EditUiState, ImageStoreState } from "../reducers/types";
 
 interface EditPageProps {
   pot: Pot;
+  images: ImageStoreState;
   ui: EditUiState;
   fontLoaded: boolean;
   onChangeTitle: (potId: string, text: string) => void;
-  onChangeNote: (potId: string, status: StatusString, text: string) => void;
+  onChangeNote: (currentPot: Pot, status: StatusString, text: string) => void;
   onNavigateToList: () => void;
-  onAddImage: (potId: string, localUri: string) => void;
-  onSetMainImage: (potId: string, imageName: string) => void;
-  onDeleteImage: (imageName: string) => void;
+  onAddImage: (currentPot: Pot, localUri: string) => void;
+  onSetMainImage: (currentPot: Pot, imageName: string) => void;
+  onDeleteImage: (currentPot: Pot, imageName: string) => void;
   onExpandImage: (imageName: string) => void;
-  setStatus: (newStatus: StatusString) => void;
-  setStatusDate: (date: Date) => void;
-  onDelete: () => void;
-  onCopy: () => void;
+  setStatus: (currentPot: Pot, newStatus: StatusString) => void;
+  setStatusDate: (currentPot: Pot, date: Date) => void;
+  onDelete: (currentPot: Pot) => void;
+  onCopy: (currentPot: Pot) => void;
+  onImageLoad: (name: string) => void;
+  onImageLoadFailure: (
+    nameOrUri: string,
+    type: "local" | "file" | "remote"
+  ) => void;
 }
 
 export default class EditPage extends React.Component<EditPageProps, {}> {
@@ -35,7 +47,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
     this.titleInput = React.createRef();
   }
   public render() {
-    const { width } = Dimensions.get('window');
+    const { width } = Dimensions.get("window");
     const pot = this.props.pot;
     if (!pot) {
       return null;
@@ -54,80 +66,102 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
 
     /* status text */
     const currentStatus = pot.status.currentStatus();
-    const currentStatusIndex = currentStatus ? Status.ordered().indexOf(currentStatus) : -1;
+    const currentStatusIndex = currentStatus
+      ? Status.ordered().indexOf(currentStatus)
+      : -1;
     const numStatusDetails = Status.ordered().length - currentStatusIndex - 2;
-    const details = Status.ordered().splice(currentStatusIndex + 1, numStatusDetails).map((s, i) => (
-      <StatusDetail
-        key={s}
-        fontLoaded={this.props.fontLoaded}
-        note={pot.notes2 && pot.notes2.notes[s] || ''}
-        status={s}
-        potId={pot.uuid}
-        date={pot.status.status[s] || new Date()}
-        first={i === 0}
-        last={i === numStatusDetails - 1}
-        onChangeNote={this.props.onChangeNote}
-      />
-    ));
-    const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
-    return (
-    <View style={styles.container}>
-      <ElevatedView style={styles.header} elevation={8}>
-        {backButton}
-        <TextInput
-          style={styles.searchBox}
-          ref={this.titleInput}
-          underlineColorAndroid="transparent"
-          placeholderTextColor="#FFCCBC"
-          onChangeText={this.onChangeTitle}
-          value={pot.title}
-          selectTextOnFocus={true}
-          autoFocus={this.props.ui.new}
+    const details = Status.ordered()
+      .splice(currentStatusIndex + 1, numStatusDetails)
+      .map((s, i) => (
+        <StatusDetail
+          key={s}
+          fontLoaded={this.props.fontLoaded}
+          note={(pot.notes2 && pot.notes2.notes[s]) || ""}
+          status={s}
+          date={pot.status.status[s] || new Date()}
+          first={i === 0}
+          last={i === numStatusDetails - 1}
+          onChangeNote={this.onChangeNote}
         />
-        {editButton}
-      </ElevatedView>
-      <KeyboardAwareScrollView extraHeight={100}>
-        <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
-          <ImageList
-            size={mainImgSize}
-            images={pot.images3}
-            onAddImage={this.onAddImage}
-            onClickImage={this.props.onExpandImage}
-            onDeleteImage={this.props.onDeleteImage}
+      ));
+    const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || "";
+    return (
+      <View style={styles.container}>
+        <ElevatedView style={styles.header} elevation={8}>
+          {backButton}
+          <TextInput
+            style={styles.searchBox}
+            ref={this.titleInput}
+            underlineColorAndroid="transparent"
+            placeholderTextColor="#FFCCBC"
+            onChangeText={this.onChangeTitle}
+            value={pot.title}
+            selectTextOnFocus={true}
+            autoFocus={this.props.ui.new}
           />
-          <StatusSwitcher
-            fontLoaded={this.props.fontLoaded}
-            status={pot.status}
-            setStatus={this.props.setStatus}
-            note={currentNoteText}
-            onChangeNote={this.props.onChangeNote}
-            potId={pot.uuid}
-            date={pot.status.date()}
-            onPickDate={this.props.setStatusDate}
-          />
-        </View>
-        {details}
-        <View style={styles.detailPadding} />
-      </KeyboardAwareScrollView>
-      <ElevatedView style={styles.bottomBar} elevation={details.length ? 8 : 0}>
-        <Button onPress={this.props.onDelete} style={[styles.button3, styles.bbb]}>DELETE POT</Button>
-        <Button onPress={this.props.onCopy} style={[styles.button3, styles.bbb]}>COPY POT</Button>
-      </ElevatedView>
-    </View>
+          {editButton}
+        </ElevatedView>
+        <KeyboardAwareScrollView extraHeight={100}>
+          <View style={/*{elevation: 4, backgroundColor: '#fff'}*/ null}>
+            <ImageList
+              size={mainImgSize}
+              images={pot.images3}
+              imageState={this.props.images}
+              onAddImage={this.onAddImage}
+              onClickImage={this.props.onExpandImage}
+              onDeleteImage={this.onDeleteImage}
+              onImageLoad={this.props.onImageLoad}
+              onImageLoadFailure={this.props.onImageLoadFailure}
+            />
+            <StatusSwitcher
+              fontLoaded={this.props.fontLoaded}
+              status={pot.status}
+              setStatus={this.setStatus}
+              note={currentNoteText}
+              onChangeNote={this.onChangeNote}
+              date={pot.status.date()}
+              onPickDate={this.onSetStatusDate}
+            />
+          </View>
+          {details}
+          <View style={styles.detailPadding} />
+        </KeyboardAwareScrollView>
+        <ElevatedView
+          style={styles.bottomBar}
+          elevation={details.length ? 8 : 0}
+        >
+          <Button
+            onPress={this.props.onDelete}
+            style={[styles.button3, styles.bbb]}
+          >
+            DELETE POT
+          </Button>
+          <Button
+            onPress={this.props.onCopy}
+            style={[styles.button3, styles.bbb]}
+          >
+            COPY POT
+          </Button>
+        </ElevatedView>
+      </View>
     );
   }
 
-  private onAddImage = (i: string) => {
-    this.props.onAddImage(this.props.pot.uuid, i);
-  }
-
-  private onChangeTitle = (text: string) => {
+  private onAddImage = (i: string) => this.props.onAddImage(this.props.pot, i);
+  private onChangeTitle = (text: string) =>
     this.props.onChangeTitle(this.props.pot.uuid, text);
-  }
+  private onChangeNote = (status: StatusString, note: string) =>
+    this.props.onChangeNote(this.props.pot, status, note);
+  private onDeleteImage = (imageName: string) =>
+    this.props.onDeleteImage(this.props.pot, imageName);
+  private setStatus = (newStatus: StatusString) =>
+    this.props.setStatus(this.props.pot, newStatus);
+  private onSetStatusDate = (newDate: Date) =>
+    this.props.setStatusDate(this.props.pot, newDate);
 
   private focusTitle = () => {
     if (this.titleInput.current) {
       this.titleInput.current.focus();
     }
-  }
+  };
 }

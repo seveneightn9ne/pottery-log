@@ -1,7 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`matches the snapshot after font loaded 1`] = `
-<FluxContainer(AppView)
-  fontLoaded={true}
-/>
+<Provider
+  store={
+    Object {
+      "@@observable": [Function],
+      "dispatch": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(AppView)
+    fontLoaded={true}
+  />
+</Provider>
 `;

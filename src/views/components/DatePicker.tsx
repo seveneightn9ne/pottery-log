@@ -1,9 +1,7 @@
 import React from 'react';
-import Button from 'react-native-button';
 import {
   DatePickerAndroid,
   DatePickerIOS,
-  Modal as RNModal,
   Platform,
   Text,
   TouchableOpacity,

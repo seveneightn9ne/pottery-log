@@ -1,42 +1,56 @@
-import React from 'react';
-import {
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { ImageStore, getImageState } from '../../stores/ImageStore';
-import Image3 from './Image3';
-import ImagePicker from './ImagePicker';
+import React from "react";
+import { ScrollView, TouchableOpacity } from "react-native";
+import Image3 from "./Image3";
+import ImagePicker from "./ImagePicker";
+import { getImageState } from "../../reducers/ImageStore";
+import { ImageStoreState } from "../../reducers/types";
 
 interface ImageListProps {
   images: string[];
+  imageState: ImageStoreState;
   size: number;
   onAddImage: (localUri: string) => void;
   onClickImage: (name: string) => void;
   onDeleteImage: (name: string) => void;
+  onImageLoad: (name: string) => void;
+  onImageLoadFailure: (
+    nameOrUri: string,
+    type: "local" | "file" | "remote"
+  ) => void;
 }
 
 export default function ImageList(props: ImageListProps) {
-  const images = props.images.map((name) => {
-    const imageState = getImageState(ImageStore.getState(), name);
+  const images = props.images.map(name => {
+    const imageState = getImageState(props.imageState, name);
     return (
-    <TouchableOpacity
-      onPress={onClickImage(props, name)}
-      key={name}
-      onLongPress={onDeleteImage(props, name)}
-      style={{marginRight: 4}}
-    >
-      <Image3 key={Image3.key(imageState)} image={imageState} style={{height: props.size, width: props.size}} />
-    </TouchableOpacity>);
+      <TouchableOpacity
+        onPress={onClickImage(props, name)}
+        key={name}
+        onLongPress={onDeleteImage(props, name)}
+        style={{ marginRight: 4 }}
+      >
+        <Image3
+          key={Image3.key(imageState)}
+          image={imageState}
+          style={{ height: props.size, width: props.size }}
+          {...props}
+        />
+      </TouchableOpacity>
+    );
   });
   return (
-  <ScrollView horizontal={true} style={{paddingLeft: 4, paddingTop: 4}}>
-    {images}
-    <ImagePicker
-      onPicked={props.onAddImage}
-      style={{height: props.size, width: images.length ? 100 - (4 * 3) : props.size + 100 - (4 * 2)}}
-      full={images.length === 0}
-    />
-  </ScrollView>);
+    <ScrollView horizontal={true} style={{ paddingLeft: 4, paddingTop: 4 }}>
+      {images}
+      <ImagePicker
+        onPicked={props.onAddImage}
+        style={{
+          height: props.size,
+          width: images.length ? 100 - 4 * 3 : props.size + 100 - 4 * 2
+        }}
+        full={images.length === 0}
+      />
+    </ScrollView>
+  );
 }
 
 function onClickImage(props: ImageListProps, name: string) {

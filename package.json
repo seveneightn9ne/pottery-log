@@ -47,6 +47,7 @@
     "@babel/core": "^7.0.0-0",
     "@babel/runtime": "^7.2.0",
     "@types/react-native-elevated-view": "^0.0.2",
+    "@types/react-redux": "^7.0.9",
     "array-reverse-polyfill": "^1.0.9",
     "exp": "^57.2.1",
     "expo": "^31.0.4",
@@ -58,6 +59,9 @@
     "react-native-button": "^2.3.0",
     "react-native-elevated-view": "^0.0.6",
     "react-native-keyboard-aware-scroll-view": "^0.4.0",
+    "react-redux": "^6.0.0",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0",
     "sentry-expo": "~1.10.0",
     "tslib": "^1.9.3",
     "whatwg-fetch": "^2.0.4"

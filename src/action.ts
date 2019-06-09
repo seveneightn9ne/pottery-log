@@ -1,17 +1,8 @@
 import Notes from './models/Notes';
 import { Image2, Pot } from './models/Pot';
 import Status from './models/Status';
-import { ImportStatePersisted } from './stores/ImportStore';
+import { ImportStatePersisted, ImageState } from './reducers/types';
 
-export interface ImageState {
-    name: string;
-    // localUri and remoteUri are deprecated
-    // they will be converted to a fileUri
-    localUri?: string;
-    remoteUri?: string;
-    fileUri?: string;
-    pots: string[];
-}
 
 export type Action = PotAction | ImageAction | UiAction | ImportAction | ExportAction | Reload;
 
@@ -257,6 +248,7 @@ interface ExportInitiate {
 interface ExportStarted {
     type: 'export-started';
     exportId: number;
+    images: { [name: string]: ImageState };
 }
 
 interface ExportImage {

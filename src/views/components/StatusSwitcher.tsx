@@ -11,11 +11,10 @@ interface StatusSwitcherProps {
   fontLoaded: boolean;
   status: Status;
   note: string;
-  potId: string;
   date: Date;
   setStatus: (newStatus: StatusString) => void;
   onPickDate: (newDate: Date) => void;
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+  onChangeNote: (status: StatusString, newNote: string) => void;
 }
 
 export default class StatusSwitcher extends React.Component<StatusSwitcherProps> {
@@ -34,7 +33,6 @@ export default class StatusSwitcher extends React.Component<StatusSwitcherProps>
     <NoteModal
       note={this.props.note}
       status={this.props.status.currentStatus()}
-      potId={this.props.potId}
       ref={this.modal}
       onChangeNote={this.props.onChangeNote}
     />);
@@ -48,7 +46,6 @@ export default class StatusSwitcher extends React.Component<StatusSwitcherProps>
         textStyle={styles.mainNoteText as TextStyle}
         fontLoaded={this.props.fontLoaded}
         status={this.props.status.currentStatus()}
-        potId={this.props.potId}
         note={this.props.note}
         onChangeNote={this.props.onChangeNote}
         showNote={true}

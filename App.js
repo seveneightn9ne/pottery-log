@@ -1,27 +1,34 @@
-import React from 'react';
-import AppContainer from './src/AppContainer';
-import {AsyncStorage} from 'react-native';
-import {Font} from 'expo';
-import Sentry from 'sentry-expo';
+import React from "react";
+import AppContainer from "./src/AppContainer";
+import { Font } from "expo";
+import Sentry from "sentry-expo";
 import "array-reverse-polyfill";
+import { Provider } from "react-redux";
+import store from "./src/reducers/store";
 // import { SentrySeverity, SentryLog } from 'react-native-sentry';
-Sentry.config('https://bad3ce09a6404191b1a0b181bdb36263@sentry.io/1341402').install();
 
+Sentry.config(
+  "https://bad3ce09a6404191b1a0b181bdb36263@sentry.io/1341402"
+).install();
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {fontLoaded: false};
+    this.state = { fontLoaded: false };
   }
 
   async componentDidMount() {
     await Font.loadAsync({
-      'material-icons': require('./assets/MaterialIcons-Regular.ttf'),
+      "material-icons": require("./assets/MaterialIcons-Regular.ttf")
     });
-    this.setState({fontLoaded: true});
+    this.setState({ fontLoaded: true });
   }
 
   render() {
-    return <AppContainer fontLoaded={this.state.fontLoaded} />
+    return (
+      <Provider store={store}>
+        <AppContainer fontLoaded={this.state.fontLoaded} />
+      </Provider>
+    );
   }
 }

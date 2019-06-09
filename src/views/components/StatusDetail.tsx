@@ -10,10 +10,9 @@ interface StatusDetailProps {
   note: string;
   status: StatusString;
   date: Date;
-  potId: string;
   first: boolean;
   last: boolean;
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+  onChangeNote: (status: StatusString, newNote: string) => void;
 }
 
 export default class StatusDetail extends React.Component<StatusDetailProps, {}> {
@@ -29,7 +28,6 @@ export default class StatusDetail extends React.Component<StatusDetailProps, {}>
       textStyle={styles.statusDetailNote as TextStyle}
       note={this.props.note}
       status={this.props.status}
-      potId={this.props.potId}
       onChangeNote={this.props.onChangeNote}
       showNote={true}
       showAddNote={false}
@@ -45,7 +43,6 @@ export default class StatusDetail extends React.Component<StatusDetailProps, {}>
       <NoteModal
         note={this.props.note}
         status={this.props.status}
-        potId={this.props.potId}
         ref={this.modal}
         onChangeNote={this.props.onChangeNote}
       />);

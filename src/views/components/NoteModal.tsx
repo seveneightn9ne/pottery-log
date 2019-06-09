@@ -5,10 +5,9 @@ import { ExpandingTextInput } from './ExpandingTextInput';
 import Modal from './Modal';
 
 interface NoteModalProps {
-  potId: string;
   note: string;
   status: StatusString;
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+  onChangeNote: (status: StatusString, newNote: string) => void;
 }
 
 export default class NoteModal extends React.Component<NoteModalProps, {open: boolean}> {
@@ -41,6 +40,6 @@ export default class NoteModal extends React.Component<NoteModalProps, {open: bo
   }
 
   private onChangeNote = (t: string) => {
-    this.props.onChangeNote(this.props.potId, this.props.status, t);
+    this.props.onChangeNote(this.props.status, t);
   }
 }

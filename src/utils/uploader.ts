@@ -1,7 +1,7 @@
 import { Constants } from 'expo';
 import _ from 'lodash';
-import dispatcher from '../AppDispatcher';
 import { nameFromUri } from './imageutils';
+import store from '../reducers/store';
 
 // Routes
 const apiPrefix = 'https://jesskenney.com/pottery-log/';
@@ -73,8 +73,8 @@ export async function startExport(id: number, metadata: any) {
       metadata: JSON.stringify(metadata),
       deviceId: Constants.deviceId
     },
-    () => dispatcher.dispatch({ type: 'export-started', exportId: id }),
-    (e) => dispatcher.dispatch({ type: 'export-failure', exportId: id, error: e }));
+    () => store.dispatch({ type: 'export-started', exportId: id }),
+    (e) => store.dispatch({ type: 'export-failure', exportId: id, error: e }));
 }
 
 export async function exportImage(id: number, uri: string, onError: (reason: any, ctx: string) => void) {
@@ -86,14 +86,14 @@ export async function exportImage(id: number, uri: string, onError: (reason: any
       type: mimeFromUri(uri),
     },
   },
-    () => dispatcher.dispatch({ type: 'export-image', exportId: id, uri }),
+    () => store.dispatch({ type: 'export-image', exportId: id, uri }),
     (e) => onError(e, 'uploader.exportImage'));
 }
 
 export async function finishExport(id: number) {
   return post(EXPORT_FINISH, { deviceId: Constants.deviceId },
-    (res: { uri: string }) => dispatcher.dispatch({ type: 'export-finished', exportId: id, uri: res.uri }),
-    (e) => dispatcher.dispatch({ type: 'export-failure', exportId: id, error: e }));
+    (res: { uri: string }) => store.dispatch({ type: 'export-finished', exportId: id, uri: res.uri }),
+    (e) => store.dispatch({ type: 'export-failure', exportId: id, error: e }));
 }
 
 export async function startImport(uri: string) {
@@ -115,13 +115,13 @@ export async function startUrlImport(uri: string) {
 }
 
 const handleImportResponse = (res: { metadata: string, image_map: { [i: string]: string } }) =>
-  dispatcher.dispatch({
+  store.dispatch({
     type: 'import-started',
     metadata: res.metadata,
     imageMap: res.image_map,
   });
 
-const handleImportFailure = (e: string | Error) => dispatcher.dispatch({ type: 'import-failure', error: e });
+const handleImportFailure = (e: string | Error) => store.dispatch({ type: 'import-failure', error: e });
 
 export async function debug(name: string, data: any) {
   return post(DEBUG, {

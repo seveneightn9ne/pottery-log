@@ -44,11 +44,10 @@ interface NoteProps {
   fontLoaded: boolean;
   showAddNote: boolean;
   showNote: boolean;
-  potId: string;
   textStyle: TextStyle;
   style?: ViewStyle | ViewStyle[];
   note: string;
-  onChangeNote: (potId: string, status: StatusString, newNote: string) => void;
+  onChangeNote: (status: StatusString, newNote: string) => void;
 }
 export default class Note extends React.Component<NoteProps, {}> {
   private modal: React.RefObject<NoteModal>;
@@ -76,7 +75,6 @@ export default class Note extends React.Component<NoteProps, {}> {
       <NoteModal
         note={this.props.note}
         status={this.props.status}
-        potId={this.props.potId}
         ref={this.modal}
         onChangeNote={this.props.onChangeNote}
       />
