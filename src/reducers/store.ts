@@ -15,8 +15,14 @@ import {
   getInitialState as getInitialPotsState
 } from "./PotsStore";
 import { reduceUi, getInitialState as getInitialUiState } from "./UIStore";
-import { createStore, applyMiddleware, Middleware, Reducer } from "redux";
-import thunk, { ThunkMiddleware } from "redux-thunk";
+import {
+  createStore,
+  applyMiddleware,
+  Middleware,
+  Reducer,
+  Store
+} from "redux";
+import thunk, { ThunkMiddleware, ThunkAction } from "redux-thunk";
 import { Action } from "../action";
 import { Constants } from "expo";
 import { FullState } from "./types";
@@ -62,7 +68,7 @@ function reducer(): Reducer<FullState, Action> {
     newState.ui = reduceUi(newState.ui, action);
     // reduceImages depends on recducePots having been run first on the current action.
     newState.images = reduceImages(newState.images, action, newState);
-    newState.exports = reduceExport(newState.exports, action);
+    newState.exports = reduceExport(newState.exports, action, newState);
     newState.imports = reduceImport(newState.imports, action);
     /*return {
       pots: reducePots(state.pots, action),
@@ -78,5 +84,5 @@ function reducer(): Reducer<FullState, Action> {
 
 export default createStore(
   reducer(),
-  applyMiddleware(thunk as ThunkMiddleware, logger)
+  applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger)
 );

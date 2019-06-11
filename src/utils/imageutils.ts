@@ -6,7 +6,6 @@ import store from "../reducers/store";
  * Errors are always caught. Dispatches 'image-file-created' or 'image-file-failed'.
  */
 export function saveToFile(uri: string, isRemote = false): Promise<void> {
-  // console.log("Will save " + uri);
   const onError = (e: Error | string) => {
     console.warn("saveToFile failure:", e);
     store.dispatch({ type: "image-file-failed", uri });
@@ -31,10 +30,8 @@ export function saveToFile(uri: string, isRemote = false): Promise<void> {
       });
     })
     .then(() => {
-      console.log("will download");
       const fileUri = dir + "/" + name;
       const afterCopy = () => {
-        // console.log("saveToFile SUCCESS on " + name);
         store.dispatch({
           type: "image-file-created",
           name,
@@ -42,17 +39,14 @@ export function saveToFile(uri: string, isRemote = false): Promise<void> {
         });
       };
       if (isRemote) {
-        // console.log("saveToFile starting " + name);
         return FileSystem.downloadAsync(uri, fileUri)
           .then(afterCopy)
           .catch(onError);
       } else {
-        // console.log("Will copyAsync");
         return FileSystem.copyAsync({ from: uri, to: fileUri })
           .then(afterCopy)
           .catch(onError);
       }
-      // console.log("Save of " + uri + " initiated.");
     })
     .catch(onError);
 }

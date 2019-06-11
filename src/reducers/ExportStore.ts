@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Action } from "../action";
 import { exportImage, finishExport, startExport } from "../utils/exports";
 //import { debug } from '../utils/uploader';
-import { ExportState } from "./types";
+import { ExportState, FullState } from "./types";
 
 export function getInitialState(): ExportState {
   return { exporting: false };
@@ -10,12 +10,13 @@ export function getInitialState(): ExportState {
 
 export function reduceExport(
   state: ExportState = getInitialState(),
-  action: Action
+  action: Action,
+  fullState: FullState
 ): ExportState {
   // console.log("will check: " + action.type);
   if (action.type === "export-initiate") {
     const id = Date.now();
-    startExport(id);
+    startExport(id, fullState.images.images);
     return {
       exporting: true,
       exportId: id,

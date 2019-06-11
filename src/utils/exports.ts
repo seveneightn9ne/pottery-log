@@ -27,9 +27,12 @@ async function getExportMetadata() {
   return snapshot;
 }
 
-async function startExport(id: number) {
+async function startExport(
+  id: number,
+  images: { [imageName: string]: ImageState }
+) {
   const metadata = await getExportMetadata();
-  uploader.startExport(id, metadata);
+  uploader.startExport(id, metadata, images);
 }
 
 function exportImage(

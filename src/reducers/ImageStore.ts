@@ -341,7 +341,7 @@ function persist(state: ImageStoreState) {
 
 export function loadInitialImages(
   isImport?: boolean
-): ThunkAction<Promise<any>, {}, undefined, Action> {
+): ThunkAction<Promise<any>, FullState, undefined, Action> {
   return async (dispatch: Dispatch) => {
     console.log("Loading ImageStore");
     const json = await AsyncStorage.getItem("@ImageStore");
