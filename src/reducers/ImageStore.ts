@@ -1,19 +1,17 @@
 import { FileSystem } from "expo";
 import _ from "lodash";
-import { AsyncStorage } from "react-native";
 import { Action } from "../action";
 import * as utils from "../utils/imageutils";
 import { StorageWriter } from "../utils/sync";
 import * as ImageUploader from "../utils/uploader";
-import { Dispatch } from "redux";
 import store from "./store";
-import { ThunkAction } from "redux-thunk";
 import {
   ImageStoreState,
   ImageState,
   FullState,
   PotsStoreState
 } from "./types";
+import { loadInitialImages } from "../thunks/loadInitial";
 
 export function getInitialState(): ImageStoreState {
   return {
@@ -337,29 +335,4 @@ function persist(state: ImageStoreState) {
     throw new Error("Cannot persist state before it's loaded");
   }
   StorageWriter.put("@ImageStore", JSON.stringify(state));
-}
-
-export function loadInitialImages(
-  isImport?: boolean
-): ThunkAction<Promise<any>, FullState, undefined, Action> {
-  return async (dispatch: Dispatch) => {
-    console.log("Loading ImageStore");
-    const json = await AsyncStorage.getItem("@ImageStore");
-
-    if (!json) {
-      console.log("There was no ImageStore to load.");
-      return dispatch({
-        type: "image-state-loaded",
-        images: {},
-        isImport: !!isImport
-      });
-    }
-    // Don't catch this because we would rather throw to see wtf happened here
-    const parsed = JSON.parse(json);
-    return dispatch({
-      type: "image-state-loaded",
-      images: parsed.images || {}, // is || {} a horrible idea?
-      isImport: !!isImport
-    });
-  };
 }

@@ -1,13 +1,11 @@
-import { AsyncStorage } from "react-native";
 import { Action } from "../action";
 import Notes from "../models/Notes";
-import { IntermediatePot, Pot } from "../models/Pot";
+import { Pot } from "../models/Pot";
 import Status from "../models/Status";
-import { nameFromUri } from "../utils/imageutils";
 import { StorageWriter } from "../utils/sync";
 import store from "./store";
-import { Dispatch } from "redux";
 import { PotsStoreState, ImageState } from "./types";
+import { loadInitialPots } from "../thunks/loadInitial";
 
 export function getInitialState(): PotsStoreState {
   return { pots: {}, potIds: [], hasLoaded: false };
@@ -26,6 +24,7 @@ export function reducePots(
         imagesLoaded: state.imagesLoaded
       };
       if (state.imagesLoaded && !action.isImport) {
+        // Can't delete images if this is an import, because the image state may be from before the import
         newState = deleteBrokenImages(newState, { images: state.imagesLoaded });
       }
       return newState;
@@ -168,93 +167,4 @@ function deleteBrokenImages(
     }
   });
   return newState;
-}
-
-export function loadInitialPots(isImport: boolean) {
-  return async (dispatch: Dispatch) => {
-    const potIdsStr = (await AsyncStorage.getItem("@Pots")) || "";
-    let potIds: string[] = [];
-    if (potIdsStr) {
-      try {
-        potIds = JSON.parse(potIdsStr) || [];
-      } catch (error) {
-        console.warn("Pot load failed to parse: " + potIdsStr);
-        console.warn(error);
-      }
-    }
-    const promises = [];
-    for (const potId of potIds) {
-      promises.push(loadPot(dispatch, potId));
-    }
-    const pots = await Promise.all(promises);
-    const potsById: { [uuid: string]: Pot } = {};
-    pots.forEach(p => {
-      if (p) {
-        potsById[p.uuid] = p;
-      }
-    });
-    return dispatch({
-      type: "loaded",
-      pots: potsById,
-      potIds,
-      isImport: !!isImport
-    });
-  };
-}
-
-async function loadPot(dispatch: Dispatch, uuid: string): Promise<Pot | null> {
-  const loadedJson = await AsyncStorage.getItem("@Pot:" + uuid);
-  if (!loadedJson) {
-    return null;
-  }
-
-  let loaded;
-  try {
-    loaded = JSON.parse(loadedJson);
-  } catch (error) {
-    console.log("Pot failed to parse: " + loadedJson);
-    console.warn(error);
-    return null;
-  }
-  // Add all fields, for version compatibility
-  const pot: IntermediatePot = { ...loaded };
-  pot.status =
-    typeof loaded.status === "string"
-      ? new Status(JSON.parse(loaded.status))
-      : new Status(loaded.status);
-
-  pot.notes2 =
-    typeof loaded.notes2 === "string"
-      ? new Notes(JSON.parse(loaded.notes2))
-      : new Notes(loaded.notes2);
-
-  if (loaded.notes !== undefined && typeof loaded.notes !== "string") {
-    delete pot.notes;
-  }
-  if (loaded.images !== undefined && loaded.images2 === undefined) {
-    // migrate - read the old data and convert to the new one, Miles said
-    // it's ok for his old clients to lose the images.
-    console.log("Migrating images 1-2.");
-    pot.images2 = [];
-    for (const image of loaded.images) {
-      pot.images2.push({
-        localUri: image
-      });
-    }
-  }
-  if (pot.images2 !== undefined && pot.images3 === undefined) {
-    console.log("Migrating images 2-3.");
-    dispatch({
-      type: "migrate-from-images2",
-      images2: pot.images2,
-      potId: pot.uuid
-    });
-    pot.images3 = [];
-    for (const image of pot.images2) {
-      pot.images3.push(nameFromUri(image.localUri));
-    }
-  }
-  delete pot.images;
-  delete pot.images2;
-  return pot;
 }

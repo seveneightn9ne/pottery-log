@@ -15,14 +15,8 @@ import {
   getInitialState as getInitialPotsState
 } from "./PotsStore";
 import { reduceUi, getInitialState as getInitialUiState } from "./UIStore";
-import {
-  createStore,
-  applyMiddleware,
-  Middleware,
-  Reducer,
-  Store
-} from "redux";
-import thunk, { ThunkMiddleware, ThunkAction } from "redux-thunk";
+import { createStore, applyMiddleware, Middleware, Reducer } from "redux";
+import thunk, { ThunkMiddleware } from "redux-thunk";
 import { Action } from "../action";
 import { Constants } from "expo";
 import { FullState } from "./types";

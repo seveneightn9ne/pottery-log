@@ -8,8 +8,6 @@ import {
 } from "../utils/exports";
 import { nameFromUri } from "../utils/imageutils";
 import { StorageWriter } from "../utils/sync";
-import { AsyncStorage } from "react-native";
-import { Dispatch } from "redux";
 import store from "./store";
 import {
   ImportState,
@@ -17,9 +15,8 @@ import {
   ImportStatePersisted,
   ImageMapValue
 } from "./types";
-import { ThunkAction } from "redux-thunk";
+import { IMPORT_STORAGE_KEY as STORAGE_KEY } from "../thunks/loadInitial";
 
-const STORAGE_KEY = "@Import";
 export const PARALLEL_IMAGE_IMPORTS = 2; // Down from 3 to prevent OOM
 
 export function getInitialState(): ImportState {
@@ -287,30 +284,4 @@ async function persist(state: ImportStatePersisted) {
     return;
   }
   StorageWriter.put(STORAGE_KEY, JSON.stringify(state));
-}
-
-export function loadInitialImport(): ThunkAction<
-  Promise<any>,
-  {},
-  undefined,
-  Action
-> {
-  return async (dispatch: Dispatch) => {
-    const json = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!json) {
-      return;
-    }
-    let existing: ImportStatePersisted;
-    try {
-      existing = JSON.parse(json);
-    } catch (e) {
-      return;
-    }
-    if (existing.imageMap && Object.keys(existing.imageMap).length > 0) {
-      dispatch({
-        type: "import-resume",
-        data: existing
-      });
-    }
-  };
 }

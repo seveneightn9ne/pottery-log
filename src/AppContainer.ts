@@ -8,10 +8,12 @@ import AppView, {
 import { connect } from "react-redux";
 import { Pot } from "./models/Pot";
 import * as types from "./action";
-import { loadInitialImages } from "./reducers/ImageStore";
+import {
+  loadInitialImages,
+  loadInitialImport,
+  loadInitialPots
+} from "./thunks/loadInitial";
 import { ThunkDispatch } from "redux-thunk";
-import { loadInitialImport } from "./reducers/ImportStore";
-import { loadInitialPots } from "./reducers/PotsStore";
 import { FullState } from "./reducers/types";
 
 const mapStateToProps = (

@@ -14,7 +14,8 @@ describe("ExportStore", () => {
   it("initiate", () => {
     const state = ExportStore.reduceExport(
       { exporting: false },
-      { type: "export-initiate" }
+      { type: "export-initiate" },
+      { images: {} }
     );
     expect(state).toHaveProperty("exporting", true);
     expect(state).toHaveProperty("exportId");

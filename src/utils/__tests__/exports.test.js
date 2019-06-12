@@ -47,12 +47,17 @@ describe("exporting", () => {
     AsyncStorage.multiGet.mockReturnValue(
       Promise.resolve([["@Pots", "{pots}"], ["@ImageStore", "{images}"]])
     );
-    await exports.startExport(12345);
+    const images = { image1: { localUri: "a.png", remoteUri: "b.png" } };
+    await exports.startExport(12345, images);
 
-    expect(uploader.startExport).toHaveBeenCalledWith(12345, {
-      "@Pots": "{pots}",
-      "@ImageStore": "{images}"
-    });
+    expect(uploader.startExport).toHaveBeenCalledWith(
+      12345,
+      {
+        "@Pots": "{pots}",
+        "@ImageStore": "{images}"
+      },
+      images
+    );
   });
 
   it("exportImage file", () => {

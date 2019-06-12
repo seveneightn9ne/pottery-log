@@ -1,10 +1,15 @@
 import { AsyncStorage } from "react-native";
-import * as dispatcher from "../../reducers/store";
 import * as exports from "../../utils/exports";
 import * as ImportStore from "../ImportStore";
+import { StorageWriter } from "../../utils/sync";
 
 jest.mock("../../utils/exports");
-jest.mock("AsyncStorage");
+jest.mock("../../utils/sync", () => ({
+  StorageWriter: {
+    put: jest.fn(),
+    delete: jest.fn()
+  }
+}));
 jest.mock("../../reducers/store", () => ({
   dispatch: jest.fn()
 }));
@@ -13,13 +18,13 @@ jest.useFakeTimers();
 
 function expectPersisted(state) {
   jest.runAllTimers();
-  expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+  expect(StorageWriter.put).toHaveBeenCalledWith(
     "@Import",
     JSON.stringify(state)
   );
 }
 function expectPersistNoImport() {
-  expect(AsyncStorage.deleteItem).toHaveBeenCalledWith("@Import");
+  expect(StorageWriter.delete).toHaveBeenCalledWith("@Import");
 }
 
 describe("ImportStore", () => {
@@ -297,30 +302,6 @@ describe("ImportStore", () => {
     );
     expect(state).toHaveProperty("importing", true);
     expect(exports.startUrlImport).toHaveBeenCalledWith(url);
-  });
-
-  it("resumes", () => {
-    jest.useFakeTimers();
-    expect.assertions(1);
-    const existingState = {
-      importing: true,
-      imagesImported: 0,
-      totalImages: 1,
-      imageMap: { "a.png": { uri: "r/a.png" } }
-    };
-    AsyncStorage.getItem.mockReturnValue(
-      Promise.resolve(JSON.stringify(existingState))
-    );
-    const dispatch = jest.fn();
-    return ImportStore.loadInitialImport()(dispatch).then(() => {
-      expect(dispatch).toHaveBeenCalledWith({
-        type: "import-resume",
-        data: existingState
-      });
-      // Wrong:
-      //expect(exports.importImage).toHaveBeenCalledTimes(1);
-      //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
-    });
   });
 
   it("handles resume initiation", () => {
