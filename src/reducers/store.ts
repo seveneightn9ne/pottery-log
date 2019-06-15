@@ -27,14 +27,8 @@ const logger: Middleware = _ => next => (action: Action) => {
     return next(action);
   }
 
-  if (action.type === "loaded") {
-    console.log("Action: loaded (body omitted)");
-  } else if (action.type === "migrate-from-images2") {
-    console.log(
-      "Action: migrate-from-images2 " +
-        action.images2.length +
-        " images (body omitted)"
-    );
+  if (action.type === "loaded-everything") {
+    console.log("Action: loaded-everything (body omitted)");
   } else {
     console.log("Action:", action.type, action);
   }

@@ -1,13 +1,26 @@
+import { loadInitial } from "../loadInitial";
 import { AsyncStorage } from "react-native";
-import { loadInitialImport } from "../loadInitial";
 
 jest.mock("AsyncStorage");
 
-describe("loadInitialImport", () => {
+function mockAsyncStorage(kvs) {
+  AsyncStorage.getItem.mockReturnValueOnce(
+    Promise.resolve(kvs["@ImageStore"] || null)
+  );
+  AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(Object.keys(kvs)));
+  const potKvs = Object.keys(kvs)
+    .filter(k => k.startsWith("@Pot"))
+    .map(k => [k, kvs[k]]);
+  AsyncStorage.multiGet.mockReturnValue(Promise.resolve(potKvs));
+  AsyncStorage.getItem.mockReturnValueOnce(
+    Promise.resolve(kvs["@Import"] || null)
+  );
+}
+
+describe("loadInitial", () => {
   afterEach(() => jest.clearAllMocks());
 
-  it("resumes", () => {
-    jest.useFakeTimers();
+  it("resumes import", async () => {
     expect.assertions(1);
     const existingState = {
       importing: true,
@@ -15,18 +28,16 @@ describe("loadInitialImport", () => {
       totalImages: 1,
       imageMap: { "a.png": { uri: "r/a.png" } }
     };
-    AsyncStorage.getItem.mockReturnValue(
-      Promise.resolve(JSON.stringify(existingState))
-    );
     const dispatch = jest.fn();
-    return loadInitialImport()(dispatch).then(() => {
-      expect(dispatch).toHaveBeenCalledWith({
-        type: "import-resume",
-        data: existingState
-      });
-      // Wrong:
-      //expect(exports.importImage).toHaveBeenCalledTimes(1);
-      //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
+    mockAsyncStorage({ "@Import": JSON.stringify(existingState) });
+
+    await loadInitial()(dispatch);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "import-resume",
+      data: existingState
     });
+    // Wrong:
+    //expect(exports.importImage).toHaveBeenCalledTimes(1);
+    //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
   });
 });

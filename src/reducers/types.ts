@@ -16,7 +16,7 @@ export interface PotsStoreState {
   potIds: string[];
   pots: { [uuid: string]: Pot };
   hasLoaded: boolean;
-  imagesLoaded?: { [name: string]: ImageState };
+  //imagesLoaded?: { [name: string]: ImageState };
 }
 
 //

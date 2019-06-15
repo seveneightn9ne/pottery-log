@@ -129,34 +129,6 @@ export function reduceImages(
       persist(newState);
       return newState;
     }
-    case "migrate-from-images2": {
-      const newState = { loaded: true, images: { ...state.images } };
-      for (const image of action.images2) {
-        const localUri = image.localUri;
-        const remoteUri = image.remoteUri;
-        const name = utils.nameFromUri(localUri);
-        if (newState.images[name]) {
-          // This image exists for another pot already
-          if (newState.images[name].pots.indexOf(action.potId) === -1) {
-            newState.images[name] = {
-              ...newState.images[name],
-              pots: [...newState.images[name].pots, action.potId]
-            };
-          }
-        } else {
-          // New image
-          newState.images[name] = {
-            name,
-            localUri,
-            remoteUri,
-            pots: [action.potId]
-          };
-        }
-      }
-      // this.persist(newState);
-      console.log("Migrated images (omitted)"); // , newState);
-      return newState;
-    }
     case "loaded": {
       // Pots loaded
       if (action.isImport) {

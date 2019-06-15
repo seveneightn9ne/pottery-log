@@ -16,16 +16,12 @@ export function reducePots(
   action: Action
 ): PotsStoreState {
   switch (action.type) {
-    case "loaded": {
-      let newState: PotsStoreState = {
-        pots: action.pots,
-        potIds: action.potIds,
-        hasLoaded: true,
-        imagesLoaded: state.imagesLoaded
-      };
-      if (state.imagesLoaded && !action.isImport) {
+    case "loaded-everything": {
+      let newState: PotsStoreState = { ...action.pots };
+      if (!action.isImport) {
+        // TODO(jessk) move this to loadInitial thunk
         // Can't delete images if this is an import, because the image state may be from before the import
-        newState = deleteBrokenImages(newState, { images: state.imagesLoaded });
+        newState = deleteBrokenImages(newState, action.images);
       }
       return newState;
     }
@@ -76,7 +72,6 @@ export function reducePots(
       }
       const newState = {
         hasLoaded: true,
-        imagesLoaded: state.imagesLoaded,
         pots: newPots,
         potIds: newPotIds
       };
@@ -111,13 +106,6 @@ export function reducePots(
         1
       );
       return newState;
-    }
-    case "image-state-loaded": {
-      if (state.hasLoaded && !action.isImport) {
-        return deleteBrokenImages(state, { images: action.images });
-      } else {
-        return { ...state, imagesLoaded: action.images };
-      }
     }
     case "reload": {
       setTimeout(() => store.dispatch(loadInitialPots(false /* isImport */)));
