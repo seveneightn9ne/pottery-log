@@ -222,9 +222,8 @@ function migrateFromImages2(
   potId: string
 ): ImageStoreState {
   const newState = { loaded: true, images: { ...state.images } };
-  const localUri = image.localUri;
-  const remoteUri = image.remoteUri;
-  const name = nameFromUri(localUri);
+  const name = nameFromUri(image.localUri);
+
   if (newState.images[name]) {
     // This image exists for another pot already
     if (newState.images[name].pots.indexOf(potId) === -1) {
@@ -236,9 +235,8 @@ function migrateFromImages2(
   } else {
     // New image
     newState.images[name] = {
+      ...image,
       name,
-      localUri,
-      remoteUri,
       pots: [potId]
     };
   }
