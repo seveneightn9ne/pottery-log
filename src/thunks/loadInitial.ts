@@ -11,12 +11,22 @@ import {
   PotsStoreState
 } from "../reducers/types";
 import { Action } from "../action";
+import _ from "lodash";
+import * as imageutils from "../utils/imageutils";
 
 type PLThunkAction = ThunkAction<Promise<any>, FullState, undefined, Action>;
 type PLThunkDispatch = ThunkDispatch<FullState, undefined, Action>;
 
 export function reloadFromImport(): PLThunkAction {
-  return load(true);
+  return async (dispatch: PLThunkDispatch) => {
+    dispatch({
+      type: "initial-pots-images"
+    });
+    await load(true);
+    dispatch({
+      type: "imported-metadata"
+    });
+  };
 }
 
 export function loadInitial(): PLThunkAction {
@@ -27,10 +37,13 @@ function load(isImport: boolean): PLThunkAction {
   return async (dispatch: PLThunkDispatch) => {
     //console.log("starting load");
     let images = await loadInitialImages();
-    const { pots, images2 } = await loadInitialPots(isImport);
+    let { pots, images2 } = await loadInitialPots(isImport);
     images2.forEach(([image, potId]) => {
       images = migrateFromImages2(images, image, potId);
     });
+    const fixed = _fixPotsAndImages(pots, images);
+    pots = fixed.pots;
+    images = fixed.images;
     const importt = isImport ? null : await loadInitialImport();
     //console.log("will dispatch loaded-everything");
     dispatch({
@@ -39,6 +52,16 @@ function load(isImport: boolean): PLThunkAction {
       images,
       isImport
     });
+    console.log("loaded everything");
+
+    // Save remote/local URIs
+    // we probably don't care about the result of promise, since it's opportunistic
+    // so I don't think we have to wait for it to continue
+    // especially since we don't want to delay offering to resume the import
+    // btw, it had to be after we dispatch "loaded-everything"
+    // so that the image store won't ignore saves to files
+    const promise = saveImagesToFiles(images);
+
     //console.log("will check importt");
     if (importt) {
       //console.log("will dispatch import-resume");
@@ -242,4 +265,102 @@ function migrateFromImages2(
   }
 
   return newState;
+}
+
+// exported for testing
+export function _fixPotsAndImages(
+  pots: PotsStoreState,
+  images: ImageStoreState
+): { pots: PotsStoreState; images: ImageStoreState } {
+  // Delete images with no URIs
+  images = deleteImagesWithNoUri(images);
+
+  // Make images refer to the pots they're used by
+  // Delete images that aren't referenced by any pots
+  // Including delete file/remote
+  images = fixImagesPotListsAndDeleteUnused(images, pots);
+
+  // Remove pot references to images that don't exist
+  pots = removeBrokenImageRefs(pots, images);
+
+  return { pots, images };
+}
+
+function deleteImagesWithNoUri(images: ImageStoreState): ImageStoreState {
+  const toDelete: string[] = [];
+  _.forOwn(images.images, image => {
+    if (!image.remoteUri && !image.fileUri && !image.localUri) {
+      toDelete.push(image.name);
+    }
+  });
+  const newImages = { ...images, images: { ...images.images } };
+  toDelete.forEach(imageName => delete newImages.images[imageName]);
+  return newImages;
+}
+
+function fixImagesPotListsAndDeleteUnused(
+  images: ImageStoreState,
+  pots: PotsStoreState
+): ImageStoreState {
+  const newState = { ...images, images: { ...images.images } };
+  _.forOwn(images.images, image => {
+    const newImage = { ...image };
+    newImage.pots = potsUsingImage(image.name, pots);
+    if (newImage.pots.length === 0) {
+      // No pots are using the image
+      imageutils.deleteUnusedImage(newImage);
+      delete newState.images[image.name];
+    } else {
+      newState.images[image.name] = newImage;
+    }
+  });
+  return newState;
+}
+
+function saveImagesToFiles(images: ImageStoreState) {
+  const promises: Array<Promise<void>> = [];
+  _.forOwn(images.images, image => {
+    if (image.fileUri) {
+      return;
+    }
+    if (image.remoteUri) {
+      promises.push(
+        imageutils.saveToFile(image.remoteUri, true /* isRemote */)
+      );
+      return;
+    }
+    if (image.localUri) {
+      promises.push(imageutils.saveToFile(image.localUri));
+      return;
+    }
+  });
+  return Promise.all(promises);
+}
+
+function removeBrokenImageRefs(
+  pots: PotsStoreState,
+  images: ImageStoreState
+): PotsStoreState {
+  const newPots = { ...pots, pots: { ...pots.pots } };
+  _.forOwn(pots.pots, pot => {
+    const newImages3 = [...pot.images3];
+    _.remove(newImages3, img => !images.images[img]);
+    newPots.pots[pot.uuid] = { ...pots.pots[pot.uuid], images3: newImages3 };
+  });
+  return newPots;
+}
+
+function potsUsingImage(image: string, potState: PotsStoreState): string[] {
+  if (!potState.hasLoaded) {
+    throw new Error("Cannot call potsUsingImage before pot store loaded");
+  }
+  const potsUsingImage: string[] = [];
+  _.values(potState.pots).map(pot => {
+    pot.images3.forEach((img: string) => {
+      if (img === image) {
+        potsUsingImage.push(pot.uuid);
+      }
+    });
+  });
+  return potsUsingImage;
 }

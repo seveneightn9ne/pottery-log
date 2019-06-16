@@ -1,8 +1,21 @@
-import { loadInitial } from "../loadInitial";
+import { loadInitial, _fixPotsAndImages } from "../loadInitial";
 import { AsyncStorage } from "react-native";
 import { newPot } from "../../models/Pot";
+import { FileSystem } from "expo";
+import * as imageutils from "../../utils/imageutils";
 
 jest.mock("AsyncStorage");
+jest.mock("expo", () => ({
+  FileSystem: {
+    documentDirectory: "file://mock-document-directory/",
+    makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
+    copyAsync: jest.fn().mockReturnValue(Promise.resolve()),
+    deleteAsync: jest.fn().mockReturnValue(Promise.resolve())
+  },
+  Constants: {
+    appOwnership: "expo"
+  }
+}));
 
 const emptyPotState = {
   potIds: [],
@@ -27,6 +40,19 @@ function mockAsyncStorage(kvs) {
   AsyncStorage.getItem.mockReturnValueOnce(
     Promise.resolve(kvs["@Import"] || null)
   );
+}
+
+function somePots() {
+  const p1 = newPot();
+  const p2 = newPot();
+  return {
+    hasLoaded: true,
+    potIds: [p1.uuid, p2.uuid],
+    pots: {
+      [p1.uuid]: p1,
+      [p2.uuid]: p2
+    }
+  };
 }
 
 describe("loadInitial", () => {
@@ -64,18 +90,18 @@ describe("loadInitial", () => {
     pot1.title = "the first pot is the best pot";
     const pot2 = newPot();
     mockAsyncStorage({
-      "@Pots": JSON.stringify(["1", "2"]),
-      "@Pot:1": JSON.stringify(pot1),
-      "@Pot:2": JSON.stringify(pot2)
+      "@Pots": JSON.stringify([pot1.uuid, pot2.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2)
     });
     await loadInitial()(dispatch);
     expect(dispatch).toHaveBeenCalledWith({
       type: "loaded-everything",
       pots: {
-        potIds: ["1", "2"],
+        potIds: [pot1.uuid, pot2.uuid],
         pots: {
-          "1": pot1,
-          "2": pot2
+          [pot1.uuid]: pot1,
+          [pot2.uuid]: pot2
         },
         hasLoaded: true
       },
@@ -101,19 +127,19 @@ describe("loadInitial", () => {
       loaded: true
     };
     mockAsyncStorage({
-      "@Pots": JSON.stringify(["1", "2"]),
-      "@Pot:1": JSON.stringify(pot1),
-      "@Pot:2": JSON.stringify(pot2),
+      "@Pots": JSON.stringify([pot1.uuid, pot2.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2),
       "@ImageStore": JSON.stringify(imageStore)
     });
     await loadInitial()(dispatch);
     expect(dispatch).toHaveBeenCalledWith({
       type: "loaded-everything",
       pots: {
-        potIds: ["1", "2"],
+        potIds: [pot1.uuid, pot2.uuid],
         pots: {
-          "1": pot1,
-          "2": pot2
+          [pot1.uuid]: pot1,
+          [pot2.uuid]: pot2
         },
         hasLoaded: true
       },
@@ -130,9 +156,9 @@ describe("loadInitial", () => {
     pot1.images = ["l/img.jpg"];
     const pot2 = newPot();
     mockAsyncStorage({
-      "@Pots": JSON.stringify(["1", "2"]),
-      "@Pot:1": JSON.stringify(pot1),
-      "@Pot:2": JSON.stringify(pot2)
+      "@Pots": JSON.stringify([pot1.uuid, pot2.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2)
     });
     delete pot1.images;
     pot1.images3 = ["img.jpg"];
@@ -140,10 +166,10 @@ describe("loadInitial", () => {
     expect(dispatch).toHaveBeenCalledWith({
       type: "loaded-everything",
       pots: {
-        potIds: ["1", "2"],
+        potIds: [pot1.uuid, pot2.uuid],
         pots: {
-          "1": pot1,
-          "2": pot2
+          [pot1.uuid]: pot1,
+          [pot2.uuid]: pot2
         },
         hasLoaded: true
       },
@@ -159,6 +185,7 @@ describe("loadInitial", () => {
       },
       isImport: false
     });
+    expect(FileSystem.makeDirectoryAsync).toHaveBeenCalled();
   });
 
   it("loads pot with images2 that was already migrated", async () => {
@@ -179,9 +206,9 @@ describe("loadInitial", () => {
       loaded: true
     };
     mockAsyncStorage({
-      "@Pots": JSON.stringify(["1", "2"]),
-      "@Pot:1": JSON.stringify(pot1),
-      "@Pot:2": JSON.stringify(pot2),
+      "@Pots": JSON.stringify([pot1.uuid, pot2.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2),
       "@ImageState": JSON.stringify(imageState)
     });
     delete pot1.images;
@@ -190,10 +217,10 @@ describe("loadInitial", () => {
     expect(dispatch).toHaveBeenCalledWith({
       type: "loaded-everything",
       pots: {
-        potIds: ["1", "2"],
+        potIds: [pot1.uuid, pot2.uuid],
         pots: {
-          "1": pot1,
-          "2": pot2
+          [pot1.uuid]: pot1,
+          [pot2.uuid]: pot2
         },
         hasLoaded: true
       },
@@ -222,4 +249,149 @@ describe("loadInitial", () => {
     //expect(exports.importImage).toHaveBeenCalledTimes(1);
     //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
   });
+
+  it("fixes pots and images", () => {
+    const l = require("../loadInitial");
+    l._fixPotsAndImages = jest.fn();
+    const dispatch = jest.fn();
+
+    const pot1 = newPot();
+    pot1.title = "the first pot is the best pot";
+    const pot2 = newPot();
+    mockAsyncStorage({
+      "@Pots": JSON.stringify([pot1.uuid, pot2.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2)
+    });
+
+    loadInitial()(dispatch).then(() => {
+      expect(l._fixPotsAndImages).toHaveBeenCalledWith(
+        {
+          potIds: [pot1.uuid, pot2.uuid, "bogus"],
+          pots: {
+            [pot1.uuid]: pot1,
+            [pot2.uuid]: pot2
+          },
+          hasLoaded: true
+        },
+        {
+          loaded: true,
+          images: {}
+        }
+      );
+    });
+  });
+});
+
+describe("_fixPotsAndImages", () => {
+  //jest.mock("../../utils/imageutils");
+
+  it("doesn't touch a good thing", () => {
+    const inPots = somePots();
+    const potWithImageId = inPots.potIds[0];
+    inPots.pots[potWithImageId].images3 = ["a.jpg"];
+    const inImages = {
+      loaded: true,
+      images: {
+        "a.jpg": {
+          name: "a.jpg",
+          fileUri: "f/a.jpg",
+          pots: [potWithImageId]
+        }
+      }
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    expect(pots).toEqual(inPots);
+    expect(images).toEqual(inImages);
+  });
+  it("deletes images with no URI", () => {
+    const inPots = somePots();
+    const potWithImageId = inPots.potIds[0];
+    inPots.pots[potWithImageId].images3 = ["a.jpg"];
+    const inImages = {
+      loaded: true,
+      images: {
+        "a.jpg": {
+          name: "a.jpg"
+        }
+      }
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    expect(pots.pots[potWithImageId].images3.length).toEqual(0);
+    expect(Object.keys(images.images).length).toEqual(0);
+  });
+
+  it("reconstructs pots lists in images", () => {
+    const inPots = somePots();
+    const potWithImageId = inPots.potIds[0];
+    inPots.pots[potWithImageId].images3 = ["a.jpg"];
+    const inImages = {
+      loaded: true,
+      images: {
+        "a.jpg": {
+          name: "a.jpg",
+          fileUri: "f/a.jpg",
+          pots: []
+        }
+      }
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    expect(pots).toEqual(inPots);
+    expect(images.images["a.jpg"].pots.length).toEqual(1);
+    expect(images.images["a.jpg"].pots[0]).toEqual(potWithImageId);
+  });
+
+  it("deletes unused images", () => {
+    const inPots = somePots();
+    const inImages = {
+      loaded: true,
+      images: {
+        "a.jpg": {
+          name: "a.jpg",
+          fileUri: "f/a.jpg",
+          pots: [inPots.potIds[0]]
+        }
+      }
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    expect(pots).toEqual(inPots);
+    expect(images).toEqual({
+      loaded: true,
+      images: {}
+    });
+  });
+
+  it("saves images to files", () => {
+    // jest.mock("../../utils/imageutils", () => ({
+    //   saveToFile: jest.fn().mockReturnValue(Promise.resolve())
+    // }));
+    //const spy = jest.spyOn(imageutils, "saveToFile");
+    jest.mock("../../utils/imageutils");
+    expect(jest.isMockFunction(imageutils.saveToFile)).toBeTruthy();
+    const inPots = somePots();
+    const potWithImageId = inPots.potIds[0];
+    inPots.pots[potWithImageId].images3 = ["a.jpg", "b.jpg"];
+    const inImages = {
+      loaded: true,
+      images: {
+        "a.jpg": {
+          name: "a.jpg",
+          remoteUri: "r/a.jpg",
+          pots: [potWithImageId]
+        },
+        "b.jpg": {
+          name: "b.jpg",
+          localUri: "l/b.jpg",
+          pots: [potWithImageId]
+        }
+      }
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    expect(pots).toEqual(inPots);
+    expect(images).toEqual(inImages);
+    expect(spy).toHaveBeenCalledWith("r/a.jpg", true);
+    expect(spy).toHaveBeenCalledWith("l/b.jpg");
+  });
+
+  it("removes missing images from pots", () => {});
 });

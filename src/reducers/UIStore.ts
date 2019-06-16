@@ -120,8 +120,6 @@ export function reduceUi(
     }
     case "import-resume-cancel":
       return { page: "list", list: { ...state.list } };
-    case "reload":
-      return getInitialState();
 
     default:
       return state;

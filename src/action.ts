@@ -148,7 +148,7 @@ interface PotCopy {
 // }
 
 interface Reload {
-  type: "reload";
+  type: "initial-pots-images";
 }
 
 interface ImportedMetadata {

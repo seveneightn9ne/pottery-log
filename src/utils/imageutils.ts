@@ -1,6 +1,8 @@
 import { FileSystem } from "expo";
 import _ from "lodash";
 import store from "../reducers/store";
+import { ImageState } from "../reducers/types";
+import * as uploader from "./uploader";
 
 /**
  * Errors are always caught. Dispatches 'image-file-created' or 'image-file-failed'.
@@ -58,4 +60,23 @@ export function deleteFile(uri: string) {
 export function nameFromUri(uri: string): string {
   const uriParts = uri.split("/");
   return uriParts[uriParts.length - 1];
+}
+
+export async function deleteUnusedImage(image: ImageState) {
+  if (image.remoteUri) {
+    try {
+      await uploader.remove(image.remoteUri);
+    } catch (e) {
+      console.warn("Failed to remove remote uri:", image.remoteUri);
+      console.warn(e);
+    }
+  }
+  if (image.fileUri) {
+    try {
+      await deleteFile(image.fileUri);
+    } catch (e) {
+      console.warn("Failed to delete unused image:", image.fileUri);
+      console.warn(e);
+    }
+  }
 }

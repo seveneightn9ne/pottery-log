@@ -1,7 +1,5 @@
 import { Action } from "../action";
-import Notes from "../models/Notes";
 import { Pot, newPot } from "../models/Pot";
-import Status from "../models/Status";
 import { StorageWriter } from "../utils/sync";
 import store from "./store";
 import { PotsStoreState, ImageState } from "./types";
@@ -16,13 +14,7 @@ export function reducePots(
 ): PotsStoreState {
   switch (action.type) {
     case "loaded-everything": {
-      let newState: PotsStoreState = { ...action.pots };
-      if (!action.isImport) {
-        // TODO(jessk) move this to loadInitial thunk
-        // Can't delete images if this is an import, because the image state may be from before the import
-        newState = deleteBrokenImages(newState, action.images);
-      }
-      return newState;
+      return action.pots;
     }
     case "new": {
       // dispatcher.waitFor(['loaded']);
@@ -100,12 +92,7 @@ export function reducePots(
       );
       return newState;
     }
-    case "reload": {
-      setTimeout(() => store.dispatch(loadInitialPots(false /* isImport */)));
-      return getInitialState();
-    }
-    case "imported-metadata": {
-      setTimeout(() => store.dispatch(loadInitialPots(true /* isImport */)));
+    case "initial-pots-images": {
       return getInitialState();
     }
     default:
@@ -118,34 +105,4 @@ function persist(state: PotsStoreState, pot?: Pot) {
     StorageWriter.put("@Pot:" + pot.uuid, JSON.stringify(pot));
   }
   StorageWriter.put("@Pots", JSON.stringify(state.potIds));
-}
-
-function deleteBrokenImages(
-  state: PotsStoreState,
-  imageState: { images: { [name: string]: ImageState } }
-): PotsStoreState {
-  // Modify the PotsStoreState to not refer to any images that are nonexistent or broken.
-  const newState = { ...state };
-  newState.pots = {};
-  state.potIds.forEach(potId => {
-    const pot = { ...state.pots[potId] };
-    const newImages3 = pot.images3.filter((imageName: string) => {
-      const image = imageState.images[imageName];
-      if (!image) {
-        console.log("Forgetting a gone image");
-        return false;
-      }
-      if (!image.localUri && !image.remoteUri && !image.fileUri) {
-        console.log("Forgetting a broken image");
-        return false;
-      }
-      return true;
-    });
-    newState.pots[potId] = pot;
-    if (newImages3.length !== pot.images3.length) {
-      pot.images3 = newImages3;
-      persist(newState, pot);
-    }
-  });
-  return newState;
 }

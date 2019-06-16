@@ -4,14 +4,7 @@ import { Action } from "../action";
 import * as utils from "../utils/imageutils";
 import { StorageWriter } from "../utils/sync";
 import * as ImageUploader from "../utils/uploader";
-import store from "./store";
-import {
-  ImageStoreState,
-  ImageState,
-  FullState,
-  PotsStoreState
-} from "./types";
-import { loadInitialImages } from "../thunks/loadInitial";
+import { ImageStoreState, ImageState } from "./types";
 
 export function getInitialState(): ImageStoreState {
   return {
@@ -22,32 +15,10 @@ export function getInitialState(): ImageStoreState {
 
 export function reduceImages(
   state: ImageStoreState,
-  action: Action,
-  fullState: FullState
+  action: Action
 ): ImageStoreState {
-  const potsState = fullState.pots;
-  if (action.type == "image-state-loaded") {
-    // PotsStore also listens for this event, to do the corresponding deletions from the pots
-    let newState = { loaded: true, images: { ...action.images } };
-    if (action.isImport) {
-      // Can skip persist if we aren't processing them.
-      return newState;
-    }
-    _.forOwn(newState.images, (image, imageName) => {
-      if (!image.remoteUri && !image.fileUri && !image.localUri) {
-        // the cached image was deleted before we could move it somewhere permanent :'(
-        // If any pots refer to this image then the pot store must handle that
-        delete newState.images[imageName];
-      }
-      newState = deleteImageIfUnused(newState, potsState, imageName);
-      if (!image.fileUri && image.remoteUri) {
-        utils.saveToFile(image.remoteUri, true /* isRemote */);
-      } else if (!image.fileUri && image.localUri) {
-        utils.saveToFile(image.localUri);
-      }
-    });
-    persist(newState);
-    return newState;
+  if (action.type == "loaded-everything") {
+    return action.images;
   }
   if (!state.loaded) {
     // Nothing else can act on an unloaded imagestore
@@ -58,29 +29,23 @@ export function reduceImages(
   }
   switch (action.type) {
     case "image-delete-from-pot": {
-      const im = state.images[action.imageName];
+      const im = { ...state.images[action.imageName] };
+      const newState = {
+        ...state,
+        images: { ...state.images, [action.imageName]: im }
+      };
+
       if (!im) {
         console.log(
           "Deleting " + action.imageName + " from pot but it's nowhere"
         );
         return state;
       }
-      let newState = {
-        loaded: true,
-        images: {
-          ...state.images,
-          [action.imageName]: {
-            ...im,
-            pots: im.pots.filter(p => p !== action.potId)
-          }
-        }
-      };
-      newState = deleteImageIfUnused(
-        newState,
-        potsState,
-        action.imageName,
-        action.potId
-      );
+      im.pots = im.pots.filter(p => p !== action.potId);
+      if (im.pots.length === 0) {
+        utils.deleteUnusedImage(im); // wee oo wee oo
+        delete newState.images[action.imageName];
+      }
       persist(newState);
       return newState;
     }
@@ -95,8 +60,12 @@ export function reduceImages(
           ...oldI,
           pots: oldI.pots.filter(p => p !== action.potId)
         };
-        newState.images[name] = newI;
-        newState = deleteImageIfUnused(newState, potsState, name, action.potId);
+        if (newI.pots.length === 0) {
+          utils.deleteUnusedImage(newI);
+          delete newState.images[name];
+        } else {
+          newState.images[name] = newI;
+        }
       }
       persist(newState);
       return newState;
@@ -129,25 +98,7 @@ export function reduceImages(
       persist(newState);
       return newState;
     }
-    case "loaded": {
-      // Pots loaded
-      if (action.isImport) {
-        return state;
-      }
-      let newState = { loaded: true, images: { ...state.images } };
-      _.forOwn(state.images, (image, imageName) => {
-        const newImage = { ...image };
-        if (newImage.pots === undefined) {
-          newImage.pots = [];
-        }
-        newImage.pots = potsUsingImage(imageName, potsState);
-        newState.images[imageName] = newImage;
-        newState = deleteImageIfUnused(newState, potsState, imageName);
-      });
-      persist(newState);
-      return newState;
-    }
-    case "reload": {
+    case "initial-pots-images": {
       return getInitialState();
     }
     case "image-error-remote": {
@@ -219,10 +170,6 @@ export function reduceImages(
       persist(newState);
       return newState;
     }
-    case "imported-metadata": {
-      setTimeout(() => store.dispatch(loadInitialImages(true /* isImport */)));
-      return getInitialState();
-    }
     default:
       return state;
   }
@@ -241,65 +188,6 @@ export function getImageState(
 }
 
 /* Private Helpers */
-
-// modifies state.
-// exceptForPot is a pot that's being deleted; or a pot from which this image is being explicitly deleted.
-function deleteImageIfUnused(
-  state: ImageStoreState,
-  potsState: PotsStoreState,
-  imageName: string,
-  exceptForPot?: string
-): ImageStoreState {
-  const image = state.images[imageName];
-  if (!image || !image.pots) {
-    return state;
-  }
-  if (!potsState.hasLoaded) {
-    // Do nothing before pot store loaded
-    return state;
-  }
-  if (image.pots.length === 0) {
-    // Note: We have seen a case where the saved state shows that only one pot uses an image,
-    // but 2 pots are using the image. This makes sure we don't delete an image that is still
-    // being used.
-    const pots = potsUsingImage(imageName, potsState).filter(
-      p => p !== exceptForPot
-    ); // double check
-    if (pots.length !== 0) {
-      console.log(
-        "Image was missing a pot, adding it instead of deleting image",
-        imageName
-      );
-      image.pots = pots;
-    } else {
-      // Really no one is using this image
-      console.log("Deleting unused image", imageName);
-      if (image.remoteUri) {
-        ImageUploader.remove(image.remoteUri);
-      }
-      if (image.fileUri) {
-        utils.deleteFile(image.fileUri);
-      }
-      delete state.images[imageName];
-    }
-  }
-  return state;
-}
-
-function potsUsingImage(image: string, potState: PotsStoreState): string[] {
-  if (!potState.hasLoaded) {
-    throw new Error("Cannot call potsUsingImage before pot store loaded");
-  }
-  const potsUsingImage: string[] = [];
-  _.values(potState.pots).map(pot => {
-    pot.images3.forEach((img: string) => {
-      if (img === image) {
-        potsUsingImage.push(pot.uuid);
-      }
-    });
-  });
-  return potsUsingImage;
-}
 
 function persist(state: ImageStoreState) {
   // console.log("Persisting ImageStore");
