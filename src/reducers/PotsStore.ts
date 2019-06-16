@@ -2,7 +2,7 @@ import { Action } from "../action";
 import { Pot, newPot } from "../models/Pot";
 import { StorageWriter } from "../utils/sync";
 import store from "./store";
-import { PotsStoreState, ImageState } from "./types";
+import { PotsStoreState } from "./types";
 
 export function getInitialState(): PotsStoreState {
   return { pots: {}, potIds: [], hasLoaded: false };

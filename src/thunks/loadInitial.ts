@@ -38,12 +38,19 @@ function load(isImport: boolean): PLThunkAction {
     //console.log("starting load");
     let images = await loadInitialImages();
     let { pots, images2 } = await loadInitialPots(isImport);
+    //console.log("pots n images before migrating");
+    //console.log(pots, images);
     images2.forEach(([image, potId]) => {
+      //console.log("migrate an image", image, potId);
       images = migrateFromImages2(images, image, potId);
     });
+    //console.log("pots n images before fixing");
+    //console.log(pots, images);
     const fixed = _fixPotsAndImages(pots, images);
     pots = fixed.pots;
     images = fixed.images;
+    //console.log("pots n images ter fixing");
+    //console.log(pots, images);
     const importt = isImport ? null : await loadInitialImport();
     //console.log("will dispatch loaded-everything");
     dispatch({
@@ -52,7 +59,7 @@ function load(isImport: boolean): PLThunkAction {
       images,
       isImport
     });
-    console.log("loaded everything");
+    //console.log("loaded everything");
 
     // Save remote/local URIs
     // we probably don't care about the result of promise, since it's opportunistic
@@ -60,7 +67,7 @@ function load(isImport: boolean): PLThunkAction {
     // especially since we don't want to delay offering to resume the import
     // btw, it had to be after we dispatch "loaded-everything"
     // so that the image store won't ignore saves to files
-    const promise = saveImagesToFiles(images);
+    const promise = _saveImagesToFiles(images);
 
     //console.log("will check importt");
     if (importt) {
@@ -317,7 +324,7 @@ function fixImagesPotListsAndDeleteUnused(
   return newState;
 }
 
-function saveImagesToFiles(images: ImageStoreState) {
+export function _saveImagesToFiles(images: ImageStoreState) {
   const promises: Array<Promise<void>> = [];
   _.forOwn(images.images, image => {
     if (image.fileUri) {

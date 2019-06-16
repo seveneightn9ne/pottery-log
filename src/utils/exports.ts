@@ -43,7 +43,7 @@ function exportImage(
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri === imageState.remoteUri;
     const promise = uri ? saveToFile(uri, isRemote) : Promise.resolve();
-    console.log("returning promise", promise);
+    // console.log("returning promise", promise);
     return {
       willExport: false,
       promise

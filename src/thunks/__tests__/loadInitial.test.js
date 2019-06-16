@@ -1,4 +1,8 @@
-import { loadInitial, _fixPotsAndImages } from "../loadInitial";
+import {
+  loadInitial,
+  _fixPotsAndImages,
+  _saveImagesToFiles
+} from "../loadInitial";
 import { AsyncStorage } from "react-native";
 import { newPot } from "../../models/Pot";
 import { FileSystem } from "expo";
@@ -15,6 +19,10 @@ jest.mock("expo", () => ({
   Constants: {
     appOwnership: "expo"
   }
+}));
+jest.mock("../../utils/imageutils", () => ({
+  ...jest.requireActual("../../utils/imageutils"),
+  saveToFile: jest.fn().mockReturnValue(Promise.resolve())
 }));
 
 const emptyPotState = {
@@ -185,7 +193,7 @@ describe("loadInitial", () => {
       },
       isImport: false
     });
-    expect(FileSystem.makeDirectoryAsync).toHaveBeenCalled();
+    expect(imageutils.saveToFile).toHaveBeenCalledWith("l/img.jpg");
   });
 
   it("loads pot with images2 that was already migrated", async () => {
@@ -252,7 +260,8 @@ describe("loadInitial", () => {
 
   it("fixes pots and images", () => {
     const l = require("../loadInitial");
-    l._fixPotsAndImages = jest.fn();
+    const spy = jest.spyOn(l, "_fixPotsAndImages");
+    //l._fixPotsAndImages = jest.fn();
     const dispatch = jest.fn();
 
     const pot1 = newPot();
@@ -265,7 +274,7 @@ describe("loadInitial", () => {
     });
 
     loadInitial()(dispatch).then(() => {
-      expect(l._fixPotsAndImages).toHaveBeenCalledWith(
+      expect(spy).toHaveBeenCalledWith(
         {
           potIds: [pot1.uuid, pot2.uuid, "bogus"],
           pots: {
@@ -281,11 +290,22 @@ describe("loadInitial", () => {
       );
     });
   });
+
+  it("saves remote/local images", () => {
+    const l = require("../loadInitial");
+    const spy = jest.spyOn(l, "_saveImagesToFiles");
+    //l._saveImagesToFiles = jest.fn();
+    const dispatch = jest.fn();
+    loadInitial()(dispatch).then(() => {
+      expect(spy).toHaveBeenCalledWith({
+        loaded: true,
+        images: {}
+      });
+    });
+  });
 });
 
 describe("_fixPotsAndImages", () => {
-  //jest.mock("../../utils/imageutils");
-
   it("doesn't touch a good thing", () => {
     const inPots = somePots();
     const potWithImageId = inPots.potIds[0];
@@ -304,6 +324,7 @@ describe("_fixPotsAndImages", () => {
     expect(pots).toEqual(inPots);
     expect(images).toEqual(inImages);
   });
+
   it("deletes images with no URI", () => {
     const inPots = somePots();
     const potWithImageId = inPots.potIds[0];
@@ -361,37 +382,40 @@ describe("_fixPotsAndImages", () => {
     });
   });
 
-  it("saves images to files", () => {
-    // jest.mock("../../utils/imageutils", () => ({
-    //   saveToFile: jest.fn().mockReturnValue(Promise.resolve())
-    // }));
-    //const spy = jest.spyOn(imageutils, "saveToFile");
-    jest.mock("../../utils/imageutils");
-    expect(jest.isMockFunction(imageutils.saveToFile)).toBeTruthy();
+  it("removes missing images from pots", () => {
     const inPots = somePots();
     const potWithImageId = inPots.potIds[0];
-    inPots.pots[potWithImageId].images3 = ["a.jpg", "b.jpg"];
+    inPots.pots[potWithImageId].images3 = ["a.jpg"];
+    const inImages = {
+      loaded: true,
+      images: {}
+    };
+    const { pots, images } = _fixPotsAndImages(inPots, inImages);
+    inPots.pots[potWithImageId].images3 = [];
+    expect(pots).toEqual(inPots);
+    expect(images).toEqual(inImages);
+  });
+});
+
+describe("_saveImagesToFiles", () => {
+  it("saves images to files", async () => {
     const inImages = {
       loaded: true,
       images: {
         "a.jpg": {
           name: "a.jpg",
           remoteUri: "r/a.jpg",
-          pots: [potWithImageId]
+          pots: ["1"]
         },
         "b.jpg": {
           name: "b.jpg",
           localUri: "l/b.jpg",
-          pots: [potWithImageId]
+          pots: ["1"]
         }
       }
     };
-    const { pots, images } = _fixPotsAndImages(inPots, inImages);
-    expect(pots).toEqual(inPots);
-    expect(images).toEqual(inImages);
-    expect(spy).toHaveBeenCalledWith("r/a.jpg", true);
-    expect(spy).toHaveBeenCalledWith("l/b.jpg");
+    await _saveImagesToFiles(inImages);
+    expect(imageutils.saveToFile).toHaveBeenCalledWith("r/a.jpg", true);
+    expect(imageutils.saveToFile).toHaveBeenCalledWith("l/b.jpg");
   });
-
-  it("removes missing images from pots", () => {});
 });
