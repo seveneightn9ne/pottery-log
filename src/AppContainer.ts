@@ -24,7 +24,8 @@ const mapStateToProps = (
   fontLoaded: !!(props && props.fontLoaded)
 });
 
-const mapDispatchToProps = (
+// exported for testing
+export const mapDispatchToProps = (
   dispatch: ThunkDispatch<FullState, never, types.Action>
 ): AppViewDispatchProps => ({
   onNew: () =>
