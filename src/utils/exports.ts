@@ -4,6 +4,7 @@ import { ImageState } from "../reducers/types";
 import { saveToFile } from "./imageutils";
 import * as uploader from "./uploader";
 import store from "../reducers/store";
+import { reloadFromImport } from "../thunks/loadInitial";
 
 const EXPORT_KEY_PREFIX = ["@Pots", "@Pot:", "@ImageStore"];
 
@@ -108,7 +109,7 @@ async function startUrlImport(url: string) {
 /**
  * Dispatches:
  *  'import-cancel' if the user declines the import.
- *  'imported-metadata' after the metadata has been imported.
+ *  reloadFromImport thunk after the metadata has been imported.
  *  'import-failure' if the input is not valid JSON, with the `error`.
  * @param metadata JSON of the keys & values to put in AsyncStorage
  */
@@ -147,7 +148,7 @@ async function importMetadataNow(metadata: string) {
       .filter(keyIsImportable)
       .map(k => [k, kvs[k]]);
     await AsyncStorage.multiSet(kvpairs);
-    store.dispatch({ type: "imported-metadata" });
+    store.dispatch(reloadFromImport());
   } catch (error) {
     setTimeout(() => store.dispatch({ type: "import-failure", error }), 0);
   }

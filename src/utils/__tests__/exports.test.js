@@ -4,6 +4,7 @@ import * as exports from "../exports";
 import * as uploader from "../uploader";
 import * as imageutils from "../imageutils";
 import * as dispatcher from "../../reducers/store";
+import * as loadInitial from "../../thunks/loadInitial";
 
 jest.mock("../uploader", () => ({
   startImport: jest.fn().mockReturnValue(Promise.resolve()),
@@ -33,6 +34,7 @@ jest.mock("expo", () => ({
 jest.mock("Alert", () => ({
   alert: jest.fn()
 }));
+jest.mock("../../thunks/loadInitial");
 //jest.mock("FileSystem", () => ({
 //  getInfoAsync: Promise.resolve({ exists: true })
 //}));
@@ -177,9 +179,7 @@ describe("importing", () => {
     expect(AsyncStorage.removeItem).not.toHaveBeenCalledWith("@DoNotExport");
 
     expect(AsyncStorage.multiSet).toHaveBeenCalledWith([["@Pot:5", '"value"']]);
-    expect(dispatcher.dispatch).toHaveBeenCalledWith({
-      type: "imported-metadata"
-    });
+    expect(loadInitial.reloadFromImport).toHaveBeenCalled();
   });
 
   it("importMetadataNow not parsable", async () => {

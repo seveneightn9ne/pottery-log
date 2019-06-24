@@ -8,11 +8,7 @@ import AppView, {
 import { connect } from "react-redux";
 import { Pot } from "./models/Pot";
 import * as types from "./action";
-import {
-  loadInitialImages,
-  loadInitialImport,
-  loadInitialPots
-} from "./thunks/loadInitial";
+import { loadInitial } from "./thunks/loadInitial";
 import { ThunkDispatch } from "redux-thunk";
 import { FullState } from "./reducers/types";
 
@@ -236,9 +232,7 @@ export const mapDispatchToProps = (
     });
   },
   loadInitial: () => {
-    dispatch(loadInitialImages());
-    dispatch(loadInitialImport());
-    dispatch(loadInitialPots(false));
+    dispatch(loadInitial());
   }
 });
 

@@ -34,7 +34,8 @@ export function getInitialState(): ImportState {
  *     -> upload URL
  *        -> 'import-started'
  * -> confirmation popup
- * -> set metadata
+ * -> save metadata
+ * -> reloadFromImport
  * -> 'imported-metadata'
  * -> saveToFile x3
  *   -> 'image-file-created'
