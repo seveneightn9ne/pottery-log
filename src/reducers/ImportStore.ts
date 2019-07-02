@@ -1,21 +1,21 @@
-import _ from "lodash";
-import { Action } from "../action";
+import _ from 'lodash';
+import { Action } from '../action';
+import { IMPORT_STORAGE_KEY as STORAGE_KEY } from '../thunks/loadInitial';
 import {
   importImage,
   importMetadataNow,
   startImport,
-  startUrlImport
-} from "../utils/exports";
-import { nameFromUri } from "../utils/imageutils";
-import { StorageWriter } from "../utils/sync";
-import store from "./store";
+  startUrlImport,
+} from '../utils/exports';
+import { nameFromUri } from '../utils/imageutils';
+import { StorageWriter } from '../utils/sync';
+import store from './store';
 import {
-  ImportState,
   ImageMapState,
+  ImageMapValue,
+  ImportState,
   ImportStatePersisted,
-  ImageMapValue
-} from "./types";
-import { IMPORT_STORAGE_KEY as STORAGE_KEY } from "../thunks/loadInitial";
+} from './types';
 
 export const PARALLEL_IMAGE_IMPORTS = 2; // Down from 3 to prevent OOM
 
@@ -47,31 +47,31 @@ export function getInitialState(): ImportState {
 
 export function reduceImport(
   state: ImportState = getInitialState(),
-  action: Action
+  action: Action,
 ): ImportState {
   // Actions when we might not be importing already
   switch (action.type) {
-    case "import-initiate": {
+    case 'import-initiate': {
       startImport();
       return {
         importing: true,
-        statusMessage: "Starting import..."
+        statusMessage: 'Starting import...',
       };
     }
-    case "import-initiate-url": {
+    case 'import-initiate-url': {
       startUrlImport(action.url);
       return {
         importing: true,
-        statusMessage: "Starting import..."
+        statusMessage: 'Starting import...',
       };
     }
-    case "import-resume": {
+    case 'import-resume': {
       return {
         importing: false,
-        resumable: action.data
+        resumable: action.data,
       };
     }
-    case "import-resume-affirm": {
+    case 'import-resume-affirm': {
       if (!state.resumable) {
         return state;
       }
@@ -79,9 +79,9 @@ export function reduceImport(
       persist(newState);
       return newState;
     }
-    case "import-resume-cancel": {
+    case 'import-resume-cancel': {
       const newState = {
-        importing: false
+        importing: false,
       };
       persist(newState);
       return newState;
@@ -92,7 +92,7 @@ export function reduceImport(
   }
   // Actions that require importing
   switch (action.type) {
-    case "import-started": {
+    case 'import-started': {
       importMetadataNow(action.metadata);
       const imageMap: ImageMapState = {};
       _.forOwn(action.imageMap, (uri, name) => {
@@ -102,7 +102,7 @@ export function reduceImport(
       const newState = {
         ...state,
         imageMap,
-        statusMessage: "Importing pots..."
+        statusMessage: 'Importing pots...',
       };
       persist(newState);
       return newState;
@@ -113,7 +113,7 @@ export function reduceImport(
             }
             return state;
         }*/
-    case "imported-metadata": {
+    case 'imported-metadata': {
       let numImages = 0;
       let started = 0;
       const imageMap: ImageMapState = { ...state.imageMap };
@@ -123,7 +123,7 @@ export function reduceImport(
           importImage(data.uri);
           imageMap[name] = {
             uri: data.uri,
-            started: true
+            started: true,
           };
           started += 1;
         }
@@ -131,25 +131,25 @@ export function reduceImport(
       });
       if (numImages === 0) {
         // Done already!
-        setTimeout(() => store.dispatch({ type: "page-list" }), 0);
+        setTimeout(() => store.dispatch({ type: 'page-list' }), 0);
         const newState = {
-          importing: false
+          importing: false,
         };
         persist(newState);
         return newState;
       }
-      console.log("Scheduled " + numImages + " for import");
+      console.log('Scheduled ' + numImages + ' for import');
       const newState = {
         ...state,
         imageMap,
         totalImages: numImages,
         imagesImported: 0,
-        statusMessage: `Importing images (0/${numImages})...`
+        statusMessage: `Importing images (0/${numImages})...`,
       };
       persist(newState);
       return newState;
     }
-    case "image-file-created": {
+    case 'image-file-created': {
       if (!state.imageMap || state.imagesImported === undefined) {
         // Not even started importing images yet
         return state;
@@ -162,11 +162,11 @@ export function reduceImport(
       const newState = { ...state, imageMap: { ...state.imageMap } };
       delete newState.imageMap[action.name];
       if (Object.keys(newState.imageMap).length === 0) {
-        console.log("Import finished!");
+        console.log('Import finished!');
         // Import finished!
-        setTimeout(() => store.dispatch({ type: "page-list" }), 0);
+        setTimeout(() => store.dispatch({ type: 'page-list' }), 0);
         const newState = {
-          importing: false
+          importing: false,
         };
         persist(newState);
         return newState;
@@ -180,7 +180,7 @@ export function reduceImport(
         }
       });
       if (!hasStartedOne) {
-        console.log("All the images have been scheduled.", newState.imageMap);
+        console.log('All the images have been scheduled.', newState.imageMap);
       }
       newState.imagesImported = (state.imagesImported || 0) + 1;
       newState.statusMessage = `Importing images (${newState.imagesImported}/${
@@ -190,40 +190,40 @@ export function reduceImport(
       persist(newState);
       return newState;
     }
-    case "image-file-failed": {
+    case 'image-file-failed': {
       if (!state.imageMap) {
         return state;
       }
       const name = nameFromUri(action.uri);
       if (state.imageMap[name]) {
-        console.log("RETRYING IMAGE " + name);
+        console.log('RETRYING IMAGE ' + name);
         importImage(action.uri);
       }
       return state;
     }
-    case "image-timeout": {
+    case 'image-timeout': {
       if (!state.imageMap) {
         return state;
       }
       const name = nameFromUri(action.uri);
       if (name in state.imageMap) {
         // It must be restarted.
-        console.log("Timed out on " + name + ", restarting.");
+        console.log('Timed out on ' + name + ', restarting.');
         importImage(action.uri);
       }
       return state;
     }
-    case "import-cancel": {
+    case 'import-cancel': {
       const newState = {
-        importing: false
+        importing: false,
       };
       persist(newState);
       return newState;
     }
-    case "import-failure": {
+    case 'import-failure': {
       const newState = {
         importing: false,
-        statusMessage: "Import failed.\n" + action.error
+        statusMessage: 'Import failed.\n' + action.error,
       };
       persist(newState);
       return newState;
@@ -245,7 +245,7 @@ export function reduceImport(
 
 /* initiate any actions to put the import back in progress, returns new state */
 function resume(state: ImportStatePersisted): ImportState {
-  if (!("imageMap" in state)) {
+  if (!('imageMap' in state)) {
     return state;
   }
   const newState: ImportState = { ...state, imageMap: { ...state.imageMap } };

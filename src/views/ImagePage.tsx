@@ -1,10 +1,10 @@
-import React from "react";
-import ElevatedView from "react-native-elevated-view";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
-import { Pot } from "../models/Pot";
-import styles from "../style";
-import Image3 from "./components/Image3";
-import { ImageState } from "../reducers/types";
+import React from 'react';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
+import { Pot } from '../models/Pot';
+import { ImageState } from '../reducers/types';
+import styles from '../style';
+import Image3 from './components/Image3';
 
 interface ImagePageProps {
   image: ImageState;
@@ -16,15 +16,15 @@ interface ImagePageProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
 export default class ImagePage extends React.Component<ImagePageProps> {
   public render() {
-    const { width } = Dimensions.get("window");
+    const { width } = Dimensions.get('window');
     const isMainImage = this.props.pot.images3[0] === this.props.image.name;
-    const star = isMainImage ? "star" : "star_border";
+    const star = isMainImage ? 'star' : 'star_border';
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.onBack}>
         <Text style={styles.searchBack}>close</Text>
@@ -46,9 +46,9 @@ export default class ImagePage extends React.Component<ImagePageProps> {
           {backButton}
           <View
             style={{
-              flexDirection: "row",
+              flexDirection: 'row',
               flex: 1,
-              justifyContent: "flex-end"
+              justifyContent: 'flex-end',
             }}
           >
             {starButton}
@@ -68,9 +68,9 @@ export default class ImagePage extends React.Component<ImagePageProps> {
 
   private onSetMainImage = () => {
     this.props.onSetMainImage(this.props.pot, this.props.image.name);
-  };
+  }
 
   private onDeleteImage = () => {
     this.props.onDeleteImage(this.props.pot, this.props.image.name);
-  };
+  }
 }

@@ -1,4 +1,4 @@
-import { AsyncStorage } from "react-native";
+import { AsyncStorage } from 'react-native';
 
 // Coprocessor for decoupling and serializing async functions.
 // Executes f on each queued item.
@@ -43,41 +43,41 @@ export class Sync<A> {
 
 type SWAction = Put | Delete;
 interface Put {
-  type: "put";
+  type: 'put';
   key: string;
   value: string;
 }
 interface Delete {
-  type: "delete";
+  type: 'delete';
   key: string;
 }
 
 // tslint:disable-next-line:max-classes-per-file
 class CStorageWriter extends Sync<SWAction> {
   constructor() {
-    super(async action => {
+    super(async (action) => {
       switch (action.type) {
-        case "put":
+        case 'put':
           // console.log("AsyncStorage set " + action.key + "...");
           await AsyncStorage.setItem(action.key, action.value);
           // console.log("AsyncStorage set done.");
           return;
-        case "delete":
+        case 'delete':
           await AsyncStorage.removeItem(action.key);
           return;
         default:
-          console.log("StorageWriter received unknown action ", action);
+          console.log('StorageWriter received unknown action ', action);
           return;
       }
     });
   }
 
   public put(key: string, value: string) {
-    this.push({ type: "put", key, value });
+    this.push({ type: 'put', key, value });
   }
 
   public delete(key: string) {
-    this.push({ type: "delete", key });
+    this.push({ type: 'delete', key });
   }
 }
 

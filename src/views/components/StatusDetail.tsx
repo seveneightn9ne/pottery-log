@@ -1,5 +1,11 @@
 import React from 'react';
-import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import {
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Status, { StatusString } from '../../models/Status';
 import styles from '../../style';
 import Note from './Note';
@@ -15,7 +21,10 @@ interface StatusDetailProps {
   onChangeNote: (status: StatusString, newNote: string) => void;
 }
 
-export default class StatusDetail extends React.Component<StatusDetailProps, {}> {
+export default class StatusDetail extends React.Component<
+  StatusDetailProps,
+  {}
+> {
   public modal: React.RefObject<NoteModal>;
   constructor(props: StatusDetailProps) {
     super(props);
@@ -23,49 +32,64 @@ export default class StatusDetail extends React.Component<StatusDetailProps, {}>
   }
   public render() {
     const noteComponent = (
-    <Note
-      fontLoaded={this.props.fontLoaded}
-      textStyle={styles.statusDetailNote as TextStyle}
-      note={this.props.note}
-      status={this.props.status}
-      onChangeNote={this.props.onChangeNote}
-      showNote={true}
-      showAddNote={false}
-    />);
+      <Note
+        fontLoaded={this.props.fontLoaded}
+        textStyle={styles.statusDetailNote as TextStyle}
+        note={this.props.note}
+        status={this.props.status}
+        onChangeNote={this.props.onChangeNote}
+        showNote={true}
+        showAddNote={false}
+      />
+    );
     const editButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.openModal}>
         <Text style={[styles.search, styles.editDetail]}>
           {this.props.note ? 'mode_edit' : 'note_add'}
         </Text>
       </TouchableOpacity>
-      ) : null;
+    ) : null;
     const noteModal = (
       <NoteModal
         note={this.props.note}
         status={this.props.status}
         ref={this.modal}
         onChangeNote={this.props.onChangeNote}
-      />);
+      />
+    );
     const timelineStyles: ViewStyle[] = [styles.timeline as ViewStyle];
-    if (this.props.first) { timelineStyles.push(styles.timelineFirst as ViewStyle); }
-    if (this.props.last) { timelineStyles.push(styles.timelineLast as ViewStyle); }
-    if (!this.props.first && this.props.last) { timelineStyles.push(styles.timelineLastOnly as ViewStyle); }
-    if (this.props.first && this.props.last) { timelineStyles.push(styles.timelineOnly as ViewStyle); }
+    if (this.props.first) {
+      timelineStyles.push(styles.timelineFirst as ViewStyle);
+    }
+    if (this.props.last) {
+      timelineStyles.push(styles.timelineLast as ViewStyle);
+    }
+    if (!this.props.first && this.props.last) {
+      timelineStyles.push(styles.timelineLastOnly as ViewStyle);
+    }
+    if (this.props.first && this.props.last) {
+      timelineStyles.push(styles.timelineOnly as ViewStyle);
+    }
     return (
-    <View style={[styles.statusDetail, {flexDirection: 'row'}]}>
-      {noteModal}
-      <View style={timelineStyles}>
-        <View style={styles.timelineInner} />
-      </View>
-      <View style={styles.statusDetailInner}>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={styles.status}>{Status.prettify(this.props.status)}</Text>
-          <Text style={styles.statusDetailDate}>{Status.dateText(this.props.date)}</Text>
+      <View style={[styles.statusDetail, { flexDirection: 'row' }]}>
+        {noteModal}
+        <View style={timelineStyles}>
+          <View style={styles.timelineInner} />
         </View>
-        {this.props.note ? noteComponent : null}
+        <View style={styles.statusDetailInner}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={styles.status}>
+              {Status.prettify(this.props.status)}
+            </Text>
+            <Text style={styles.statusDetailDate}>
+              {Status.dateText(this.props.date)}
+            </Text>
+          </View>
+          {this.props.note ? noteComponent : null}
+        </View>
+        {editButton}
       </View>
-      {editButton}
-    </View>);
+    );
   }
 
   private openModal = () => {

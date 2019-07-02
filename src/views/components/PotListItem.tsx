@@ -1,9 +1,9 @@
-import React from "react";
-import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
-import { Pot } from "../../models/Pot";
-import styles from "../../style";
-import Image3 from "./Image3";
-import { ImageState } from "../../reducers/types";
+import React from 'react';
+import { Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Pot } from '../../models/Pot';
+import { ImageState } from '../../reducers/types';
+import styles from '../../style';
+import Image3 from './Image3';
 
 interface PotListItemProps {
   pot: Pot;
@@ -13,19 +13,19 @@ interface PotListItemProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
 export default function(props: PotListItemProps) {
-  const { width } = Dimensions.get("window");
+  const { width } = Dimensions.get('window');
   const size = { width: width / 2 - 6, height: width / 2 - 6 };
   const img = props.image ? (
     <Image3 style={size} key={Image3.key(props.image)} {...props} />
   ) : (
     <View style={[styles.liImagePlaceholder, size]}>
       <Image
-        source={require("../../../assets/coffee.png")}
+        source={require('../../../assets/coffee.png')}
         style={{ width: 48, height: 48 }}
       />
     </View>

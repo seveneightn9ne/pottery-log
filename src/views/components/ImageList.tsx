@@ -1,9 +1,9 @@
-import React from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
-import Image3 from "./Image3";
-import ImagePicker from "./ImagePicker";
-import { getImageState } from "../../reducers/ImageStore";
-import { ImageStoreState } from "../../reducers/types";
+import React from 'react';
+import { ScrollView, TouchableOpacity } from 'react-native';
+import { getImageState } from '../../reducers/ImageStore';
+import { ImageStoreState } from '../../reducers/types';
+import Image3 from './Image3';
+import ImagePicker from './ImagePicker';
 
 interface ImageListProps {
   images: string[];
@@ -15,12 +15,12 @@ interface ImageListProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
 export default function ImageList(props: ImageListProps) {
-  const images = props.images.map(name => {
+  const images = props.images.map((name) => {
     const imageState = getImageState(props.imageState, name);
     return (
       <TouchableOpacity
@@ -45,7 +45,7 @@ export default function ImageList(props: ImageListProps) {
         onPicked={props.onAddImage}
         style={{
           height: props.size,
-          width: images.length ? 100 - 4 * 3 : props.size + 100 - 4 * 2
+          width: images.length ? 100 - 4 * 3 : props.size + 100 - 4 * 2,
         }}
         full={images.length === 0}
       />

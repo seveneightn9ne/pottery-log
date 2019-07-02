@@ -1,12 +1,12 @@
-import { DocumentPicker, FileSystem } from "expo";
-import { AsyncStorage, Alert } from "react-native";
-import { ImageState } from "../reducers/types";
-import { saveToFile } from "./imageutils";
-import * as uploader from "./uploader";
-import store from "../reducers/store";
-import { reloadFromImport } from "../thunks/loadInitial";
+import { DocumentPicker, FileSystem } from 'expo';
+import { Alert, AsyncStorage } from 'react-native';
+import store from '../reducers/store';
+import { ImageState } from '../reducers/types';
+import { reloadFromImport } from '../thunks/loadInitial';
+import { saveToFile } from './imageutils';
+import * as uploader from './uploader';
 
-const EXPORT_KEY_PREFIX = ["@Pots", "@Pot:", "@ImageStore"];
+const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
 
 const keyIsExportable = (key: string) => {
   for (let i = 0; i < EXPORT_KEY_PREFIX.length; i++) {
@@ -22,7 +22,7 @@ async function getExportMetadata() {
   const allKeys = (await AsyncStorage.getAllKeys()).filter(keyIsExportable);
   const pairs = await AsyncStorage.multiGet(allKeys);
   const snapshot: { [key: string]: string } = {};
-  pairs.forEach(pair => {
+  pairs.forEach((pair) => {
     snapshot[pair[0]] = pair[1];
   });
   return snapshot;
@@ -30,7 +30,7 @@ async function getExportMetadata() {
 
 async function startExport(
   id: number,
-  images: { [imageName: string]: ImageState }
+  images: { [imageName: string]: ImageState },
 ) {
   const metadata = await getExportMetadata();
   uploader.startExport(id, metadata, images);
@@ -38,7 +38,7 @@ async function startExport(
 
 function exportImage(
   id: number,
-  imageState: Partial<ImageState>
+  imageState: Partial<ImageState>,
 ): { willExport: boolean; promise: Promise<void> } {
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
@@ -47,44 +47,44 @@ function exportImage(
     // console.log("returning promise", promise);
     return {
       willExport: false,
-      promise
+      promise,
     };
   }
 
   const onImageError = (e: any, ctx: string) => {
-    let eStr = "unknown error";
-    if (typeof e === "string") {
+    let eStr = 'unknown error';
+    if (typeof e === 'string') {
       eStr = e;
-    } else if ("message" in e) {
+    } else if ('message' in e) {
       eStr = e.message;
     }
-    if (ctx !== "") {
-      eStr = ctx + ": " + eStr;
+    if (ctx !== '') {
+      eStr = ctx + ': ' + eStr;
     }
     store.dispatch({
-      type: "export-image-failure",
+      type: 'export-image-failure',
       exportId: id,
       uri: imageState.fileUri as string,
-      reason: eStr
+      reason: eStr,
     });
   };
   const promise = FileSystem.getInfoAsync(imageState.fileUri)
-    .then(i => {
+    .then((i) => {
       if (i.exists) {
         return uploader.exportImage(
           id,
           imageState.fileUri as string,
-          onImageError
+          onImageError,
         );
       } else {
-        onImageError("Image file does not exist", "");
+        onImageError('Image file does not exist', '');
         return;
       }
     })
-    .catch(e => onImageError(e, "getInfoAsync"));
+    .catch((e) => onImageError(e, 'getInfoAsync'));
   return {
     willExport: true,
-    promise
+    promise,
   };
 }
 
@@ -94,10 +94,10 @@ async function finishExport(id: number) {
 
 async function startImport(): Promise<void> {
   const docResult = await DocumentPicker.getDocumentAsync();
-  if (docResult.type === "success") {
+  if (docResult.type === 'success') {
     return uploader.startImport(docResult.uri);
-  } else if (docResult.type === "cancel") {
-    store.dispatch({ type: "import-cancel" });
+  } else if (docResult.type === 'cancel') {
+    store.dispatch({ type: 'import-cancel' });
   }
   return Promise.resolve();
 }
@@ -117,27 +117,27 @@ async function importMetadata(metadata: string) {
   // No good; infinite loop
   // setTimeout(() => dispatcher.dispatch({ type: 'import-metadata-again', metadata }), 100);
   Alert.alert(
-    "Ready to import. This will erase any existing data. Are you sure?",
+    'Ready to import. This will erase any existing data. Are you sure?',
     undefined,
     [
       {
-        text: "Nevermind",
-        style: "cancel",
-        onPress: () => store.dispatch({ type: "import-cancel" })
+        text: 'Nevermind',
+        style: 'cancel',
+        onPress: () => store.dispatch({ type: 'import-cancel' }),
       },
       {
-        text: "Continue",
-        onPress: () => importMetadataNow(metadata)
-      }
+        text: 'Continue',
+        onPress: () => importMetadataNow(metadata),
+      },
     ],
-    { cancelable: false }
+    { cancelable: false },
   );
 }
 
 async function importMetadataNow(metadata: string) {
   try {
     const existingKeys = await AsyncStorage.getAllKeys();
-    for (let existingKey of existingKeys) {
+    for (const existingKey of existingKeys) {
       if (keyIsImportable(existingKey)) {
         await AsyncStorage.removeItem(existingKey);
       }
@@ -146,11 +146,11 @@ async function importMetadataNow(metadata: string) {
     const kvs: { [k: string]: string } = JSON.parse(metadata);
     const kvpairs = Object.keys(kvs)
       .filter(keyIsImportable)
-      .map(k => [k, kvs[k]]);
+      .map((k) => [k, kvs[k]]);
     await AsyncStorage.multiSet(kvpairs);
     store.dispatch(reloadFromImport());
   } catch (error) {
-    setTimeout(() => store.dispatch({ type: "import-failure", error }), 0);
+    setTimeout(() => store.dispatch({ type: 'import-failure', error }), 0);
   }
 }
 
@@ -160,10 +160,10 @@ function importImage(remoteUri: string) {
   setTimeout(
     () =>
       store.dispatch({
-        type: "image-timeout",
-        uri: remoteUri
+        type: 'image-timeout',
+        uri: remoteUri,
       }),
-    30000
+    30000,
   );
 }
 
@@ -175,5 +175,5 @@ export {
   startUrlImport,
   importMetadata,
   importMetadataNow,
-  importImage
+  importImage,
 };

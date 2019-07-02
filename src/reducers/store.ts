@@ -1,36 +1,36 @@
+import { Constants } from 'expo';
+import { applyMiddleware, createStore, Middleware, Reducer } from 'redux';
+import thunk, { ThunkMiddleware } from 'redux-thunk';
+import { Action } from '../action';
 import {
+  getInitialState as getInitialExportState,
   reduceExport,
-  getInitialState as getInitialExportState
-} from "./ExportStore";
+} from './ExportStore';
 import {
+  getInitialState as getInitialImageState,
   reduceImages,
-  getInitialState as getInitialImageState
-} from "./ImageStore";
+} from './ImageStore';
 import {
+  getInitialState as getInitialImportState,
   reduceImport,
-  getInitialState as getInitialImportState
-} from "./ImportStore";
+} from './ImportStore';
 import {
+  getInitialState as getInitialPotsState,
   reducePots,
-  getInitialState as getInitialPotsState
-} from "./PotsStore";
-import { reduceUi, getInitialState as getInitialUiState } from "./UIStore";
-import { createStore, applyMiddleware, Middleware, Reducer } from "redux";
-import thunk, { ThunkMiddleware } from "redux-thunk";
-import { Action } from "../action";
-import { Constants } from "expo";
-import { FullState } from "./types";
+} from './PotsStore';
+import { FullState } from './types';
+import { getInitialState as getInitialUiState, reduceUi } from './UIStore';
 
-const logger: Middleware = _ => next => (action: Action) => {
-  if (Constants.appOwnership === "standalone") {
+const logger: Middleware = (_) => (next) => (action: Action) => {
+  if (Constants.appOwnership === 'standalone') {
     // Skip logs in prod, for great speed
     return next(action);
   }
 
-  if (action.type === "loaded-everything") {
-    console.log("Action: loaded-everything (body omitted)");
+  if (action.type === 'loaded-everything') {
+    console.log('Action: loaded-everything (body omitted)');
   } else {
-    console.log("Action:", action.type, action);
+    console.log('Action:', action.type, action);
   }
 
   return next(action);
@@ -42,7 +42,7 @@ function getInitialState(): FullState {
     ui: getInitialUiState(),
     images: getInitialImageState(),
     exports: getInitialExportState(),
-    imports: getInitialImportState()
+    imports: getInitialImportState(),
   };
 }
 
@@ -55,7 +55,7 @@ function reducer(): Reducer<FullState, Action> {
     newState.pots = reducePots(newState.pots, action);
     newState.ui = reduceUi(newState.ui, action);
     // reduceImages depends on recducePots having been run first on the current action.
-    newState.images = reduceImages(newState.images, action, newState);
+    newState.images = reduceImages(newState.images, action);
     newState.exports = reduceExport(newState.exports, action, newState);
     newState.imports = reduceImport(newState.imports, action);
     /*return {
@@ -72,5 +72,5 @@ function reducer(): Reducer<FullState, Action> {
 
 export default createStore(
   reducer(),
-  applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger)
+  applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger),
 );

@@ -1,11 +1,8 @@
-import Status, {StatusString} from './Status';
+import Status, { StatusString } from './Status';
 
-type BareNotes = {
-  [key in StatusString]: string | undefined;
-};
+type BareNotes = { [key in StatusString]: string | undefined };
 
 export default class Notes {
-
   public static empty(): BareNotes {
     return {
       notstarted: undefined,
@@ -25,11 +22,11 @@ export default class Notes {
       notes = Notes.empty();
     }
 
-    this.notes = {...notes};
+    this.notes = { ...notes };
   }
 
   public toObj() {
-    return {...this.notes};
+    return { ...this.notes };
   }
 
   public toJSON(): string {
@@ -47,7 +44,7 @@ export default class Notes {
   }
 
   public withNoteForStatus(status: StatusString, note: string): Notes {
-    return new Notes({...this.toObj(), [status]: note});
+    return new Notes({ ...this.toObj(), [status]: note });
   }
 
   public forStatus(status: Status): string {
@@ -69,5 +66,4 @@ export default class Notes {
     });
     return contains;
   }
-
 }

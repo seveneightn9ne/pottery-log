@@ -10,32 +10,39 @@ interface NoteModalProps {
   onChangeNote: (status: StatusString, newNote: string) => void;
 }
 
-export default class NoteModal extends React.Component<NoteModalProps, {open: boolean}> {
+export default class NoteModal extends React.Component<
+  NoteModalProps,
+  { open: boolean }
+> {
   constructor(props: NoteModalProps) {
     super(props);
-    this.state = {open: false};
+    this.state = { open: false };
   }
   public open = () => {
-    this.setState({open: true});
+    this.setState({ open: true });
   }
   public close = () => {
-    this.setState({open: false});
+    this.setState({ open: false });
   }
   public render() {
-    return (<Modal
-      header={capitalize(Status.progressive(this.props.status)) + ' Note'}
-      body={<ExpandingTextInput
-        value={this.props.note}
-        multiline={true}
-        numberOfLines={4}
-        style={styles.modalInput}
-        onChangeText={this.onChangeNote}
-        autoFocus={true}
-        onSubmit={this.close}
-      />}
-      buttons={[{text: 'DONE'}]}
-      open={this.state.open}
-      close={this.close} />
+    return (
+      <Modal
+        header={capitalize(Status.progressive(this.props.status)) + ' Note'}
+        body={
+          <ExpandingTextInput
+            value={this.props.note}
+            multiline={true}
+            numberOfLines={4}
+            style={styles.modalInput}
+            onChangeText={this.onChangeNote}
+            autoFocus={true}
+            onSubmit={this.close}
+          />
+        }
+        buttons={[{ text: 'DONE' }]}
+        open={this.state.open}
+        close={this.close}
+      />
     );
   }
 

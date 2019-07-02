@@ -2,11 +2,18 @@ import React from 'react';
 import { Clipboard, Linking, Text, ToastAndroid } from 'react-native';
 import styles from '../../style';
 
-export default class Anchor extends React.Component<{href: string, onPress?: () => void}> {
-
+export default class Anchor extends React.Component<{
+  href: string;
+  onPress?: () => void;
+}> {
   public render() {
     return (
-      <Text {...this.props} onPress={this.handlePress} onLongPress={this.handleLongPress} style={styles.anchor}>
+      <Text
+        {...this.props}
+        onPress={this.handlePress}
+        onLongPress={this.handleLongPress}
+        style={styles.anchor}
+      >
         {this.props.children || this.props.href}
       </Text>
     );

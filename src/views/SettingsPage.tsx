@@ -1,18 +1,18 @@
-import React from "react";
-import ElevatedView from "react-native-elevated-view";
+import React from 'react';
 import {
   ActivityIndicator,
   Alert,
   Button,
   Text,
   TouchableOpacity,
-  View
-} from "react-native";
-import { ExportState, ImportState } from "../reducers/types";
-import styles from "../style";
-import Anchor from "./components/Anchor";
-import { ExpandingTextInput } from "./components/ExpandingTextInput";
-import Modal from "./components/Modal";
+  View,
+} from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
+import { ExportState, ImportState } from '../reducers/types';
+import styles from '../style';
+import Anchor from './components/Anchor';
+import { ExpandingTextInput } from './components/ExpandingTextInput';
+import Modal from './components/Modal';
 
 interface SettingsPageProps {
   onNavigateToList: () => void;
@@ -36,9 +36,9 @@ export default class SettingsPage extends React.Component<
   SettingsPageProps,
   SettingsPageState
 > {
-  state = {
+  public state = {
     linkModalOpen: false,
-    linkText: ""
+    linkText: '',
   };
 
   public render() {
@@ -49,7 +49,7 @@ export default class SettingsPage extends React.Component<
     ) : null;
 
     let body;
-    if ("exportUri" in this.props.exports) {
+    if ('exportUri' in this.props.exports) {
       body = (
         <View>
           <Text style={styles.settingsText}>The export is available at:</Text>
@@ -69,7 +69,7 @@ export default class SettingsPage extends React.Component<
         ? this.props.exports.statusMessage
         : this.props.imports.statusMessage;
       body = (
-        <View style={{ flexDirection: "row", paddingLeft: 20 }}>
+        <View style={{ flexDirection: 'row', paddingLeft: 20 }}>
           <ActivityIndicator size="small" />
           <Text style={styles.settingsText}>{status}</Text>
         </View>
@@ -79,7 +79,7 @@ export default class SettingsPage extends React.Component<
       const status =
         this.props.exports.statusMessage ||
         this.props.imports.statusMessage ||
-        "Exporting will save your Pottery Log data so you can move your data to a new phone.";
+        'Exporting will save your Pottery Log data so you can move your data to a new phone.';
       body = (
         <View style={{ padding: 20, paddingTop: 0 }}>
           <Text style={styles.settingsText}>{status}</Text>
@@ -108,14 +108,14 @@ export default class SettingsPage extends React.Component<
   }
 
   private importPopup = () => {
-    Alert.alert("Import", "Choose a source", [
-      { text: "Paste Link", onPress: this.openModal },
-      { text: "Upload File", onPress: this.props.onStartImport }
+    Alert.alert('Import', 'Choose a source', [
+      { text: 'Paste Link', onPress: this.openModal },
+      { text: 'Upload File', onPress: this.props.onStartImport },
     ]);
-  };
+  }
 
   private openModal = () =>
-    this.setState({ linkModalOpen: true, linkText: "" });
+    this.setState({ linkModalOpen: true, linkText: '' })
   private closeModal = () => this.setState({ linkModalOpen: false });
 
   private renderResumeImport = () => {
@@ -124,41 +124,41 @@ export default class SettingsPage extends React.Component<
     }
 
     return Alert.alert(
-      "Resume Import",
-      "There is an import in progress. Would you like to resume importing?",
+      'Resume Import',
+      'There is an import in progress. Would you like to resume importing?',
       [
         {
-          text: "Cancel",
-          style: "cancel",
-          onPress: this.props.onCancelResumeImport
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: this.props.onCancelResumeImport,
         },
-        { text: "Resume", onPress: this.props.onResumeImport }
+        { text: 'Resume', onPress: this.props.onResumeImport },
       ],
-      { cancelable: false }
+      { cancelable: false },
     );
-  };
+  }
 
   private renderModal() {
     let belowInput: JSX.Element | null = null;
     const buttons = [
-      { text: "CANCEL" },
+      { text: 'CANCEL' },
       {
-        text: "IMPORT",
+        text: 'IMPORT',
         onPress: () => {
           this.props.onStartUrlImport(this.state.linkText);
         },
-        disabled: true
-      }
+        disabled: true,
+      },
     ];
     if (this.state.linkText) {
       if (
         this.state.linkText.indexOf(
-          "https://pottery-log-exports.s3.amazonaws.com/"
+          'https://pottery-log-exports.s3.amazonaws.com/',
         ) !== 0
       ) {
         // Something that isn't a valid link
         belowInput = (
-          <Text style={{ color: "red" }}>
+          <Text style={{ color: 'red' }}>
             The link should start with
             https://pottery-log-exports.s3.amazonaws.com/
           </Text>
@@ -170,7 +170,7 @@ export default class SettingsPage extends React.Component<
     }
     return (
       <Modal
-        header={"Paste link"}
+        header={'Paste link'}
         body={
           <View>
             <ExpandingTextInput
@@ -178,7 +178,7 @@ export default class SettingsPage extends React.Component<
               multiline={true}
               numberOfLines={1}
               style={styles.modalInput}
-              onChangeText={text => this.setState({ linkText: text })}
+              onChangeText={(text) => this.setState({ linkText: text })}
               autoFocus={true}
               onSubmit={() => {}}
             />
@@ -193,18 +193,13 @@ export default class SettingsPage extends React.Component<
   }
 
   private onBack = () => {
-    if (this.props.exports.exporting && !("exportUri" in this.props.exports)) {
-      Alert.alert("Cancel this export?", undefined, [
-        { text: "Stay here", style: "cancel" },
-        { text: "Cancel export", onPress: this.props.onNavigateToList }
+    if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
+      Alert.alert('Cancel this export?', undefined, [
+        { text: 'Stay here', style: 'cancel' },
+        { text: 'Cancel export', onPress: this.props.onNavigateToList },
       ]);
-    } /*else if (this.props.imports.importing) {
-        Alert.alert('Cancel this import?', undefined,
-          [{text: 'Stay here', style: 'cancel'},
-          {text: 'Cancel import', onPress: this.props.onNavigateToList},
-        ]);
-    }*/ else {
+    } else {
       this.props.onNavigateToList();
     }
-  };
+  }
 }

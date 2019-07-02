@@ -1,7 +1,7 @@
 // import { FileSystem } from 'expo';
-import React from "react";
-import { Image, ImageErrorEventData, NativeSyntheticEvent } from "react-native";
-import { ImageState } from "../../reducers/types";
+import React from 'react';
+import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
+import { ImageState } from '../../reducers/types';
 
 interface Image3Props {
   image: ImageState | null;
@@ -10,7 +10,7 @@ interface Image3Props {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
@@ -23,9 +23,9 @@ interface Image3State {
 export default class Image3 extends React.Component<Image3Props, Image3State> {
   public static key(imageState: ImageState | null): string {
     if (!imageState) {
-      return "";
+      return '';
     }
-    return "" + imageState.localUri + imageState.fileUri + imageState.remoteUri;
+    return '' + imageState.localUri + imageState.fileUri + imageState.remoteUri;
   }
 
   // 0 tries for local because iOS doesn't reload the image unless
@@ -49,7 +49,7 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     this.state = {
       failed: false,
       tries: Image3.defaultTries(props),
-      uri: this.uri(props)
+      uri: this.uri(props),
     };
   }
 
@@ -87,15 +87,15 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
 
   private uri = (props = this.props) => {
     if (!props.image) {
-      return "";
+      return '';
     }
     const fullUri =
       props.image.fileUri ||
       props.image.localUri ||
       props.image.remoteUri ||
-      "";
-    return fullUri + "?r" + Date.now();
-  };
+      '';
+    return fullUri + '?r' + Date.now();
+  }
 
   /*
   private resetDirectory(uri: string): string {
@@ -116,10 +116,10 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     this.setState({ failed: false, tries });
 
     // Debugging
-    //FileSystem.getInfoAsync(this.state.uri).then((info) => {
+    // FileSystem.getInfoAsync(this.state.uri).then((info) => {
     //  console.log("Loaded file info.", info);
-    //});
-  };
+    // });
+  }
 
   private onError = (e: NativeSyntheticEvent<ImageErrorEventData>) => {
     if (!this.props.image) {
@@ -129,7 +129,7 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
       this.setState({
         tries: this.state.tries - 1,
         failed: false,
-        uri: this.uri()
+        uri: this.uri(),
       });
       return;
     }
@@ -137,21 +137,21 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
       // The fileUri failed 3 times. It's gone.
 
       // Debugging
-      //console.log(this.props.image.name, 'loaded FAILURE');
-      //FileSystem.getInfoAsync(this.state.uri).then((info) => {
+      // console.log(this.props.image.name, 'loaded FAILURE');
+      // FileSystem.getInfoAsync(this.state.uri).then((info) => {
       //  console.log("Loaded file info.", info);
-      //});
+      // });
 
-      this.props.onImageLoadFailure(this.props.image.fileUri, "file");
+      this.props.onImageLoadFailure(this.props.image.fileUri, 'file');
       this.setState({ failed: true, tries: this.state.tries });
     } else if (this.props.image.localUri) {
       // The localUri failed 3 times. It's gone.
-      this.props.onImageLoadFailure(this.props.image.name, "local");
+      this.props.onImageLoadFailure(this.props.image.name, 'local');
       this.setState({ failed: true, tries: this.state.tries });
     } else if (this.props.image.remoteUri) {
       // Remote image failed, what can you do?
-      this.props.onImageLoadFailure(this.props.image.name, "remote");
+      this.props.onImageLoadFailure(this.props.image.name, 'remote');
       this.setState({ failed: true, tries: this.state.tries });
     }
-  };
+  }
 }

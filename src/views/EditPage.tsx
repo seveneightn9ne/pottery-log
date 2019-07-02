@@ -1,21 +1,21 @@
-import React from "react";
-import ElevatedView from "react-native-elevated-view";
+import React from 'react';
 import {
   Dimensions,
   Text,
   TextInput,
   TouchableOpacity,
-  View
-} from "react-native";
-import Button from "react-native-button";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Pot } from "../models/Pot";
-import Status, { StatusString } from "../models/Status";
-import styles from "../style";
-import ImageList from "./components/ImageList";
-import StatusDetail from "./components/StatusDetail";
-import StatusSwitcher from "./components/StatusSwitcher";
-import { EditUiState, ImageStoreState } from "../reducers/types";
+  View,
+} from 'react-native';
+import Button from 'react-native-button';
+import ElevatedView from 'react-native-elevated-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Pot } from '../models/Pot';
+import Status, { StatusString } from '../models/Status';
+import { EditUiState, ImageStoreState } from '../reducers/types';
+import styles from '../style';
+import ImageList from './components/ImageList';
+import StatusDetail from './components/StatusDetail';
+import StatusSwitcher from './components/StatusSwitcher';
 
 interface EditPageProps {
   pot: Pot;
@@ -36,7 +36,7 @@ interface EditPageProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
@@ -47,7 +47,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
     this.titleInput = React.createRef();
   }
   public render() {
-    const { width } = Dimensions.get("window");
+    const { width } = Dimensions.get('window');
     const pot = this.props.pot;
     if (!pot) {
       return null;
@@ -76,7 +76,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         <StatusDetail
           key={s}
           fontLoaded={this.props.fontLoaded}
-          note={(pot.notes2 && pot.notes2.notes[s]) || ""}
+          note={(pot.notes2 && pot.notes2.notes[s]) || ''}
           status={s}
           date={pot.status.status[s] || new Date()}
           first={i === 0}
@@ -84,7 +84,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
           onChangeNote={this.onChangeNote}
         />
       ));
-    const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || "";
+    const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
     return (
       <View style={styles.container}>
         <ElevatedView style={styles.header} elevation={8}>
@@ -102,7 +102,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
           {editButton}
         </ElevatedView>
         <KeyboardAwareScrollView extraHeight={100}>
-          <View style={/*{elevation: 4, backgroundColor: '#fff'}*/ null}>
+          <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
             <ImageList
               size={mainImgSize}
               images={pot.images3}
@@ -149,19 +149,19 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
 
   private onAddImage = (i: string) => this.props.onAddImage(this.props.pot, i);
   private onChangeTitle = (text: string) =>
-    this.props.onChangeTitle(this.props.pot.uuid, text);
+    this.props.onChangeTitle(this.props.pot.uuid, text)
   private onChangeNote = (status: StatusString, note: string) =>
-    this.props.onChangeNote(this.props.pot, status, note);
+    this.props.onChangeNote(this.props.pot, status, note)
   private onDeleteImage = (imageName: string) =>
-    this.props.onDeleteImage(this.props.pot, imageName);
+    this.props.onDeleteImage(this.props.pot, imageName)
   private setStatus = (newStatus: StatusString) =>
-    this.props.setStatus(this.props.pot, newStatus);
+    this.props.setStatus(this.props.pot, newStatus)
   private onSetStatusDate = (newDate: Date) =>
-    this.props.setStatusDate(this.props.pot, newDate);
+    this.props.setStatusDate(this.props.pot, newDate)
 
   private focusTitle = () => {
     if (this.titleInput.current) {
       this.titleInput.current.focus();
     }
-  };
+  }
 }

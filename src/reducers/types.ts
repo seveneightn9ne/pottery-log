@@ -1,4 +1,4 @@
-import { Pot } from "../models/Pot";
+import { Pot } from '../models/Pot';
 
 export interface FullState {
   pots: PotsStoreState;
@@ -16,7 +16,7 @@ export interface PotsStoreState {
   potIds: string[];
   pots: { [uuid: string]: Pot };
   hasLoaded: boolean;
-  //imagesLoaded?: { [name: string]: ImageState };
+  // imagesLoaded?: { [name: string]: ImageState };
 }
 
 //
@@ -118,7 +118,7 @@ interface BaseUiState {
 }
 
 export interface ListUiState extends BaseUiState {
-  page: "list";
+  page: 'list';
 }
 
 export interface SearchingUiState extends ListUiState {
@@ -127,18 +127,18 @@ export interface SearchingUiState extends ListUiState {
 }
 
 export interface EditUiState extends BaseUiState {
-  page: "edit-pot";
+  page: 'edit-pot';
   editPotId: string;
   new: boolean;
 }
 
 export interface ImageUiState extends BaseUiState {
-  page: "image";
+  page: 'image';
   editPotId: string;
   imageId: string;
 }
 
 export interface SettingsUiState extends BaseUiState {
-  page: "settings";
+  page: 'settings';
   resumeImport: boolean;
 }

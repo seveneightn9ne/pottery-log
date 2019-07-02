@@ -1,66 +1,85 @@
 import _ from 'lodash';
 
-export type StatusString = 'notstarted' | 'thrown' | 'trimmed' | 'bisqued' | 'glazed' | 'pickedup';
+export type StatusString =
+  | 'notstarted'
+  | 'thrown'
+  | 'trimmed'
+  | 'bisqued'
+  | 'glazed'
+  | 'pickedup';
 
 export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-type EmptyableBareStatus = {
-  [k in StatusString]?: Date | undefined;
-};
+type EmptyableBareStatus = { [k in StatusString]?: Date | undefined };
 
-type EmptyStatus = {
-  [k in StatusString]: undefined;
-};
+type EmptyStatus = { [k in StatusString]: undefined };
 
-type BareStatus = EmptyStatus & (
-  {notstarted: Date}
-  | {thrown: Date}
-  | {bisqued: Date}
-  | {trimmed: Date}
-  | {glazed: Date}
-  | {pickedup: Date});
+type BareStatus = EmptyStatus &
+  (
+    | { notstarted: Date }
+    | { thrown: Date }
+    | { bisqued: Date }
+    | { trimmed: Date }
+    | { glazed: Date }
+    | { pickedup: Date });
 
-type StatusConstructor = {
-  [k in StatusString]?: Date | string | number;
-};
+type StatusConstructor = { [k in StatusString]?: Date | string | number };
 
 export default class Status {
-
   public static prettify(name: StatusString): string {
-    return name.replace('pickedup', 'picked up').replace('notstarted', 'not started');
+    return name
+      .replace('pickedup', 'picked up')
+      .replace('notstarted', 'not started');
   }
 
   public static longterm(name: StatusString) {
     switch (name) {
-      case 'bisqued': return 'bisquing';
-      case 'glazed': return 'glaze firing';
-      case 'pickedup': return 'finished';
-      case 'notstarted': return 'not started';
-      default: return name;
+      case 'bisqued':
+        return 'bisquing';
+      case 'glazed':
+        return 'glaze firing';
+      case 'pickedup':
+        return 'finished';
+      case 'notstarted':
+        return 'not started';
+      default:
+        return name;
     }
   }
 
   public static progressive(name: StatusString) {
     switch (name) {
-      case 'thrown': return 'throwing';
-      case 'trimmed': return 'trimming';
-      case 'bisqued': return 'bisquing';
-      case 'glazed': return 'glazing';
-      case 'pickedup': return 'finished';
-      default: return name;
+      case 'thrown':
+        return 'throwing';
+      case 'trimmed':
+        return 'trimming';
+      case 'bisqued':
+        return 'bisquing';
+      case 'glazed':
+        return 'glazing';
+      case 'pickedup':
+        return 'finished';
+      default:
+        return name;
     }
   }
 
   public static action(name: StatusString) {
     switch (name) {
-      case 'thrown': return 'throw';
-      case 'trimmed': return 'trim';
-      case 'bisqued': return 'bisque';
-      case 'glazed': return 'glaze';
-      case 'pickedup': return 'pick up';
-      default: return name;
+      case 'thrown':
+        return 'throw';
+      case 'trimmed':
+        return 'trim';
+      case 'bisqued':
+        return 'bisque';
+      case 'glazed':
+        return 'glaze';
+      case 'pickedup':
+        return 'pick up';
+      default:
+        return name;
     }
   }
 
@@ -68,7 +87,9 @@ export default class Status {
     return ['pickedup', 'glazed', 'bisqued', 'trimmed', 'thrown', 'notstarted'];
   }
 
-  public static isValidStatus(status: EmptyableBareStatus): status is BareStatus {
+  public static isValidStatus(
+    status: EmptyableBareStatus,
+  ): status is BareStatus {
     let isValid = false;
     Status.ordered().forEach((s) => {
       if (status[s]) {
@@ -78,7 +99,7 @@ export default class Status {
     return isValid;
   }
 
-  public static dateText(date: Date): string  {
+  public static dateText(date: Date): string {
     const dateStringLong = date.toDateString();
     const dateString = dateStringLong.substr(0, dateStringLong.length - 5);
     return dateString;
@@ -89,13 +110,14 @@ export default class Status {
   public status: BareStatus;
 
   constructor(from: Partial<StatusConstructor>) {
-
     const status: EmptyableBareStatus = {};
 
     _.forOwn(from, (item, ss) => {
       const s = ss as keyof EmptyableBareStatus;
-      status[s] = (typeof(item) === 'string' || typeof(item) === 'number') ?
-        status[s] = new Date(item) : status[s] = item;
+      status[s] =
+        typeof item === 'string' || typeof item === 'number'
+          ? (status[s] = new Date(item))
+          : (status[s] = item);
     });
 
     if (Status.isValidStatus(status)) {
@@ -106,7 +128,7 @@ export default class Status {
   }
 
   public toObj(): BareStatus {
-    return {...this.status};
+    return { ...this.status };
   }
 
   public toJSON(): string {
@@ -132,8 +154,11 @@ export default class Status {
     }
     const hour = 1000 * 60 * 60;
     const week = hour * 24 * 7;
-    const oneWeekIsh = week - (12 * hour);
-    return new Date().getTime() - date.getTime() > oneWeekIsh && this.currentStatus() !== 'pickedup';
+    const oneWeekIsh = week - 12 * hour;
+    return (
+      new Date().getTime() - date.getTime() > oneWeekIsh &&
+      this.currentStatus() !== 'pickedup'
+    );
   }
 
   public text(): string {
@@ -152,10 +177,10 @@ export default class Status {
         return false;
       }
       return true;
-   });
+    });
     if (current === undefined) {
-    throw Error('Impossible condition: the status has no status');
-   }
+      throw Error('Impossible condition: the status has no status');
+    }
     return current;
   }
 
@@ -163,7 +188,7 @@ export default class Status {
     // const pot = PotsStore.getState().pots[UIStore.getState().editPotId];
     // console.log("I see current status is " + JSON.stringify(pot.status));
     const prevDate = this.toObj()[name];
-    date = date ? date : (prevDate ? prevDate : new Date());
+    date = date ? date : prevDate ? prevDate : new Date();
     const newFullStatus: BareStatus = {
       ...this.toObj(),
       [name]: date,
@@ -211,6 +236,8 @@ export default class Status {
   }
 
   public hasTimeline(): boolean {
-    return this.currentStatus() !== 'thrown' && this.currentStatus() !== 'notstarted';
+    return (
+      this.currentStatus() !== 'thrown' && this.currentStatus() !== 'notstarted'
+    );
   }
 }

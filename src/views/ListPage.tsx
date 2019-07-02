@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -7,20 +7,20 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
-} from "react-native";
-import ElevatedView from "react-native-elevated-view";
-import { Pot } from "../models/Pot";
-import Status, { capitalize, StatusString } from "../models/Status";
+  View,
+} from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
+import { Pot } from '../models/Pot';
+import Status, { capitalize, StatusString } from '../models/Status';
 import {
-  PotsStoreState,
+  ImageStoreState,
   ListUiState,
+  PotsStoreState,
   SearchingUiState,
-  ImageStoreState
-} from "../reducers/types";
-import styles from "../style";
-import NewPotButton from "./components/NewPotButton";
-import PotListItem from "./components/PotListItem";
+} from '../reducers/types';
+import styles from '../style';
+import NewPotButton from './components/NewPotButton';
+import PotListItem from './components/PotListItem';
 
 interface ListPageProps {
   pots: PotsStoreState;
@@ -37,7 +37,7 @@ interface ListPageProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
 }
 
@@ -54,11 +54,11 @@ interface SectionData {
 function filterSortedPots(
   allPots: Pot[],
   status: StatusString,
-  searchTerm: string
+  searchTerm: string,
 ) {
   return allPots
-    .filter(pot => pot.status.currentStatus() === status)
-    .filter(pot => {
+    .filter((pot) => pot.status.currentStatus() === status)
+    .filter((pot) => {
       // Filter for search
       if (!searchTerm) {
         return true;
@@ -83,7 +83,7 @@ function filterSortedPots(
       const tA = dA.getTime();
       const tB = dB.getTime();
       let cmp = tA < tB ? -1 : tA > tB ? 1 : 0;
-      if (potA.status.currentStatus() === "pickedup") {
+      if (potA.status.currentStatus() === 'pickedup') {
         cmp *= -1;
       }
       return cmp;
@@ -95,7 +95,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
 
   constructor(props: ListPageProps) {
     super(props);
-    const { width } = Dimensions.get("window");
+    const { width } = Dimensions.get('window');
     this.width = width;
   }
 
@@ -109,7 +109,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     ) : null;
 
     let header;
-    if ("searching" in this.props.ui && this.props.ui.searching) {
+    if ('searching' in this.props.ui && this.props.ui.searching) {
       header = (
         <ElevatedView style={styles.header} elevation={4}>
           {backButton}
@@ -119,8 +119,8 @@ export class ListPage extends React.Component<ListPageProps, {}> {
             placeholderTextColor="#c8e6c9"
             onChangeText={this.props.onSearch}
             autoFocus={true}
-            placeholder={"search"}
-            value={this.props.ui.searchTerm || ""}
+            placeholder={'search'}
+            value={this.props.ui.searchTerm || ''}
           />
         </ElevatedView>
       );
@@ -142,7 +142,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       header = (
         <ElevatedView style={styles.header} elevation={4}>
           <Text style={[styles.h1, { flex: 1 }]}>Pottery Log</Text>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: 'row' }}>
             {searchButton}
             {settingsButton}
           </View>
@@ -177,31 +177,31 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     }
 
     const allPots = this.props.pots.potIds.map(
-      (id: string) => this.props.pots.pots[id]
+      (id: string) => this.props.pots.pots[id],
     );
     const searchTerm =
-      ("searching" in this.props.ui && this.props.ui.searchTerm) || "";
+      ('searching' in this.props.ui && this.props.ui.searchTerm) || '';
 
     const sections: SectionT[] = Status.ordered()
       .reverse()
-      .map(status => {
+      .map((status) => {
         return {
           data: filterSortedPots(allPots, status, searchTerm),
-          title: capitalize(Status.longterm(status))
+          title: capitalize(Status.longterm(status)),
         };
       })
-      .filter(section => section.data.length > 0)
-      .map(section =>
+      .filter((section) => section.data.length > 0)
+      .map((section) =>
         this.collapsed(section.title)
           ? {
               data: [],
-              title: section.title + " (" + section.data.length + ")"
+              title: section.title + ' (' + section.data.length + ')',
             }
-          : section
+          : section,
       )
-      .map(section => ({
+      .map((section) => ({
         data: [{ key: section.title, data: section.data }],
-        title: section.title
+        title: section.title,
       }));
 
     /* TODO(jessk) - this goes in the SectionList
@@ -225,32 +225,32 @@ export class ListPage extends React.Component<ListPageProps, {}> {
   }
 
   private sectionKeyExtractor = (listdata: SectionT, index: number) =>
-    listdata.title;
+    listdata.title
   private renderSectionFooter = () => <View style={styles.separator} />;
 
   private stripCount = (sectionTitle: string): string => {
-    if (sectionTitle.charAt(sectionTitle.length - 1) !== ")") {
+    if (sectionTitle.charAt(sectionTitle.length - 1) !== ')') {
       return sectionTitle;
     }
-    const parts = sectionTitle.split(" ");
-    const section = parts.splice(0, parts.length - 1).join(" ");
+    const parts = sectionTitle.split(' ');
+    const section = parts.splice(0, parts.length - 1).join(' ');
     return section;
-  };
+  }
 
   private collapsed = (section: string) => {
     return (
       this.props.ui.list.collapsed.indexOf(this.stripCount(section)) !== -1
     );
-  };
+  }
 
   private sectionItemLayout = (layoutData: any, index: number) => {
     const itemSize = this.width / 2 - 2;
     return {
       length: itemSize,
       offset: itemSize * index,
-      index
+      index,
     };
-  };
+  }
 
   private renderPotListItem = (data: { item: Pot }): JSX.Element => {
     const image =
@@ -265,7 +265,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
         {...this.props}
       />
     );
-  };
+  }
 
   private onClickPot(pot: Pot) {
     return () => this.props.onClickPot(pot.uuid);
@@ -281,7 +281,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
         renderItem={this.renderPotListItem}
       />
     );
-  };
+  }
 
   private potKeyExtractor = (pot: Pot, index: number) => pot.uuid;
 
@@ -292,8 +292,8 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     const content = this.props.fontLoaded ? (
       <Text style={styles.collapse}>
         {this.collapsed(section.title)
-          ? "keyboard_arrow_down"
-          : "keyboard_arrow_up"}
+          ? 'keyboard_arrow_down'
+          : 'keyboard_arrow_up'}
       </Text>
     ) : null;
     return (
@@ -304,9 +304,9 @@ export class ListPage extends React.Component<ListPageProps, {}> {
         </View>
       </TouchableOpacity>
     );
-  };
+  }
 
   private collapseSection = (section: string) => {
     return () => this.props.onCollapse(this.stripCount(section));
-  };
+  }
 }

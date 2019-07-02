@@ -1,47 +1,47 @@
-import { FileSystem } from "expo";
-import _ from "lodash";
-import { Action } from "../action";
-import * as utils from "../utils/imageutils";
-import { StorageWriter } from "../utils/sync";
-import * as ImageUploader from "../utils/uploader";
-import { ImageStoreState, ImageState } from "./types";
+import { FileSystem } from 'expo';
+import _ from 'lodash';
+import { Action } from '../action';
+import * as utils from '../utils/imageutils';
+import { StorageWriter } from '../utils/sync';
+import * as ImageUploader from '../utils/uploader';
+import { ImageState, ImageStoreState } from './types';
 
 export function getInitialState(): ImageStoreState {
   return {
     images: {},
-    loaded: false
+    loaded: false,
   };
 }
 
 export function reduceImages(
   state: ImageStoreState,
-  action: Action
+  action: Action,
 ): ImageStoreState {
-  if (action.type == "loaded-everything") {
+  if (action.type == 'loaded-everything') {
     return action.images;
   }
   if (!state.loaded) {
     // Nothing else can act on an unloaded imagestore
     console.log(
-      "imagestore ignores " + action.type + " because it has not loaded"
+      'imagestore ignores ' + action.type + ' because it has not loaded',
     );
     return state;
   }
   switch (action.type) {
-    case "image-delete-from-pot": {
+    case 'image-delete-from-pot': {
       const im = { ...state.images[action.imageName] };
       const newState = {
         ...state,
-        images: { ...state.images, [action.imageName]: im }
+        images: { ...state.images, [action.imageName]: im },
       };
 
       if (!im) {
         console.log(
-          "Deleting " + action.imageName + " from pot but it's nowhere"
+          'Deleting ' + action.imageName + " from pot but it's nowhere",
         );
         return state;
       }
-      im.pots = im.pots.filter(p => p !== action.potId);
+      im.pots = im.pots.filter((p) => p !== action.potId);
       if (im.pots.length === 0) {
         utils.deleteUnusedImage(im); // wee oo wee oo
         delete newState.images[action.imageName];
@@ -49,8 +49,8 @@ export function reduceImages(
       persist(newState);
       return newState;
     }
-    case "pot-delete": {
-      let newState = { loaded: true, images: { ...state.images } };
+    case 'pot-delete': {
+      const newState = { loaded: true, images: { ...state.images } };
       for (const name of action.imageNames) {
         const oldI = newState.images[name];
         if (!oldI) {
@@ -58,7 +58,7 @@ export function reduceImages(
         }
         const newI = {
           ...oldI,
-          pots: oldI.pots.filter(p => p !== action.potId)
+          pots: oldI.pots.filter((p) => p !== action.potId),
         };
         if (newI.pots.length === 0) {
           utils.deleteUnusedImage(newI);
@@ -70,7 +70,7 @@ export function reduceImages(
       persist(newState);
       return newState;
     }
-    case "image-add": {
+    case 'image-add': {
       const name = utils.nameFromUri(action.localUri);
       const newState = {
         loaded: true,
@@ -79,59 +79,59 @@ export function reduceImages(
           [name]: {
             name,
             localUri: action.localUri,
-            pots: [action.potId]
-          }
-        }
+            pots: [action.potId],
+          },
+        },
       };
       utils.saveToFile(action.localUri);
       persist(newState);
       return newState;
     }
-    case "pot-copy": {
+    case 'pot-copy': {
       const newState = { loaded: true, images: { ...state.images } };
       for (const name of action.imageNames) {
         newState.images[name] = {
           ...newState.images[name],
-          pots: [...newState.images[name].pots, action.potId]
+          pots: [...newState.images[name].pots, action.potId],
         };
       }
       persist(newState);
       return newState;
     }
-    case "initial-pots-images": {
+    case 'initial-pots-images': {
       return getInitialState();
     }
-    case "image-error-remote": {
+    case 'image-error-remote': {
       // There's nothing to do, I guess
       return state;
     }
-    case "image-error-local": {
+    case 'image-error-local': {
       const i = state.images[action.name];
       const newImage = { ...i };
       const newState = {
         loaded: true,
         images: {
           ...state.images,
-          [action.name]: newImage
-        }
+          [action.name]: newImage,
+        },
       };
-      console.log("Removing failed local URI for image " + i.name);
+      console.log('Removing failed local URI for image ' + i.name);
       delete newImage.localUri;
       return newState;
     }
-    case "image-error-file": {
+    case 'image-error-file': {
       const uri = action.uri;
       const documentDirectory = FileSystem.documentDirectory;
-      ImageUploader.debug("image-error-file", { uri, documentDirectory });
+      ImageUploader.debug('image-error-file', { uri, documentDirectory });
       return state;
     }
-    case "image-remote-failed": {
+    case 'image-remote-failed': {
       // TODO(jessk) handle... by deleting the image
       // and removing it from its pot(s)
       // OR... who cares since we use files now
       return state;
     }
-    case "image-loaded": {
+    case 'image-loaded': {
       // Convert to a fileUri if needed
       const i = state.images[action.name];
       if (!i || i.fileUri) {
@@ -144,16 +144,16 @@ export function reduceImages(
       }
       return state;
     }
-    case "image-file-created": {
+    case 'image-file-created': {
       if (state.images[action.name] === undefined) {
         console.warn(
-          "Image file created, but no image exists for it! This is quite bad, probably."
+          'Image file created, but no image exists for it! This is quite bad, probably.',
         );
         return state;
       }
       const newImage = {
         ...state.images[action.name],
-        fileUri: action.fileUri
+        fileUri: action.fileUri,
       };
       if (newImage.remoteUri) {
         ImageUploader.remove(newImage.remoteUri);
@@ -164,8 +164,8 @@ export function reduceImages(
         loaded: true,
         images: {
           ...state.images,
-          [action.name]: newImage
-        }
+          [action.name]: newImage,
+        },
       };
       persist(newState);
       return newState;
@@ -177,11 +177,11 @@ export function reduceImages(
 
 export function getImageState(
   state: ImageStoreState,
-  name: string
+  name: string,
 ): ImageState | null {
   const i = state.images[name];
   if (!i) {
-    console.log("That image named " + name + " is not in the image store.");
+    console.log('That image named ' + name + ' is not in the image store.');
     return null;
   }
   return i;
@@ -194,5 +194,5 @@ function persist(state: ImageStoreState) {
   if (!state.loaded) {
     throw new Error("Cannot persist state before it's loaded");
   }
-  StorageWriter.put("@ImageStore", JSON.stringify(state));
+  StorageWriter.put('@ImageStore', JSON.stringify(state));
 }

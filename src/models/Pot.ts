@@ -1,5 +1,5 @@
-import Notes from "./Notes";
-import Status from "./Status";
+import Notes from './Notes';
+import Status from './Status';
 
 export interface Pot {
   title: string;
@@ -27,9 +27,9 @@ export interface IntermediatePot extends Pot {
 export function newPot() {
   return {
     uuid: String(Math.random()).substring(2),
-    title: "New Pot",
+    title: 'New Pot',
     images3: [],
     status: new Status({ thrown: new Date() }),
-    notes2: new Notes()
+    notes2: new Notes(),
   };
 }

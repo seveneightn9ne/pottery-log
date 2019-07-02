@@ -1,11 +1,11 @@
-import Notes from "./models/Notes";
-import Status from "./models/Status";
+import Notes from './models/Notes';
+import Status from './models/Status';
 import {
-  ImportStatePersisted,
   ImageState,
+  ImageStoreState,
+  ImportStatePersisted,
   PotsStoreState,
-  ImageStoreState
-} from "./reducers/types";
+} from './reducers/types';
 
 export type Action =
   | LoadedEverything
@@ -83,60 +83,60 @@ type ExportAction =
 // }
 
 interface LoadedEverything {
-  type: "loaded-everything";
+  type: 'loaded-everything';
   pots: PotsStoreState;
   images: ImageStoreState;
   isImport: boolean;
 }
 
 interface New {
-  type: "new";
+  type: 'new';
 }
 
 interface PageNewPot {
-  type: "page-new-pot";
+  type: 'page-new-pot';
   potId: string;
 }
 
 interface PotEditField {
-  type: "pot-edit-field";
+  type: 'pot-edit-field';
   potId: string;
   field: string;
   value: any;
 }
 
 interface PotEditNote extends PotEditField {
-  field: "notes2";
+  field: 'notes2';
   value: Notes;
 }
 
 interface PotEditTitle extends PotEditField {
-  field: "title";
+  field: 'title';
   value: string;
 }
 
 interface PotEditImages3 extends PotEditField {
-  field: "images3";
+  field: 'images3';
   value: string[];
 }
 
 interface PotEditStatus extends PotEditField {
-  field: "status";
+  field: 'status';
   value: Status;
 }
 
 interface PotDelete {
-  type: "pot-delete";
+  type: 'pot-delete';
   potId: string;
   imageNames: string[];
 }
 
 interface PageList {
-  type: "page-list";
+  type: 'page-list';
 }
 
 interface PotCopy {
-  type: "pot-copy";
+  type: 'pot-copy';
   potId: string;
   imageNames: string[];
 }
@@ -148,176 +148,176 @@ interface PotCopy {
 // }
 
 interface Reload {
-  type: "initial-pots-images";
+  type: 'initial-pots-images';
 }
 
 interface ImportedMetadata {
-  type: "imported-metadata";
+  type: 'imported-metadata';
 }
 
 interface ImageDeleteFromPot {
-  type: "image-delete-from-pot";
+  type: 'image-delete-from-pot';
   imageName: string;
   potId: string;
 }
 
 interface ImageAdd {
-  type: "image-add";
+  type: 'image-add';
   potId: string;
   localUri: string;
 }
 
 interface ImageErrorRemote {
-  type: "image-error-remote";
+  type: 'image-error-remote';
   name: string;
 }
 
 interface ImageErrorLocal {
-  type: "image-error-local";
+  type: 'image-error-local';
   name: string;
 }
 
 interface ImageErrorFile {
-  type: "image-error-file";
+  type: 'image-error-file';
   uri: string;
 }
 
 interface ImageRemoteFailed {
-  type: "image-remote-failed";
+  type: 'image-remote-failed';
   name: string;
 }
 
 interface ImageLoaded {
-  type: "image-loaded";
+  type: 'image-loaded';
   name: string;
 }
 
 interface ImageFileCreated {
-  type: "image-file-created";
+  type: 'image-file-created';
   name: string;
   fileUri: string;
 }
 
 interface ImageFileFailed {
-  type: "image-file-failed";
+  type: 'image-file-failed';
   uri: string;
 }
 
 interface ImportInitiate {
-  type: "import-initiate";
+  type: 'import-initiate';
 }
 
 interface ImportInitiateUrl {
-  type: "import-initiate-url";
+  type: 'import-initiate-url';
   url: string;
 }
 
 interface ImportStarted {
-  type: "import-started";
+  type: 'import-started';
   metadata: string;
   imageMap: { [name: string]: string };
 }
 
 interface ImageTimeout {
-  type: "image-timeout";
+  type: 'image-timeout';
   uri: string;
 }
 
 interface ImportCancel {
-  type: "import-cancel";
+  type: 'import-cancel';
 }
 
 interface ImportFailure {
-  type: "import-failure";
+  type: 'import-failure';
   error: string | Error;
 }
 
 interface ImportMetadataAgain {
-  type: "import-metadata-again";
+  type: 'import-metadata-again';
   metadata: string;
 }
 
 interface ImportResume {
-  type: "import-resume";
+  type: 'import-resume';
   data: ImportStatePersisted;
 }
 
 interface ImportResumeAffirm {
-  type: "import-resume-affirm";
+  type: 'import-resume-affirm';
 }
 
 interface ImportResumeCancel {
-  type: "import-resume-cancel";
+  type: 'import-resume-cancel';
 }
 
 interface ExportInitiate {
-  type: "export-initiate";
+  type: 'export-initiate';
 }
 
 interface ExportStarted {
-  type: "export-started";
+  type: 'export-started';
   exportId: number;
   images: { [name: string]: ImageState };
 }
 
 interface ExportImage {
-  type: "export-image";
+  type: 'export-image';
   exportId: number;
   uri: string;
 }
 
 interface ExportImageFailure {
-  type: "export-image-failure";
+  type: 'export-image-failure';
   exportId: number;
   uri: string;
   reason: string;
 }
 
 interface ExportFinished {
-  type: "export-finished";
+  type: 'export-finished';
   exportId: number;
   uri: string;
 }
 
 interface ExportFailure {
-  type: "export-failure";
+  type: 'export-failure';
   exportId: number;
   error: string | Error;
 }
 
 interface PageEditPot {
-  type: "page-edit-pot";
+  type: 'page-edit-pot';
   potId: string;
 }
 
 interface PageSettings {
-  type: "page-settings";
+  type: 'page-settings';
 }
 
 interface ListSearchOpen {
-  type: "list-search-open";
+  type: 'list-search-open';
 }
 
 interface ListSearchClose {
-  type: "list-search-close";
+  type: 'list-search-close';
 }
 
 interface ListSearchTerm {
-  type: "list-search-term";
+  type: 'list-search-term';
   text: string;
 }
 
 interface ListCollapse {
-  type: "list-collapse";
+  type: 'list-collapse';
   section: string;
 }
 
 interface ListScroll {
-  type: "list-scroll";
+  type: 'list-scroll';
   y: number;
 }
 
 interface PageImage {
-  type: "page-image";
+  type: 'page-image';
   imageId: string;
 }

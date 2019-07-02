@@ -1,20 +1,20 @@
-import React from "react";
-import { Text, View } from "react-native";
-import { StatusString } from "../models/Status";
+import React from 'react';
+import { Text, View } from 'react-native';
+import { Pot } from '../models/Pot';
+import { StatusString } from '../models/Status';
 import {
   ExportState,
+  FullState,
   ImageStoreState,
   ImportState,
   PotsStoreState,
   UIState,
-  FullState
-} from "../reducers/types";
-import styles from "../style";
-import EditPage from "./EditPage";
-import ImagePage from "./ImagePage";
-import { ListPage } from "./ListPage";
-import SettingsPage from "./SettingsPage";
-import { Pot } from "../models/Pot";
+} from '../reducers/types';
+import styles from '../style';
+import EditPage from './EditPage';
+import ImagePage from './ImagePage';
+import { ListPage } from './ListPage';
+import SettingsPage from './SettingsPage';
 
 export interface AppViewStateProps {
   pots: PotsStoreState;
@@ -52,7 +52,7 @@ export interface AppViewDispatchProps {
   onImageLoad: (name: string) => void;
   onImageLoadFailure: (
     nameOrUri: string,
-    type: "local" | "file" | "remote"
+    type: 'local' | 'file' | 'remote',
   ) => void;
   addBackButtonHandler: (state: FullState) => void;
   loadInitial: () => void;
@@ -61,14 +61,14 @@ export interface AppViewDispatchProps {
 class AppView extends React.Component<
   AppViewDispatchProps & AppViewStateProps
 > {
-  componentDidMount() {
+  public componentDidMount() {
     this.props.addBackButtonHandler(this.props);
     this.props.loadInitial();
   }
-  render() {
+  public render() {
     const props = this.props;
     switch (props.ui.page) {
-      case "list":
+      case 'list':
         return (
           <ListPage
             pots={props.pots}
@@ -86,7 +86,7 @@ class AppView extends React.Component<
             onImageLoadFailure={props.onImageLoadFailure}
           />
         );
-      case "edit-pot":
+      case 'edit-pot':
         return (
           <EditPage
             pot={props.pots.pots[props.ui.editPotId]}
@@ -108,7 +108,7 @@ class AppView extends React.Component<
             onImageLoadFailure={props.onImageLoadFailure}
           />
         );
-      case "settings":
+      case 'settings':
         return (
           <SettingsPage
             exports={props.exports}
@@ -123,7 +123,7 @@ class AppView extends React.Component<
             onCancelResumeImport={props.onCancelResumeImport}
           />
         );
-      case "image":
+      case 'image':
         return (
           <ImagePage
             image={props.images.images[props.ui.imageId]}

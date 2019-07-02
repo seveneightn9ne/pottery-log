@@ -1,8 +1,8 @@
-import _ from "lodash";
-import { Action } from "../action";
-import { exportImage, finishExport, startExport } from "../utils/exports";
-//import { debug } from '../utils/uploader';
-import { ExportState, FullState } from "./types";
+import _ from 'lodash';
+import { Action } from '../action';
+import { exportImage, finishExport, startExport } from '../utils/exports';
+// import { debug } from '../utils/uploader';
+import { ExportState, FullState } from './types';
 
 export function getInitialState(): ExportState {
   return { exporting: false };
@@ -11,37 +11,37 @@ export function getInitialState(): ExportState {
 export function reduceExport(
   state: ExportState = getInitialState(),
   action: Action,
-  fullState: FullState
+  fullState: FullState,
 ): ExportState {
   // console.log("will check: " + action.type);
-  if (action.type === "export-initiate") {
+  if (action.type === 'export-initiate') {
     const id = Date.now();
     startExport(id, fullState.images.images);
     return {
       exporting: true,
       exportId: id,
-      statusMessage: "Starting export..."
+      statusMessage: 'Starting export...',
     };
   }
 
-  if (action.type === "page-list") {
+  if (action.type === 'page-list') {
     return getInitialState();
   }
-  if (action.type === "page-settings") {
+  if (action.type === 'page-settings') {
     // Make sure it's re-initialized when you navigate here
     return getInitialState();
   }
   if (
     !state.exporting ||
-    ("exportId" in action && action.exportId !== state.exportId)
+    ('exportId' in action && action.exportId !== state.exportId)
   ) {
     return state;
   }
   switch (action.type) {
-    case "export-started": {
+    case 'export-started': {
       let totalImages = 0;
       // let awaitingFile = 0;
-      _.forOwn(action.images, imageState => {
+      _.forOwn(action.images, (imageState) => {
         const { willExport } = exportImage(state.exportId, imageState);
         if (willExport) {
           totalImages += 1;
@@ -56,7 +56,7 @@ export function reduceExport(
           imagesExported: 0,
           totalImages,
           // awaitingFile: awaitingFile,
-          statusMessage: `Exporting images (0/${totalImages})...`
+          statusMessage: `Exporting images (0/${totalImages})...`,
         };
       } else {
         // No images, export is finished
@@ -66,12 +66,12 @@ export function reduceExport(
           ...state,
           imagesExported: 0,
           totalImages: 0,
-          statusMessage: "Finishing export..."
+          statusMessage: 'Finishing export...',
         };
       }
     }
-    case "image-file-created": {
-      if (!("exportingImages" in state)) {
+    case 'image-file-created': {
+      if (!('exportingImages' in state)) {
         return state;
       }
       // const awaitingFile = state.awaitingFile - 1;
@@ -83,7 +83,7 @@ export function reduceExport(
         // awaitingFile: awaitingFile,
         statusMessage: `Exporting images (${
           state.imagesExported
-        }/${totalImages})...`
+        }/${totalImages})...`,
       };
     }
     /*case 'image-file-failure': {
@@ -95,8 +95,8 @@ export function reduceExport(
                 awaitingFile: state.awaitingFile - 1,
             }
         }*/
-    case "export-image": {
-      if (!("exportingImages" in state)) {
+    case 'export-image': {
+      if (!('exportingImages' in state)) {
         return state;
       }
       const newState = {
@@ -104,36 +104,36 @@ export function reduceExport(
         imagesExported: state.imagesExported + 1,
         statusMessage: `Exporting images (${state.imagesExported + 1}/${
           state.totalImages
-        })...`
+        })...`,
       };
       if (
         newState.imagesExported >=
         state.totalImages /*&& state.awaitingFile <= 0*/
       ) {
-        newState.statusMessage = "Finishing export...";
+        newState.statusMessage = 'Finishing export...';
         delete newState.exportingImages;
         finishExport(state.exportId);
       }
       return newState;
     }
-    case "export-image-failure": {
+    case 'export-image-failure': {
       // uploader.debug
       return {
         exporting: false,
-        statusMessage: "Export failed.\n" + action.reason
+        statusMessage: 'Export failed.\n' + action.reason,
       };
     }
-    case "export-finished": {
+    case 'export-finished': {
       return {
         exporting: false,
-        statusMessage: "Export finished!",
-        exportUri: action.uri
+        statusMessage: 'Export finished!',
+        exportUri: action.uri,
       };
     }
-    case "export-failure": {
+    case 'export-failure': {
       return {
         exporting: false,
-        statusMessage: "Export failed.\n" + action.error
+        statusMessage: 'Export failed.\n' + action.error,
       };
     }
     default:
