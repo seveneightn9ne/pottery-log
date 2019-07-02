@@ -22,7 +22,7 @@ export function reloadFromImport(): PLThunkAction {
     dispatch({
       type: "initial-pots-images"
     });
-    await load(true);
+    await dispatch(load(true));
     dispatch({
       type: "imported-metadata"
     });
