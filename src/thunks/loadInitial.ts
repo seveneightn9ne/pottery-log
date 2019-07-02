@@ -1,18 +1,17 @@
-import { AsyncStorage } from "react-native";
-import { Pot, IntermediatePot, Image2 } from "../models/Pot";
-import { nameFromUri } from "../utils/imageutils";
-import Status from "../models/Status";
-import Notes from "../models/Notes";
-import { ThunkAction, ThunkDispatch } from "redux-thunk";
+import _ from 'lodash';
+import { AsyncStorage } from 'react-native';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { Action } from '../action';
+import Notes from '../models/Notes';
+import { Image2, IntermediatePot, Pot } from '../models/Pot';
+import Status from '../models/Status';
 import {
   FullState,
-  ImportStatePersisted,
   ImageStoreState,
-  PotsStoreState
-} from "../reducers/types";
-import { Action } from "../action";
-import _ from "lodash";
-import * as imageutils from "../utils/imageutils";
+  ImportStatePersisted,
+  PotsStoreState,
+} from '../reducers/types';
+import * as imageutils from '../utils/imageutils';
 
 type PLThunkAction = ThunkAction<Promise<any>, FullState, undefined, Action>;
 type PLThunkDispatch = ThunkDispatch<FullState, undefined, Action>;
@@ -20,11 +19,11 @@ type PLThunkDispatch = ThunkDispatch<FullState, undefined, Action>;
 export function reloadFromImport(): PLThunkAction {
   return async (dispatch: PLThunkDispatch) => {
     dispatch({
-      type: "initial-pots-images"
+      type: 'initial-pots-images',
     });
     await dispatch(load(true));
     dispatch({
-      type: "imported-metadata"
+      type: 'imported-metadata',
     });
   };
 }
@@ -35,31 +34,31 @@ export function loadInitial(): PLThunkAction {
 
 function load(isImport: boolean): PLThunkAction {
   return async (dispatch: PLThunkDispatch) => {
-    //console.log("starting load");
+    // console.log("starting load");
     let images = await loadInitialImages();
     let { pots, images2 } = await loadInitialPots(isImport);
-    //console.log("pots n images before migrating");
-    //console.log(pots, images);
+    // console.log("pots n images before migrating");
+    // console.log(pots, images);
     images2.forEach(([image, potId]) => {
-      //console.log("migrate an image", image, potId);
+      // console.log("migrate an image", image, potId);
       images = migrateFromImages2(images, image, potId);
     });
-    //console.log("pots n images before fixing");
-    //console.log(pots, images);
+    // console.log("pots n images before fixing");
+    // console.log(pots, images);
     const fixed = _fixPotsAndImages(pots, images);
     pots = fixed.pots;
     images = fixed.images;
-    //console.log("pots n images ter fixing");
-    //console.log(pots, images);
+    // console.log("pots n images ter fixing");
+    // console.log(pots, images);
     const importt = isImport ? null : await loadInitialImport();
-    //console.log("will dispatch loaded-everything");
+    // console.log("will dispatch loaded-everything");
     dispatch({
-      type: "loaded-everything",
+      type: 'loaded-everything',
       pots,
       images,
-      isImport
+      isImport,
     });
-    //console.log("loaded everything");
+    // console.log("loaded everything");
 
     // Save remote/local URIs
     // we probably don't care about the result of promise, since it's opportunistic
@@ -69,71 +68,71 @@ function load(isImport: boolean): PLThunkAction {
     // so that the image store won't ignore saves to files
     const promise = _saveImagesToFiles(images);
 
-    //console.log("will check importt");
+    // console.log("will check importt");
     if (importt) {
-      //console.log("will dispatch import-resume");
+      // console.log("will dispatch import-resume");
       dispatch({
-        type: "import-resume",
-        data: importt
+        type: 'import-resume',
+        data: importt,
       });
     }
   };
 }
 
 async function loadInitialPots(
-  isImport: boolean
-): Promise<{ pots: PotsStoreState; images2: [Image2, string][] }> {
+  isImport: boolean,
+): Promise<{ pots: PotsStoreState; images2: Array<[Image2, string]> }> {
   const keys = await AsyncStorage.getAllKeys();
-  const allPotKeys = keys.filter(k => k.startsWith("@Pot:"));
-  const potKvPairs = await AsyncStorage.multiGet([...allPotKeys, "@Pots"]);
+  const allPotKeys = keys.filter((k) => k.startsWith('@Pot:'));
+  const potKvPairs = await AsyncStorage.multiGet([...allPotKeys, '@Pots']);
   let potIdsJson = null;
-  let potsJson: { [uuid: string]: string } = {};
+  const potsJson: { [uuid: string]: string } = {};
   potKvPairs.forEach(([key, val]) => {
-    if (key.startsWith("@Pot:")) {
+    if (key.startsWith('@Pot:')) {
       const potId = key.substring(5);
       potsJson[potId] = val;
     }
-    if (key === "@Pots") {
+    if (key === '@Pots') {
       potIdsJson = val;
     }
   });
   const { potIds, pots, images2 } = loadInitialPotsFromJson(
     isImport,
     potIdsJson,
-    potsJson
+    potsJson,
   );
   return {
     pots: {
       potIds,
       pots,
-      hasLoaded: true
+      hasLoaded: true,
     },
-    images2
+    images2,
   };
 }
 
 function loadInitialPotsFromJson(
   isImport: boolean,
   potIdsJson: string | null,
-  allPotsJson: { [key: string]: string | null }
+  allPotsJson: { [key: string]: string | null },
 ): {
   potIds: string[];
   pots: { [uuid: string]: Pot };
-  images2: [Image2, string][];
+  images2: Array<[Image2, string]>;
 } {
   let potIds: string[] = [];
   if (potIdsJson) {
     try {
       potIds = JSON.parse(potIdsJson) || [];
     } catch (error) {
-      console.warn("Pot load failed to parse: " + potIdsJson);
+      console.warn('Pot load failed to parse: ' + potIdsJson);
       // Cannot continue... the @Pots key is truthy but is not json-encoded?
       throw error;
     }
   }
   const pots: { [uuid: string]: Pot } = {};
-  const allImages2: [Image2, string][] = [];
-  potIds.forEach(id => {
+  const allImages2: Array<[Image2, string]> = [];
+  potIds.forEach((id) => {
     const json = allPotsJson[id];
     if (!json) {
       console.warn(`@Pots has ${id} but there is no @Pot:${id} key`);
@@ -144,7 +143,7 @@ function loadInitialPotsFromJson(
       pots[id] = pot;
     }
     if (images2) {
-      images2.forEach(pair => {
+      images2.forEach((pair) => {
         allImages2.push(pair);
       });
     }
@@ -158,52 +157,52 @@ function loadInitialPotsFromJson(
 // }
 
 function loadPotFromJson(
-  loadedJson: string | null
-): { pot: Pot | null; images2: [Image2, string][] } {
+  loadedJson: string | null,
+): { pot: Pot | null; images2: Array<[Image2, string]> } {
   if (!loadedJson) {
     return { pot: null, images2: [] };
   }
-  const images2: [Image2, string][] = [];
+  const images2: Array<[Image2, string]> = [];
   let loaded;
   try {
     loaded = JSON.parse(loadedJson);
   } catch (error) {
-    console.log("Pot failed to parse: " + loadedJson);
+    console.log('Pot failed to parse: ' + loadedJson);
     console.warn(error);
     return { pot: null, images2: [] };
   }
   // Add all fields, for version compatibility
   const pot: IntermediatePot = { ...loaded };
   pot.status =
-    typeof loaded.status === "string"
+    typeof loaded.status === 'string'
       ? new Status(JSON.parse(loaded.status))
       : new Status(loaded.status);
 
   pot.notes2 =
-    typeof loaded.notes2 === "string"
+    typeof loaded.notes2 === 'string'
       ? new Notes(JSON.parse(loaded.notes2))
       : new Notes(loaded.notes2);
 
-  if (loaded.notes !== undefined && typeof loaded.notes !== "string") {
+  if (loaded.notes !== undefined && typeof loaded.notes !== 'string') {
     delete pot.notes;
   }
   if (loaded.images !== undefined && loaded.images2 === undefined) {
     // migrate - read the old data and convert to the new one, Miles said
     // it's ok for his old clients to lose the images.
-    console.log("Migrating images 1-2.");
+    console.log('Migrating images 1-2.');
     pot.images2 = [];
     for (const image of loaded.images) {
       pot.images2.push({
-        localUri: image
+        localUri: image,
       });
     }
   }
   if (pot.images2 !== undefined && pot.images3 === undefined) {
-    console.log("Migrating images 2-3.");
-    pot.images2.forEach(i => images2.push([i, pot.uuid])); // will add these to the image store
+    console.log('Migrating images 2-3.');
+    pot.images2.forEach((i) => images2.push([i, pot.uuid])); // will add these to the image store
     pot.images3 = [];
     for (const image of pot.images2) {
-      pot.images3.push(nameFromUri(image.localUri));
+      pot.images3.push(imageutils.nameFromUri(image.localUri));
     }
   }
   delete pot.images;
@@ -212,11 +211,11 @@ function loadPotFromJson(
 }
 
 async function loadInitialImages(): Promise<ImageStoreState> {
-  console.log("Loading ImageStore");
-  const json = await AsyncStorage.getItem("@ImageStore");
+  console.log('Loading ImageStore');
+  const json = await AsyncStorage.getItem('@ImageStore');
 
   if (!json) {
-    console.log("There was no ImageStore to load.");
+    console.log('There was no ImageStore to load.');
     return { images: {}, loaded: true };
   }
   // Don't catch this because we would rather throw to see wtf happened here
@@ -224,12 +223,12 @@ async function loadInitialImages(): Promise<ImageStoreState> {
   return { images: parsed.images || {}, loaded: true };
 }
 
-export const IMPORT_STORAGE_KEY = "@Import";
+export const IMPORT_STORAGE_KEY = '@Import';
 
 async function loadInitialImport(): Promise<ImportStatePersisted | null> {
-  //console.log("loading improt");
+  // console.log("loading improt");
   const json = await AsyncStorage.getItem(IMPORT_STORAGE_KEY);
-  //console.log("from asyncstorage got", json);
+  // console.log("from asyncstorage got", json);
   if (!json) {
     return null;
   }
@@ -249,17 +248,17 @@ async function loadInitialImport(): Promise<ImportStatePersisted | null> {
 function migrateFromImages2(
   state: ImageStoreState,
   image: Image2,
-  potId: string
+  potId: string,
 ): ImageStoreState {
   const newState = { loaded: true, images: { ...state.images } };
-  const name = nameFromUri(image.localUri);
+  const name = imageutils.nameFromUri(image.localUri);
 
   if (newState.images[name]) {
     // This image exists for another pot already
     if (newState.images[name].pots.indexOf(potId) === -1) {
       newState.images[name] = {
         ...newState.images[name],
-        pots: [...newState.images[name].pots, potId]
+        pots: [...newState.images[name].pots, potId],
       };
     }
   } else {
@@ -267,7 +266,7 @@ function migrateFromImages2(
     newState.images[name] = {
       ...image,
       name,
-      pots: [potId]
+      pots: [potId],
     };
   }
 
@@ -277,7 +276,7 @@ function migrateFromImages2(
 // exported for testing
 export function _fixPotsAndImages(
   pots: PotsStoreState,
-  images: ImageStoreState
+  images: ImageStoreState,
 ): { pots: PotsStoreState; images: ImageStoreState } {
   // Delete images with no URIs
   images = deleteImagesWithNoUri(images);
@@ -295,22 +294,22 @@ export function _fixPotsAndImages(
 
 function deleteImagesWithNoUri(images: ImageStoreState): ImageStoreState {
   const toDelete: string[] = [];
-  _.forOwn(images.images, image => {
+  _.forOwn(images.images, (image) => {
     if (!image.remoteUri && !image.fileUri && !image.localUri) {
       toDelete.push(image.name);
     }
   });
   const newImages = { ...images, images: { ...images.images } };
-  toDelete.forEach(imageName => delete newImages.images[imageName]);
+  toDelete.forEach((imageName) => delete newImages.images[imageName]);
   return newImages;
 }
 
 function fixImagesPotListsAndDeleteUnused(
   images: ImageStoreState,
-  pots: PotsStoreState
+  pots: PotsStoreState,
 ): ImageStoreState {
   const newState = { ...images, images: { ...images.images } };
-  _.forOwn(images.images, image => {
+  _.forOwn(images.images, (image) => {
     const newImage = { ...image };
     newImage.pots = potsUsingImage(image.name, pots);
     if (newImage.pots.length === 0) {
@@ -326,13 +325,13 @@ function fixImagesPotListsAndDeleteUnused(
 
 export function _saveImagesToFiles(images: ImageStoreState) {
   const promises: Array<Promise<void>> = [];
-  _.forOwn(images.images, image => {
+  _.forOwn(images.images, (image) => {
     if (image.fileUri) {
       return;
     }
     if (image.remoteUri) {
       promises.push(
-        imageutils.saveToFile(image.remoteUri, true /* isRemote */)
+        imageutils.saveToFile(image.remoteUri, true /* isRemote */),
       );
       return;
     }
@@ -346,12 +345,12 @@ export function _saveImagesToFiles(images: ImageStoreState) {
 
 function removeBrokenImageRefs(
   pots: PotsStoreState,
-  images: ImageStoreState
+  images: ImageStoreState,
 ): PotsStoreState {
   const newPots = { ...pots, pots: { ...pots.pots } };
-  _.forOwn(pots.pots, pot => {
+  _.forOwn(pots.pots, (pot) => {
     const newImages3 = [...pot.images3];
-    _.remove(newImages3, img => !images.images[img]);
+    _.remove(newImages3, (img) => !images.images[img]);
     newPots.pots[pot.uuid] = { ...pots.pots[pot.uuid], images3: newImages3 };
   });
   return newPots;
@@ -359,10 +358,10 @@ function removeBrokenImageRefs(
 
 function potsUsingImage(image: string, potState: PotsStoreState): string[] {
   if (!potState.hasLoaded) {
-    throw new Error("Cannot call potsUsingImage before pot store loaded");
+    throw new Error('Cannot call potsUsingImage before pot store loaded');
   }
   const potsUsingImage: string[] = [];
-  _.values(potState.pots).map(pot => {
+  _.values(potState.pots).map((pot) => {
     pot.images3.forEach((img: string) => {
       if (img === image) {
         potsUsingImage.push(pot.uuid);
