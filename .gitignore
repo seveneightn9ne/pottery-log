@@ -9,3 +9,4 @@ exp
 expo-cli
 .jest/
 .envrc
+coverage/

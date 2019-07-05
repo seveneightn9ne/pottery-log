@@ -1,5 +1,6 @@
+import _ from 'lodash';
 import { Action } from '../action';
-import { newPot, Pot } from '../models/Pot';
+import { newPot } from '../models/Pot';
 import { StorageWriter } from '../utils/sync';
 import store from './store';
 import { PotsStoreState } from './types';
@@ -17,14 +18,12 @@ export function reducePots(
       return action.pots;
     }
     case 'new': {
-      // dispatcher.waitFor(['loaded']);
       const pot = newPot();
       const newState = {
         ...state,
         potIds: [...state.potIds, pot.uuid],
         pots: { ...state.pots, [pot.uuid]: pot },
       };
-      persist(newState, pot);
       setTimeout(
         () => store.dispatch({ type: 'page-new-pot', potId: pot.uuid }),
         0,
@@ -43,7 +42,6 @@ export function reducePots(
           [action.potId]: newPot,
         },
       };
-      persist(newState, newPot);
       return newState;
     }
     case 'pot-delete': {
@@ -60,7 +58,6 @@ export function reducePots(
         pots: newPots,
         potIds: newPotIds,
       };
-      persist(newState);
       console.log('will navigate to page list');
       setTimeout(() => store.dispatch({ type: 'page-list' }), 1);
       return newState;
@@ -85,7 +82,6 @@ export function reducePots(
         potIds: [...state.potIds, pot.uuid],
         pots: { ...state.pots, [pot.uuid]: pot },
       };
-      persist(newState, pot);
       setTimeout(
         () => store.dispatch({ type: 'page-new-pot', potId: pot.uuid }),
         1,
@@ -98,11 +94,4 @@ export function reducePots(
     default:
       return state;
   }
-}
-
-function persist(state: PotsStoreState, pot?: Pot) {
-  if (pot !== undefined) {
-    StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot));
-  }
-  StorageWriter.put('@Pots', JSON.stringify(state.potIds));
 }

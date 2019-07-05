@@ -92,6 +92,31 @@ describe("loadInitial", () => {
     expect(dispatch).toHaveBeenCalledTimes(1);
   });
 
+  it("ignores deleted pots", async () => {
+    const dispatch = jest.fn();
+    const pot1 = newPot();
+    pot1.title = "the first pot is the best pot";
+    const pot2 = newPot();
+    mockAsyncStorage({
+      "@Pots": JSON.stringify([pot1.uuid]),
+      ["@Pot:" + pot1.uuid]: JSON.stringify(pot1),
+      ["@Pot:" + pot2.uuid]: JSON.stringify(pot2)
+    });
+    await loadInitial()(dispatch);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "loaded-everything",
+      pots: {
+        potIds: [pot1.uuid],
+        pots: {
+          [pot1.uuid]: pot1
+        },
+        hasLoaded: true
+      },
+      images: emptyImageState,
+      isImport: false
+    });
+  });
+
   it("loads pots with no images", async () => {
     const dispatch = jest.fn();
     const pot1 = newPot();
