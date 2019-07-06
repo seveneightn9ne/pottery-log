@@ -55,3 +55,14 @@ export const subscribeToPersistPotStore = makePersistingSubscriber<Pot[]>({
     );
   },
 });
+
+export const subscribeToPersistImageStore = makePersistingSubscriber({
+  shouldPersist: (prevState, newState) => [
+    !!prevState &&
+      prevState.images !== newState.images &&
+      newState.images.loaded,
+    {},
+  ],
+  persist: (newState) =>
+    StorageWriter.put('@ImageStore', JSON.stringify(newState.images)),
+});

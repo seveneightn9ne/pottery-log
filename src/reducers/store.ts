@@ -2,7 +2,10 @@ import { Constants } from 'expo';
 import { applyMiddleware, createStore, Middleware, Reducer } from 'redux';
 import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { Action } from '../action';
-import { subscribeToPersistPotStore } from '../thunks/persist';
+import {
+  subscribeToPersistImageStore,
+  subscribeToPersistPotStore,
+} from '../thunks/persist';
 import {
   getInitialState as getInitialExportState,
   reduceExport,
@@ -76,5 +79,6 @@ const store = createStore(
   applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger),
 );
 subscribeToPersistPotStore(store);
+subscribeToPersistImageStore(store);
 
 export default store;

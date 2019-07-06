@@ -2,7 +2,6 @@ import { FileSystem } from 'expo';
 import _ from 'lodash';
 import { Action } from '../action';
 import * as utils from '../utils/imageutils';
-import { StorageWriter } from '../utils/sync';
 import * as ImageUploader from '../utils/uploader';
 import { ImageState, ImageStoreState } from './types';
 
@@ -17,7 +16,7 @@ export function reduceImages(
   state: ImageStoreState,
   action: Action,
 ): ImageStoreState {
-  if (action.type == 'loaded-everything') {
+  if (action.type === 'loaded-everything') {
     return action.images;
   }
   if (!state.loaded) {
@@ -46,7 +45,6 @@ export function reduceImages(
         utils.deleteUnusedImage(im); // wee oo wee oo
         delete newState.images[action.imageName];
       }
-      persist(newState);
       return newState;
     }
     case 'pot-delete': {
@@ -67,7 +65,6 @@ export function reduceImages(
           newState.images[name] = newI;
         }
       }
-      persist(newState);
       return newState;
     }
     case 'image-add': {
@@ -84,7 +81,6 @@ export function reduceImages(
         },
       };
       utils.saveToFile(action.localUri);
-      persist(newState);
       return newState;
     }
     case 'pot-copy': {
@@ -95,7 +91,6 @@ export function reduceImages(
           pots: [...newState.images[name].pots, action.potId],
         };
       }
-      persist(newState);
       return newState;
     }
     case 'initial-pots-images': {
@@ -167,7 +162,6 @@ export function reduceImages(
           [action.name]: newImage,
         },
       };
-      persist(newState);
       return newState;
     }
     default:
@@ -185,14 +179,4 @@ export function getImageState(
     return null;
   }
   return i;
-}
-
-/* Private Helpers */
-
-function persist(state: ImageStoreState) {
-  // console.log("Persisting ImageStore");
-  if (!state.loaded) {
-    throw new Error("Cannot persist state before it's loaded");
-  }
-  StorageWriter.put('@ImageStore', JSON.stringify(state));
 }

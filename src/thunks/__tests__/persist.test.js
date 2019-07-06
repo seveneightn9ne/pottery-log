@@ -1,5 +1,8 @@
 import { StorageWriter } from "../../utils/sync";
-import { subscribeToPersistPotStore } from "../persist";
+import {
+  subscribeToPersistPotStore,
+  subscribeToPersistImageStore
+} from "../persist";
 import { newPot } from "../../models/Pot";
 
 jest.mock("../../utils/sync", () => ({
@@ -14,6 +17,10 @@ function initialState() {
       hasLoaded: false,
       potIds: [],
       pots: {}
+    },
+    images: {
+      loaded: false,
+      images: {}
     }
   };
 }
@@ -29,7 +36,20 @@ function stateWithPot() {
   return state;
 }
 
-function mockStoreAndSubscribe(oldState, newState) {
+function stateWithImage() {
+  state = initialState();
+  state.images.loaded = true;
+  state.images.images = {
+    "1.png": {
+      localUri: "1.png",
+      name: "1.png",
+      pots: ["1"]
+    }
+  };
+  return state;
+}
+
+function mockStoreAndSubscribe(oldState, newState, subscriber) {
   let hasSentOldState = false;
   let fn = null;
   const store = {
@@ -46,25 +66,105 @@ function mockStoreAndSubscribe(oldState, newState) {
       fn();
     }
   };
-  subscribeToPersistPotStore(store);
+  subscriber(store);
   expect(fn).not.toBeNull();
   fn();
   fn();
   jest.runAllTimers();
   return store;
 }
+
+describe("subscribeToPersistImageStore", () => {
+  jest.useFakeTimers();
+  afterEach(() => jest.clearAllMocks());
+
+  it("doesn't persist initial state", () => {
+    mockStoreAndSubscribe(
+      initialState(),
+      initialState(),
+      subscribeToPersistImageStore
+    );
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+
+  it("persists a new state", () => {
+    const newState = stateWithImage();
+    mockStoreAndSubscribe(
+      initialState(),
+      newState,
+      subscribeToPersistImageStore
+    );
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@ImageStore",
+      JSON.stringify(newState.images)
+    );
+  });
+
+  it("doesn't persist a reset state", () => {
+    const prevState = stateWithImage();
+    mockStoreAndSubscribe(
+      prevState,
+      initialState(),
+      subscribeToPersistImageStore
+    );
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+
+  it("persists a modified image store", () => {
+    const prevState = stateWithImage();
+    const newState = {
+      ...prevState,
+      images: {
+        ...prevState.images
+        // Don't actually need to modify anything to trigger persist
+      }
+    };
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImageStore);
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@ImageStore",
+      JSON.stringify(newState.images)
+    );
+  });
+
+  it("persists a loaded empty state", () => {
+    const prevState = stateWithImage();
+    const newState = initialState();
+    newState.images.loaded = true;
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImageStore);
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@ImageStore",
+      JSON.stringify(newState.images)
+    );
+  });
+
+  it("does not persist unchanged state", () => {
+    const prevState = stateWithImage();
+    const newState = {
+      ...prevState,
+      images: prevState.images,
+      pots: { ...prevState.pots }
+    };
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImageStore);
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+});
+
 describe("subscribeToPersistPots", () => {
   jest.useFakeTimers();
   afterEach(() => jest.clearAllMocks());
 
   it("doesn't persist initial state", () => {
-    mockStoreAndSubscribe(initialState(), initialState());
+    mockStoreAndSubscribe(
+      initialState(),
+      initialState(),
+      subscribeToPersistPotStore
+    );
     expect(StorageWriter.put).not.toHaveBeenCalled();
   });
 
   it("persists a new state", () => {
     const newState = stateWithPot();
-    mockStoreAndSubscribe(initialState(), newState);
+    mockStoreAndSubscribe(initialState(), newState, subscribeToPersistPotStore);
     expect(StorageWriter.put).toHaveBeenNthCalledWith(
       1,
       "@Pots",
@@ -79,7 +179,11 @@ describe("subscribeToPersistPots", () => {
 
   it("doesn't persist a reset state", () => {
     const prevState = stateWithPot();
-    mockStoreAndSubscribe(prevState, initialState());
+    mockStoreAndSubscribe(
+      prevState,
+      initialState(),
+      subscribeToPersistPotStore
+    );
     expect(StorageWriter.put).not.toHaveBeenCalled();
   });
 
@@ -96,7 +200,7 @@ describe("subscribeToPersistPots", () => {
         }
       }
     };
-    mockStoreAndSubscribe(prevState, newState);
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistPotStore);
     expect(StorageWriter.put).toHaveBeenNthCalledWith(
       1,
       "@Pots",
@@ -113,7 +217,7 @@ describe("subscribeToPersistPots", () => {
     const prevState = stateWithPot();
     const newState = initialState();
     newState.pots.hasLoaded = true;
-    mockStoreAndSubscribe(prevState, newState);
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistPotStore);
     expect(StorageWriter.put).toHaveBeenNthCalledWith(
       1,
       "@Pots",
@@ -125,7 +229,7 @@ describe("subscribeToPersistPots", () => {
   it("does not persist unchanged state", () => {
     const prevState = stateWithPot();
     const newState = { ...prevState, pots: prevState.pots };
-    mockStoreAndSubscribe(prevState, newState);
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistPotStore);
     expect(StorageWriter.put).not.toHaveBeenCalled();
   });
 });
