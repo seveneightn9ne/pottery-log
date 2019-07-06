@@ -1,46 +1,57 @@
 import _ from 'lodash';
 import { Store } from 'redux';
 import { Pot } from '../models/Pot';
-import { FullState, PotsStoreState } from '../reducers/types';
+import { FullState } from '../reducers/types';
 import { StorageWriter } from '../utils/sync';
 
-function shouldPersistState(
-  prevState: PotsStoreState | undefined,
-  newState: PotsStoreState,
-): [boolean, Pot[]] {
-  if (prevState === undefined) {
-    // not persisting the initial state
-    return [false, []];
-  }
-  if (prevState === newState) {
-    return [false, []];
-  }
-  if (!newState.hasLoaded) {
-    return [false, []];
-  }
-  const potsToPersist: Pot[] = _.values(newState.pots).filter(
-    (p) => p !== prevState.pots[p.uuid],
+const makePersistingSubscriber = <T>(args: {
+  shouldPersist: (
+    prevState: FullState | undefined,
+    newState: FullState,
+  ) => [boolean, T];
+  persist: (state: FullState, t: T) => void;
+}) => (store: Store<FullState>) => {
+  let prevState: FullState | undefined;
+  store.subscribe(
+    _.throttle(() => {
+      const newState = store.getState();
+      const [shouldPersist, stuffToPersist] = args.shouldPersist(
+        prevState,
+        newState,
+      );
+      if (shouldPersist) {
+        args.persist(newState, stuffToPersist);
+      }
+      prevState = newState;
+    }, 250),
   );
-  if (potsToPersist.length > 0) {
-    return [true, potsToPersist];
-  }
-  return [newState.potIds !== prevState.potIds, []];
-}
+};
 
-export function subscribeToPersistPotStore(store: Store<FullState>) {
-  let prevState: PotsStoreState | undefined;
-  store.subscribe(() => {
-    const newState = store.getState().pots;
-    const [shouldPersist, potsToPersist] = shouldPersistState(
-      prevState,
-      newState,
-    );
-    if (shouldPersist) {
-      StorageWriter.put('@Pots', JSON.stringify(newState.potIds));
+export const subscribeToPersistPotStore = makePersistingSubscriber<Pot[]>({
+  shouldPersist: (prevState, newState) => {
+    if (prevState === undefined) {
+      // not persisting the initial state
+      return [false, []];
     }
+    if (prevState.pots === newState.pots) {
+      return [false, []];
+    }
+    if (!newState.pots.hasLoaded) {
+      return [false, []];
+    }
+    const potsToPersist: Pot[] = _.values(newState.pots.pots).filter(
+      (p) => p !== prevState.pots.pots[p.uuid],
+    );
+    if (potsToPersist.length > 0) {
+      return [true, potsToPersist];
+    }
+    return [newState.pots.potIds !== prevState.pots.potIds, []];
+  },
+  persist: (newState, potsToPersist) => {
+    StorageWriter.put('@Pots', JSON.stringify(newState.pots.potIds));
+
     potsToPersist.forEach((pot) =>
       StorageWriter.put('@Pot:' + pot.uuid, JSON.stringify(pot)),
     );
-    prevState = newState;
-  });
-}
+  },
+});

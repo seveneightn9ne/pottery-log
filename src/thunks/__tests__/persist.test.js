@@ -50,9 +50,11 @@ function mockStoreAndSubscribe(oldState, newState) {
   expect(fn).not.toBeNull();
   fn();
   fn();
+  jest.runAllTimers();
   return store;
 }
 describe("subscribeToPersistPots", () => {
+  jest.useFakeTimers();
   afterEach(() => jest.clearAllMocks());
 
   it("doesn't persist initial state", () => {
