@@ -31,7 +31,7 @@ export function reducePots(
       return newState;
     }
     case 'pot-edit-field': {
-      const newPot = {
+      const pot = {
         ...state.pots[action.potId],
         [action.field]: action.value,
       };
@@ -39,7 +39,7 @@ export function reducePots(
         ...state,
         pots: {
           ...state.pots,
-          [action.potId]: newPot,
+          [action.potId]: pot,
         },
       };
       return newState;
