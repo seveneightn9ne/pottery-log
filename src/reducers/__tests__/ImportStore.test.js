@@ -16,17 +16,6 @@ jest.mock("../../reducers/store", () => ({
 jest.mock("../../utils/exports");
 jest.useFakeTimers();
 
-function expectPersisted(state) {
-  jest.runAllTimers();
-  expect(StorageWriter.put).toHaveBeenCalledWith(
-    "@Import",
-    JSON.stringify(state)
-  );
-}
-function expectPersistNoImport() {
-  expect(StorageWriter.delete).toHaveBeenCalledWith("@Import");
-}
-
 describe("ImportStore", () => {
   afterEach(() => jest.clearAllMocks());
 
@@ -344,7 +333,6 @@ describe("ImportStore", () => {
     };
     expect(state).toEqual(expectedState);
     expect(exports.importImage).toHaveBeenCalledWith("r/a.png");
-    expectPersisted(expectedState);
   });
 
   it("does resume with parallelism", () => {
@@ -377,7 +365,6 @@ describe("ImportStore", () => {
 
     expect(exports.importImage).toHaveBeenCalledWith("r/b.png");
     expect(exports.importImage).toHaveBeenCalledWith("r/c.png");
-    expectPersisted(expectedState);
   });
 
   it("aborts resume", () => {

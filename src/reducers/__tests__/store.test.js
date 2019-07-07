@@ -1,10 +1,11 @@
-import store from "../store";
+import { makeStore } from "../store";
 import { StorageWriter } from "../../utils/sync";
 import { loadInitial } from "../../thunks/loadInitial";
 
 jest.mock("../../utils/sync", () => ({
   StorageWriter: {
-    put: jest.fn()
+    put: jest.fn(),
+    delete: jest.fn()
   }
 }));
 
@@ -17,13 +18,12 @@ jest.mock("expo", () => ({
 
 describe("store", () => {
   afterEach(() => {
+    jest.clearAllTimers();
     jest.clearAllMocks();
-    store.dispatch({
-      type: "initial-pots-images"
-    });
   });
 
   it("persists pots", async () => {
+    store = makeStore();
     jest.useFakeTimers();
     await store.dispatch(loadInitial());
     expect(StorageWriter.put).not.toHaveBeenCalled();
@@ -35,6 +35,7 @@ describe("store", () => {
   });
 
   it("persists images", async () => {
+    const store = makeStore();
     jest.useFakeTimers();
     await store.dispatch(loadInitial());
     expect(StorageWriter.put).not.toHaveBeenCalled();
@@ -48,5 +49,35 @@ describe("store", () => {
       "@ImageStore",
       expect.anything()
     );
+  });
+
+  it("persists import", async () => {
+    const store = makeStore();
+    jest.useFakeTimers();
+
+    await store.dispatch(loadInitial());
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+
+    await store.dispatch({
+      type: "import-resume",
+      data: { importing: true }
+    });
+    jest.runAllTimers();
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+
+    await store.dispatch({
+      type: "import-resume-affirm"
+    });
+    jest.runAllTimers();
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@Import",
+      expect.anything()
+    );
+
+    await store.dispatch({
+      type: "import-cancel"
+    });
+    jest.runAllTimers();
+    expect(StorageWriter.delete).toHaveBeenCalledWith("@Import");
   });
 });

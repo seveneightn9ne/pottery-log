@@ -2,9 +2,11 @@ import _ from 'lodash';
 import { Store } from 'redux';
 import { Pot } from '../models/Pot';
 import { FullState } from '../reducers/types';
+import { IMPORT_STORAGE_KEY } from '../thunks/loadInitial';
 import { StorageWriter } from '../utils/sync';
 
 const makePersistingSubscriber = <T>(args: {
+  name: string;
   shouldPersist: (
     prevState: FullState | undefined,
     newState: FullState,
@@ -28,6 +30,7 @@ const makePersistingSubscriber = <T>(args: {
 };
 
 export const subscribeToPersistPotStore = makePersistingSubscriber<Pot[]>({
+  name: 'pots',
   shouldPersist: (prevState, newState) => {
     if (prevState === undefined) {
       // not persisting the initial state
@@ -57,6 +60,7 @@ export const subscribeToPersistPotStore = makePersistingSubscriber<Pot[]>({
 });
 
 export const subscribeToPersistImageStore = makePersistingSubscriber({
+  name: 'images',
   shouldPersist: (prevState, newState) => [
     !!prevState &&
       prevState.images !== newState.images &&
@@ -65,4 +69,21 @@ export const subscribeToPersistImageStore = makePersistingSubscriber({
   ],
   persist: (newState) =>
     StorageWriter.put('@ImageStore', JSON.stringify(newState.images)),
+});
+
+export const subscribeToPersistImportStore = makePersistingSubscriber({
+  name: 'import',
+  shouldPersist: (prevState, newState) => [
+    !!prevState &&
+      prevState.imports !== newState.imports &&
+      !newState.imports.resumable,
+    {},
+  ],
+  persist: (newState) => {
+    if (!newState.imports.importing) {
+      StorageWriter.delete(IMPORT_STORAGE_KEY);
+    } else {
+      StorageWriter.put(IMPORT_STORAGE_KEY, JSON.stringify(newState.imports));
+    }
+  },
 });

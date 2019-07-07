@@ -4,6 +4,7 @@ import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { Action } from '../action';
 import {
   subscribeToPersistImageStore,
+  subscribeToPersistImportStore,
   subscribeToPersistPotStore,
 } from '../thunks/persist';
 import {
@@ -74,11 +75,16 @@ function reducer(): Reducer<FullState, Action> {
   };
 }
 
-const store = createStore(
-  reducer(),
-  applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger),
-);
-subscribeToPersistPotStore(store);
-subscribeToPersistImageStore(store);
+// EXPORTED FOR TESTS
+export function makeStore() {
+  const store = createStore(
+    reducer(),
+    applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger),
+  );
+  subscribeToPersistPotStore(store);
+  subscribeToPersistImageStore(store);
+  subscribeToPersistImportStore(store);
+  return store;
+}
 
-export default store;
+export default makeStore();

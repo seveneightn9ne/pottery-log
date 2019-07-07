@@ -1,15 +1,20 @@
 import { StorageWriter } from "../../utils/sync";
 import {
   subscribeToPersistPotStore,
-  subscribeToPersistImageStore
+  subscribeToPersistImageStore,
+  subscribeToPersistImportStore
 } from "../persist";
 import { newPot } from "../../models/Pot";
 
 jest.mock("../../utils/sync", () => ({
   StorageWriter: {
-    put: jest.fn()
+    put: jest.fn(),
+    delete: jest.fn()
   }
 }));
+
+// don't want anyone to try to call the global store
+jest.mock("../../reducers/store");
 
 function initialState() {
   return {
@@ -21,6 +26,9 @@ function initialState() {
     images: {
       loaded: false,
       images: {}
+    },
+    imports: {
+      importing: false
     }
   };
 }
@@ -45,6 +53,20 @@ function stateWithImage() {
       name: "1.png",
       pots: ["1"]
     }
+  };
+  return state;
+}
+
+function stateWithImport() {
+  state = initialState();
+  state.imports.importing = true;
+  return state;
+}
+
+function stateWithResumableImport() {
+  state = initialState();
+  state.imports.resumable = {
+    importing: true
   };
   return state;
 }
@@ -230,6 +252,73 @@ describe("subscribeToPersistPots", () => {
     const prevState = stateWithPot();
     const newState = { ...prevState, pots: prevState.pots };
     mockStoreAndSubscribe(prevState, newState, subscribeToPersistPotStore);
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+});
+
+describe("subscribeToPersistImportStore", () => {
+  jest.useFakeTimers();
+  afterEach(() => jest.clearAllMocks());
+
+  it("doesn't persist initial state", () => {
+    mockStoreAndSubscribe(
+      initialState(),
+      initialState(),
+      subscribeToPersistImportStore
+    );
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+
+  it("persists a new state", () => {
+    const newState = stateWithImport();
+    mockStoreAndSubscribe(
+      initialState(),
+      newState,
+      subscribeToPersistImportStore
+    );
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@Import",
+      JSON.stringify(newState.imports)
+    );
+  });
+
+  it("doesn't persist a resumable state", () => {
+    const newState = stateWithResumableImport();
+    mockStoreAndSubscribe(
+      initialState(),
+      newState,
+      subscribeToPersistImportStore
+    );
+    expect(StorageWriter.put).not.toHaveBeenCalled();
+  });
+
+  it("persists a modified import state", () => {
+    const prevState = stateWithImport();
+    const newState = {
+      ...prevState,
+      imports: {
+        ...prevState.imports,
+        statusMessage: "something"
+      }
+    };
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImportStore);
+    expect(StorageWriter.put).toHaveBeenCalledWith(
+      "@Import",
+      JSON.stringify(newState.imports)
+    );
+  });
+
+  it("persists a loaded empty state", () => {
+    const prevState = stateWithImport();
+    const newState = initialState();
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImportStore);
+    expect(StorageWriter.delete).toHaveBeenCalledWith("@Import");
+  });
+
+  it("does not persist unchanged state", () => {
+    const prevState = stateWithImport();
+    const newState = { ...prevState, imports: prevState.imports };
+    mockStoreAndSubscribe(prevState, newState, subscribeToPersistImportStore);
     expect(StorageWriter.put).not.toHaveBeenCalled();
   });
 });

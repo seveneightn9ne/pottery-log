@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { Action } from '../action';
-import { IMPORT_STORAGE_KEY as STORAGE_KEY } from '../thunks/loadInitial';
 import {
   importImage,
   importMetadataNow,
@@ -8,7 +7,6 @@ import {
   startUrlImport,
 } from '../utils/exports';
 import { nameFromUri } from '../utils/imageutils';
-import { StorageWriter } from '../utils/sync';
 import store from './store';
 import {
   ImageMapState,
@@ -76,14 +74,12 @@ export function reduceImport(
         return state;
       }
       const newState = resume(state.resumable);
-      persist(newState);
       return newState;
     }
     case 'import-resume-cancel': {
       const newState = {
         importing: false,
       };
-      persist(newState);
       return newState;
     }
   }
@@ -104,7 +100,7 @@ export function reduceImport(
         imageMap,
         statusMessage: 'Importing pots...',
       };
-      persist(newState);
+      delete newState.resumable;
       return newState;
     }
     /*case 'import-metadata-again': {
@@ -135,7 +131,6 @@ export function reduceImport(
         const newState = {
           importing: false,
         };
-        persist(newState);
         return newState;
       }
       console.log('Scheduled ' + numImages + ' for import');
@@ -146,7 +141,7 @@ export function reduceImport(
         imagesImported: 0,
         statusMessage: `Importing images (0/${numImages})...`,
       };
-      persist(newState);
+      delete newState.resumable;
       return newState;
     }
     case 'image-file-created': {
@@ -160,6 +155,7 @@ export function reduceImport(
       }
       // console.log("Will check off this image.");
       const newState = { ...state, imageMap: { ...state.imageMap } };
+      delete newState.resumable; // shouldn't be necessary but just in case
       delete newState.imageMap[action.name];
       if (Object.keys(newState.imageMap).length === 0) {
         console.log('Import finished!');
@@ -168,7 +164,6 @@ export function reduceImport(
         const newState = {
           importing: false,
         };
-        persist(newState);
         return newState;
       }
       let hasStartedOne = false;
@@ -187,7 +182,6 @@ export function reduceImport(
         newState.totalImages
       })...`;
       // console.log(newState.statusMessage);
-      persist(newState);
       return newState;
     }
     case 'image-file-failed': {
@@ -217,7 +211,6 @@ export function reduceImport(
       const newState = {
         importing: false,
       };
-      persist(newState);
       return newState;
     }
     case 'import-failure': {
@@ -225,7 +218,6 @@ export function reduceImport(
         importing: false,
         statusMessage: 'Import failed.\n' + action.error,
       };
-      persist(newState);
       return newState;
     }
     /*
@@ -233,9 +225,6 @@ export function reduceImport(
             const newState = {
                 importing: false,
             };
-            if (state.importing) {
-                this.persist(newState);
-            }
             return newState;
         }*/
     default:
@@ -277,12 +266,4 @@ function resume(state: ImportStatePersisted): ImportState {
   }
 
   return newState;
-}
-
-async function persist(state: ImportStatePersisted) {
-  if (!state.importing) {
-    StorageWriter.delete(STORAGE_KEY);
-    return;
-  }
-  StorageWriter.put(STORAGE_KEY, JSON.stringify(state));
 }
