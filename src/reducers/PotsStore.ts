@@ -74,7 +74,7 @@ export function reducePots(
           (1 + parseInt(lastWord, 10));
       const pot = {
         ...oldPot,
-        uuid: String(Math.random()).substring(2),
+        uuid: action.newPotId,
         title: newTitle,
       };
       const newState = {
@@ -82,10 +82,6 @@ export function reducePots(
         potIds: [...state.potIds, pot.uuid],
         pots: { ...state.pots, [pot.uuid]: pot },
       };
-      setTimeout(
-        () => store.dispatch({ type: 'page-new-pot', potId: pot.uuid }),
-        1,
-      );
       return newState;
     }
     case 'initial-pots-images': {

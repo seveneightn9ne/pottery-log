@@ -138,6 +138,7 @@ interface PageList {
 interface PotCopy {
   type: 'pot-copy';
   potId: string;
+  newPotId: string;
   imageNames: string[];
 }
 

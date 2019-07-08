@@ -25,6 +25,14 @@ export function reduceUi(
         },
         new: true,
       };
+    case 'pot-copy': {
+      return {
+        ...state,
+        page: 'edit-pot',
+        editPotId: action.newPotId,
+        new: true,
+      };
+    }
     case 'page-edit-pot':
       return {
         page: 'edit-pot',

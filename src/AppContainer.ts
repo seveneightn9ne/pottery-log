@@ -157,6 +157,7 @@ export const mapDispatchToProps = (
     dispatch({
       type: 'pot-copy',
       potId: currentPot.uuid,
+      newPotId: String(Math.random()).substring(2),
       imageNames: currentPot.images3,
     }),
   onCollapse: (section: string) =>

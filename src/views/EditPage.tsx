@@ -130,16 +130,10 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
           style={styles.bottomBar}
           elevation={details.length ? 8 : 0}
         >
-          <Button
-            onPress={this.props.onDelete}
-            style={[styles.button3, styles.bbb]}
-          >
+          <Button onPress={this.onDelete} style={[styles.button3, styles.bbb]}>
             DELETE POT
           </Button>
-          <Button
-            onPress={this.props.onCopy}
-            style={[styles.button3, styles.bbb]}
-          >
+          <Button onPress={this.onCopy} style={[styles.button3, styles.bbb]}>
             COPY POT
           </Button>
         </ElevatedView>
@@ -158,6 +152,8 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
     this.props.setStatus(this.props.pot, newStatus)
   private onSetStatusDate = (newDate: Date) =>
     this.props.setStatusDate(this.props.pot, newDate)
+  private onCopy = () => this.props.onCopy(this.props.pot);
+  private onDelete = () => this.props.onDelete(this.props.pot);
 
   private focusTitle = () => {
     if (this.titleInput.current) {
