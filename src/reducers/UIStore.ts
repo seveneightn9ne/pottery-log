@@ -44,6 +44,7 @@ export function reduceUi(
         new: false,
       };
     case 'page-list':
+    case 'pot-delete':
       return { page: 'list', list: { ...state.list } };
     case 'page-settings':
       return {

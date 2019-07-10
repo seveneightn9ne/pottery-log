@@ -182,6 +182,7 @@ describe("subscribeToPersistPots", () => {
       subscribeToPersistPotStore
     );
     expect(StorageWriter.put).not.toHaveBeenCalled();
+    expect(StorageWriter.delete).not.toHaveBeenCalled();
   });
 
   it("persists a new state", () => {
@@ -197,6 +198,7 @@ describe("subscribeToPersistPots", () => {
       "@Pot:" + newState.pots.potIds[0],
       JSON.stringify(newState.pots.pots[newState.pots.potIds[0]])
     );
+    expect(StorageWriter.delete).not.toHaveBeenCalled();
   });
 
   it("doesn't persist a reset state", () => {
@@ -207,6 +209,7 @@ describe("subscribeToPersistPots", () => {
       subscribeToPersistPotStore
     );
     expect(StorageWriter.put).not.toHaveBeenCalled();
+    expect(StorageWriter.delete).not.toHaveBeenCalled();
   });
 
   it("persists a modified pot", () => {
@@ -233,6 +236,7 @@ describe("subscribeToPersistPots", () => {
       "@Pot:" + potId,
       JSON.stringify(newState.pots.pots[potId])
     );
+    expect(StorageWriter.delete).not.toHaveBeenCalled();
   });
 
   it("persists a loaded empty state", () => {
@@ -246,6 +250,9 @@ describe("subscribeToPersistPots", () => {
       JSON.stringify([])
     );
     expect(StorageWriter.put).toHaveBeenCalledTimes(1);
+    expect(StorageWriter.delete).toHaveBeenCalledWith(
+      "@Pot:" + prevState.pots.potIds[0]
+    );
   });
 
   it("does not persist unchanged state", () => {
@@ -253,6 +260,7 @@ describe("subscribeToPersistPots", () => {
     const newState = { ...prevState, pots: prevState.pots };
     mockStoreAndSubscribe(prevState, newState, subscribeToPersistPotStore);
     expect(StorageWriter.put).not.toHaveBeenCalled();
+    expect(StorageWriter.delete).not.toHaveBeenCalled();
   });
 });
 

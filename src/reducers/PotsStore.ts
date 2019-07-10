@@ -45,21 +45,18 @@ export function reducePots(
       return newState;
     }
     case 'pot-delete': {
-      const potIndex = state.potIds.indexOf(action.potId);
       const newPots = { ...state.pots };
       delete newPots[action.potId];
       const newPotIds = [...state.potIds];
+      const potIndex = state.potIds.indexOf(action.potId);
       if (potIndex > -1) {
         newPotIds.splice(potIndex, 1);
-        StorageWriter.delete('@Pot:' + action.potId);
       }
       const newState = {
         hasLoaded: true,
         pots: newPots,
         potIds: newPotIds,
       };
-      console.log('will navigate to page list');
-      setTimeout(() => store.dispatch({ type: 'page-list' }), 1);
       return newState;
     }
     case 'pot-copy': {
