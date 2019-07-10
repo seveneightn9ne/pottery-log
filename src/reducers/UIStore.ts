@@ -12,13 +12,13 @@ export function reduceUi(
   action: Action,
 ): UIState {
   switch (action.type) {
-    case 'page-new-pot':
+    case 'new':
       if (state.page !== 'list') {
         return state;
       }
       return {
         page: 'edit-pot',
-        editPotId: action.potId,
+        editPotId: action.pot.uuid,
         list: {
           ...state.list,
           yInitial: state.list.yCurrent,

@@ -1,4 +1,5 @@
 import Notes from './models/Notes';
+import { Pot } from './models/Pot';
 import Status from './models/Status';
 import {
   ImageState,
@@ -37,7 +38,6 @@ type PotAction =
   | PotCopy;
 
 type UiAction =
-  | PageNewPot
   | PageList
   | PageEditPot
   | PageSettings
@@ -91,11 +91,7 @@ interface LoadedEverything {
 
 interface New {
   type: 'new';
-}
-
-interface PageNewPot {
-  type: 'page-new-pot';
-  potId: string;
+  pot: Pot;
 }
 
 interface PotEditField {

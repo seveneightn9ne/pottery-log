@@ -2,7 +2,7 @@ import { Alert, BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import * as types from './action';
-import { Pot } from './models/Pot';
+import { newPot, Pot } from './models/Pot';
 import { StatusString } from './models/Status';
 import { FullState } from './reducers/types';
 import { loadInitial } from './thunks/loadInitial';
@@ -27,6 +27,7 @@ export const mapDispatchToProps = (
   onNew: () =>
     dispatch({
       type: 'new',
+      pot: newPot(),
     }),
   onEdit: (potId: string) =>
     dispatch({

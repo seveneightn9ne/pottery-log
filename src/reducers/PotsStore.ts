@@ -1,8 +1,5 @@
 import _ from 'lodash';
 import { Action } from '../action';
-import { newPot } from '../models/Pot';
-import { StorageWriter } from '../utils/sync';
-import store from './store';
 import { PotsStoreState } from './types';
 
 export function getInitialState(): PotsStoreState {
@@ -18,16 +15,11 @@ export function reducePots(
       return action.pots;
     }
     case 'new': {
-      const pot = newPot();
       const newState = {
         ...state,
-        potIds: [...state.potIds, pot.uuid],
-        pots: { ...state.pots, [pot.uuid]: pot },
+        potIds: [...state.potIds, action.pot.uuid],
+        pots: { ...state.pots, [action.pot.uuid]: action.pot },
       };
-      setTimeout(
-        () => store.dispatch({ type: 'page-new-pot', potId: pot.uuid }),
-        0,
-      );
       return newState;
     }
     case 'pot-edit-field': {
