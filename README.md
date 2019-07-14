@@ -22,4 +22,9 @@ yarn start # the expo dev server
 6. Press the big button
 7. Select your `ipa` file
 8. Click through until it tells you you're done
-9. TODO - do we need to do anything to publish it?
+9. Ignore any email from Apple about Missing Push Notification Entitlement
+10. Wait for the "completed processing" email
+11. Go to App Store Connect -> My Apps -> +Version or Platform
+12. Fill in the description, Add the new build, Save, Submit for review
+13. Answer "No" to encryption question
+14. Answer "Yes" to IDFA question - check the two "Attribute" boxes ([details](https://docs.expo.io/versions/latest/distribution/app-stores/#ios-specific-guidelines)}
