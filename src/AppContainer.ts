@@ -5,6 +5,7 @@ import * as types from './action';
 import { newPot, Pot } from './models/Pot';
 import { StatusString } from './models/Status';
 import { FullState } from './reducers/types';
+import { handleBackButton } from './thunks/back';
 import { loadInitial } from './thunks/loadInitial';
 import { nameFromUri } from './utils/imageutils';
 import AppView, {
@@ -201,37 +202,14 @@ export const mapDispatchToProps = (
       });
     }
   },
-  addBackButtonHandler: (state: FullState) => {
-    const { ui, exports } = state;
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      if (ui.page === 'list') {
-        if ('searching' in ui) {
-          dispatch({
-            type: 'list-search-close',
-          });
-          return true;
-        }
-        return false;
-      }
-      if (ui.page === 'image') {
-        dispatch({
-          type: 'page-edit-pot',
-          potId: ui.editPotId,
-        });
-        return true;
-      }
-      if (exports.exporting && !('exportUri' in exports)) {
-        Alert.alert('Cancel this export?', undefined, [
-          { text: 'Stay here', style: 'cancel' },
-          { text: 'Cancel', onPress: () => dispatch({ type: 'page-list' }) },
-        ]);
-        return true;
-      }
-      dispatch({
-        type: 'page-list',
-      });
-      return true;
-    });
+  addBackButtonHandler: () => {
+    const handler = () => dispatch(handleBackButton());
+    BackHandler.addEventListener('hardwareBackPress', handler);
+    return handler;
+  },
+  removeBackButtonHandler: (handler: undefined | (() => void)) => {
+    if (handler) { BackHandler.removeEventListener('hardwareBackPress', handler); }
+    return undefined;
   },
   loadInitial: () => {
     dispatch(loadInitial());

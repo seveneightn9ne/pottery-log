@@ -4,7 +4,6 @@ import { Pot } from '../models/Pot';
 import { StatusString } from '../models/Status';
 import {
   ExportState,
-  FullState,
   ImageStoreState,
   ImportState,
   PotsStoreState,
@@ -54,16 +53,22 @@ export interface AppViewDispatchProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
-  addBackButtonHandler: (state: FullState) => void;
+  addBackButtonHandler: () => () => void;
+  removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
 }
 
 class AppView extends React.Component<
   AppViewDispatchProps & AppViewStateProps
 > {
+  private backHandler: (() => void) | undefined;
   public componentDidMount() {
-    this.props.addBackButtonHandler(this.props);
+    this.backHandler = this.props.addBackButtonHandler();
     this.props.loadInitial();
+  }
+
+  public componentWillUnmount() {
+    this.backHandler = this.props.removeBackButtonHandler(this.backHandler);
   }
   public render() {
     const props = this.props;

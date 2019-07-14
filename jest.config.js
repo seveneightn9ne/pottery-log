@@ -1,13 +1,9 @@
 module.exports = {
-  preset: 'jest-expo',
-  cacheDirectory: '.jest/cache',
-  moduleFileExtensions: [
-    "ts",
-    "tsx",
-    "js"
-  ],
+  preset: "jest-expo",
+  cacheDirectory: ".jest/cache",
+  moduleFileExtensions: ["ts", "tsx", "js"],
   transform: {
     "^.+\\.(js|ts|tsx)$": "babel-jest"
   },
-  setupTestFrameworkScriptFile: "<rootDir>setupTests.js",
+  setupFilesAfterEnv: ["<rootDir>setupTests.js"]
 };

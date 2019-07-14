@@ -1,6 +1,7 @@
 import { makeStore } from "../store";
 import { StorageWriter } from "../../utils/sync";
 import { loadInitial } from "../../thunks/loadInitial";
+import { newPot } from "../../models/Pot";
 
 jest.mock("../../utils/sync", () => ({
   StorageWriter: {
@@ -28,7 +29,8 @@ describe("store", () => {
     await store.dispatch(loadInitial());
     expect(StorageWriter.put).not.toHaveBeenCalled();
     store.dispatch({
-      type: "new"
+      type: "new",
+      pot: newPot()
     });
     jest.runAllTimers();
     expect(StorageWriter.put).toHaveBeenCalledWith("@Pots", expect.anything());

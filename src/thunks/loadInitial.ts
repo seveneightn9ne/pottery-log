@@ -1,20 +1,15 @@
 import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { Action } from '../action';
 import Notes from '../models/Notes';
 import { Image2, IntermediatePot, Pot } from '../models/Pot';
 import Status from '../models/Status';
 import {
-  FullState,
   ImageStoreState,
   ImportStatePersisted,
   PotsStoreState,
 } from '../reducers/types';
 import * as imageutils from '../utils/imageutils';
-
-type PLThunkAction = ThunkAction<Promise<any>, FullState, undefined, Action>;
-type PLThunkDispatch = ThunkDispatch<FullState, undefined, Action>;
+import { PLThunkAction, PLThunkDispatch } from './types';
 
 export function reloadFromImport(): PLThunkAction {
   return async (dispatch: PLThunkDispatch) => {
