@@ -9,8 +9,8 @@ import * as uploader from './uploader';
 const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
 
 const keyIsExportable = (key: string) => {
-  for (let i = 0; i < EXPORT_KEY_PREFIX.length; i++) {
-    if (key.indexOf(EXPORT_KEY_PREFIX[i]) === 0) {
+  for (const prefix of EXPORT_KEY_PREFIX) {
+    if (key.indexOf(prefix) === 0) {
       return true;
     }
   }
@@ -43,11 +43,11 @@ function exportImage(
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri === imageState.remoteUri;
-    const promise = uri ? saveToFile(uri, isRemote) : Promise.resolve();
+    const p = uri ? saveToFile(uri, isRemote) : Promise.resolve();
     // console.log("returning promise", promise);
     return {
       willExport: false,
-      promise,
+      promise: p,
     };
   }
 

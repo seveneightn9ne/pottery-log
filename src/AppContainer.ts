@@ -7,7 +7,7 @@ import { StatusString } from './models/Status';
 import { FullState } from './reducers/types';
 import { handleBackButton } from './thunks/back';
 import { loadInitial } from './thunks/loadInitial';
-import { nameFromUri } from './utils/imageutils';
+import { addImage } from './thunks/pickImage';
 import AppView, {
   AppViewDispatchProps,
   AppViewStateProps,
@@ -72,19 +72,7 @@ export const mapDispatchToProps = (
       text,
     });
   },
-  onAddImage: (currentPot: Pot, localUri: string) => {
-    dispatch({
-      type: 'image-add',
-      localUri,
-      potId: currentPot.uuid,
-    });
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'images3',
-      value: [nameFromUri(localUri), ...currentPot.images3],
-      potId: currentPot.uuid,
-    });
-  },
+  onAddImage: (currentPot: Pot) => dispatch(addImage(currentPot)),
   onSetMainImage: (currentPot: Pot, name: string) =>
     dispatch({
       type: 'pot-edit-field',
@@ -208,7 +196,9 @@ export const mapDispatchToProps = (
     return handler;
   },
   removeBackButtonHandler: (handler: undefined | (() => void)) => {
-    if (handler) { BackHandler.removeEventListener('hardwareBackPress', handler); }
+    if (handler) {
+      BackHandler.removeEventListener('hardwareBackPress', handler);
+    }
     return undefined;
   },
   loadInitial: () => {

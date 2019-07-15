@@ -31,7 +31,7 @@ export interface AppViewDispatchProps {
   onEdit: (potId: string) => void;
   onNavigateToList: () => void;
   onNavigateToSettings: () => void;
-  onAddImage: (currentPot: Pot, localUri: string) => void;
+  onAddImage: (currentPot: Pot) => void;
   onSetMainImage: (currentPot: Pot, name: string) => void;
   onDeleteImage: (currentPot: Pot, name: string) => void;
   onExpandImage: (name: string) => void;

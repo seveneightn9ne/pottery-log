@@ -1694,15 +1694,16 @@
   resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
   integrity sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==
 
-"@types/expo@^31.0.3":
-  version "31.0.4"
-  resolved "https://registry.yarnpkg.com/@types/expo/-/expo-31.0.4.tgz#093e37fa8ef5be87d323091482c0a4c494031a90"
-  integrity sha512-MHb9fBh7K+/2lviypYvzKnh6JmnbiQd9tnQLtxFQ3m+HK2o2g3EHsiYWhP+jD3+bHy5J/y1nShraU5TtHa53vg==
+"@types/expo@^33.0.0":
+  version "32.0.13"
+  resolved "https://registry.yarnpkg.com/@types/expo/-/expo-32.0.13.tgz#c43c9c0ada5e62a466ea427cc922c495345f55a7"
+  integrity sha512-kKU0zpkiyGGB4+A26vT9QmWbQ8/ccu9ui8ek7gDsz8FAk8atAvHQq9WaZpARSNqH6jTn+Ww2tKUo3Mw/cutoQQ==
   dependencies:
     "@types/fbemitter" "*"
     "@types/react" "*"
     "@types/react-native" "*"
     react-native-maps "*"
+    react-native-svg "*"
 
 "@types/fbemitter@*", "@types/fbemitter@^2.0.32":
   version "2.0.32"
@@ -5449,7 +5450,7 @@ expo-camera@~5.0.1:
     lodash "^4.6.0"
     prop-types "^15.6.0"
 
-expo-cli@^2.16.1:
+expo-cli@^2.21.2:
   version "2.21.2"
   resolved "https://registry.yarnpkg.com/expo-cli/-/expo-cli-2.21.2.tgz#7e2d24f5c2de1cf9347fc7c9209a0053b9f6aa14"
   integrity sha512-0Dx1Mmj72b/Xpg5vuougrOqfWhfa3VTSPYQl89TPV8TD5ZeKZsEpAL+/+Sr1FYl4i0BBiolHT/mSYRnElTWxXg==
@@ -12058,6 +12059,11 @@ react-native-sentry@^0.42.0:
   dependencies:
     "@sentry/wizard" "^0.12.1"
     raven-js "^3.24.2"
+
+react-native-svg@*:
+  version "9.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.5.1.tgz#eb21fa7eb5d71649620541e6549c6ed425d80240"
+  integrity sha512-cRGfomzG/5LEwuJ6ct3m5yccckeI9aj8BNYwDPVxOeJ84LuJuvk5OqcjlYNeEzOWmWiH+QrFXfpLH1ag04bUeQ==
 
 react-native-svg@9.4.0:
   version "9.4.0"

@@ -25,7 +25,7 @@ interface EditPageProps {
   onChangeTitle: (potId: string, text: string) => void;
   onChangeNote: (currentPot: Pot, status: StatusString, text: string) => void;
   onNavigateToList: () => void;
-  onAddImage: (currentPot: Pot, localUri: string) => void;
+  onAddImage: (currentPot: Pot) => void;
   onSetMainImage: (currentPot: Pot, imageName: string) => void;
   onDeleteImage: (currentPot: Pot, imageName: string) => void;
   onExpandImage: (imageName: string) => void;
@@ -141,7 +141,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
     );
   }
 
-  private onAddImage = (i: string) => this.props.onAddImage(this.props.pot, i);
+  private onAddImage = () => this.props.onAddImage(this.props.pot);
   private onChangeTitle = (text: string) =>
     this.props.onChangeTitle(this.props.pot.uuid, text)
   private onChangeNote = (status: StatusString, note: string) =>

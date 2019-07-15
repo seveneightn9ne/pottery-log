@@ -8,7 +8,7 @@
     "@babel/plugin-transform-flow-strip-types": "^7.2.3",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-typescript": "^7.1.0",
-    "@types/expo": "^31.0.3",
+    "@types/expo": "^32.0.13",
     "@types/flux": "^3.1.8",
     "@types/jest": "^23.3.10",
     "@types/react": "^16.7.17",

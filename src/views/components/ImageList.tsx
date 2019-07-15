@@ -9,7 +9,7 @@ interface ImageListProps {
   images: string[];
   imageState: ImageStoreState;
   size: number;
-  onAddImage: (localUri: string) => void;
+  onAddImage: () => void;
   onClickImage: (name: string) => void;
   onDeleteImage: (name: string) => void;
   onImageLoad: (name: string) => void;
@@ -42,7 +42,7 @@ export default function ImageList(props: ImageListProps) {
     <ScrollView horizontal={true} style={{ paddingLeft: 4, paddingTop: 4 }}>
       {images}
       <ImagePicker
-        onPicked={props.onAddImage}
+        onAddImage={props.onAddImage}
         style={{
           height: props.size,
           width: images.length ? 100 - 4 * 3 : props.size + 100 - 4 * 2,
