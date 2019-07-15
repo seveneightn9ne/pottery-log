@@ -1,4 +1,5 @@
-import { ImagePicker, Permissions } from 'expo';
+import * as ImagePicker from 'expo-image-picker';
+import * as Permissions from 'expo-permissions';
 import { Alert } from 'react-native';
 import { Pot } from '../models/Pot';
 import { nameFromUri } from '../utils/imageutils';
@@ -35,8 +36,8 @@ function pickImage(
   pot: Pot,
   getPermission: () => Promise<void>,
   launcher: (
-    options?: ImagePicker.CameraOptions & ImagePicker.ImageLibraryOptions,
-  ) => Promise<ImagePicker.ImageResult>,
+    options?: ImagePicker.ImagePickerOptions,
+  ) => Promise<ImagePicker.ImagePickerResult>,
 ) {
   return async () => {
     try {

@@ -1,4 +1,4 @@
-import { FileSystem } from 'expo';
+import * as FileSystem from 'expo-file-system';
 import _ from 'lodash';
 import store from '../reducers/store';
 import { ImageState } from '../reducers/types';
@@ -19,6 +19,11 @@ export function saveToFile(uri: string, isRemote = false): Promise<void> {
   }
   const name = nameFromUri(uri);
   const random = Math.floor(Math.random() * 1000000 + 1);
+  if (FileSystem.documentDirectory == null) {
+    console.warn('No document directory');
+    setTimeout(onError, 0);
+    return Promise.resolve();
+  }
   const dir = FileSystem.documentDirectory + random;
   return FileSystem.makeDirectoryAsync(dir, { intermediates: true })
     .catch(() => {

@@ -1,5 +1,6 @@
 import { Alert, AsyncStorage } from "react-native";
-import { DocumentPicker, FileSystem } from "expo";
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 import * as exports from "../exports";
 import * as uploader from "../uploader";
 import * as imageutils from "../imageutils";

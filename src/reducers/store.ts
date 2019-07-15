@@ -1,4 +1,4 @@
-import { Constants } from 'expo';
+import Constants from 'expo-constants';
 import { applyMiddleware, createStore, Middleware, Reducer } from 'redux';
 import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { Action } from '../action';

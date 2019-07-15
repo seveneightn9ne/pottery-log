@@ -1,5 +1,5 @@
 import dispatcher from "../../reducers/store";
-import { FileSystem } from "expo";
+import * as FileSystem from 'expo-file-system';
 import { saveToFile } from "../imageutils";
 
 jest.mock("../uploader");

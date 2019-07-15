@@ -5,7 +5,7 @@ import {
 } from "../loadInitial";
 import { AsyncStorage } from "react-native";
 import { newPot } from "../../models/Pot";
-import { FileSystem } from "expo";
+import * as FileSystem from 'expo-file-system';
 import * as imageutils from "../../utils/imageutils";
 
 jest.mock("AsyncStorage");

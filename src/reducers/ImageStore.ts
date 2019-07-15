@@ -1,4 +1,4 @@
-import { FileSystem } from 'expo';
+import * as FileSystem from 'expo-file-system';
 import _ from 'lodash';
 import { Action } from '../action';
 import * as utils from '../utils/imageutils';

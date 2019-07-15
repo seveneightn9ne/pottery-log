@@ -1,4 +1,4 @@
-import { Constants } from 'expo';
+import Constants from 'expo-constants';
 import _ from 'lodash';
 import store from '../reducers/store';
 import { ImageState } from '../reducers/types';

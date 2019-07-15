@@ -1,6 +1,6 @@
 import React from "react";
 import AppContainer from "./src/AppContainer";
-import { Font } from "expo";
+import * as Font from 'expo-font';
 import Sentry from "sentry-expo";
 import "array-reverse-polyfill";
 import { Provider } from "react-redux";
