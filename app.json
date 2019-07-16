@@ -4,7 +4,7 @@
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.33.0",
+    "version": "2.33.1",
     "privacy": "public",
     "assetBundlePatterns": ["./assets/*.png", "./assets/*.ttf"],
     "android": {
@@ -19,13 +19,13 @@
     },
     "ios": {
       "bundleIdentifier": "com.jesskenney.potterylog",
-      "buildNumber": "1.0.3",
+      "buildNumber": "1.0.4",
       "icon": "./assets/launcher_ios_1024.png",
       "usesIcloudStorage": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow Pottery Log to use the camera to take photos of your pots.",
-        "NSPhotoLibraryAddUsageDescription": "Allow Pottery Log to store your pot photos.",
-        "NSPhotoLibraryUsageDescription": "Allow Pottery Log to use photos from your Camera Roll."
+        "NSCameraUsageDescription": "Allow Pottery Log to use the camera to take photos of your pots so you can view the photos of your pots in the app.",
+        "NSPhotoLibraryAddUsageDescription": "Allow Pottery Log to store your pot photos so it can display them in the app.",
+        "NSPhotoLibraryUsageDescription": "Allow Pottery Log to include photos from your Camera Roll so you can view the photos of your pots in the app."
       }
     },
     "primaryColor": "#4caf50",
