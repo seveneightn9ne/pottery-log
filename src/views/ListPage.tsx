@@ -39,6 +39,7 @@ interface ListPageProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 interface SectionT {

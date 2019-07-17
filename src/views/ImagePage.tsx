@@ -18,6 +18,7 @@ interface ImagePageProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 export default class ImagePage extends React.Component<ImagePageProps> {

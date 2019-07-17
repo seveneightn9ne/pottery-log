@@ -90,6 +90,7 @@ class AppView extends React.Component<
             onCollapse={props.onCollapse}
             onImageLoad={props.onImageLoad}
             onImageLoadFailure={props.onImageLoadFailure}
+            onResetImageLoad={props.onResetImageLoad}
           />
         );
       case 'edit-pot':
@@ -141,6 +142,7 @@ class AppView extends React.Component<
             onBack={props.onEdit}
             onImageLoad={props.onImageLoad}
             onImageLoadFailure={props.onImageLoadFailure}
+            onResetImageLoad={props.onResetImageLoad}
           />
         );
       default:
