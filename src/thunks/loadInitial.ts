@@ -61,6 +61,7 @@ function load(isImport: boolean): PLThunkAction {
     // especially since we don't want to delay offering to resume the import
     // btw, it had to be after we dispatch "loaded-everything"
     // so that the image store won't ignore saves to files
+    // @ts-ignore
     const promise = _saveImagesToFiles(images);
 
     // console.log("will check importt");
