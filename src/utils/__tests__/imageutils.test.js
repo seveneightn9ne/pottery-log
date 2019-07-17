@@ -4,14 +4,12 @@ import { saveToFile, nameFromUri, resetDirectory } from "../imageutils";
 
 jest.mock("../uploader");
 jest.mock("../../reducers/store");
-jest.mock("expo", () => ({
-  FileSystem: {
-    documentDirectory: "test://document/directory",
-    makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
-    getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true })),
-    downloadAsync: jest.fn().mockReturnValue(Promise.resolve()),
-    copyAsync: jest.fn().mockReturnValue(Promise.resolve())
-  }
+jest.mock("expo-file-system", () => ({
+  documentDirectory: "test://document/directory",
+  makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true })),
+  downloadAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  copyAsync: jest.fn().mockReturnValue(Promise.resolve())
 }));
 
 function expectError(uri) {

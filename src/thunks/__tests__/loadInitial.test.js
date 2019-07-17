@@ -5,20 +5,18 @@ import {
 } from "../loadInitial";
 import { AsyncStorage } from "react-native";
 import { newPot } from "../../models/Pot";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 import * as imageutils from "../../utils/imageutils";
 
 jest.mock("AsyncStorage");
-jest.mock("expo", () => ({
-  FileSystem: {
-    documentDirectory: "file://mock-document-directory/",
-    makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
-    copyAsync: jest.fn().mockReturnValue(Promise.resolve()),
-    deleteAsync: jest.fn().mockReturnValue(Promise.resolve())
-  },
-  Constants: {
-    appOwnership: "expo"
-  }
+jest.mock("expo-file-system", () => ({
+  documentDirectory: "file://mock-document-directory/",
+  makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  copyAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  deleteAsync: jest.fn().mockReturnValue(Promise.resolve())
+}));
+jest.mock("expo-constants", () => ({
+  appOwnership: "expo"
 }));
 jest.mock("../../utils/imageutils", () => ({
   ...jest.requireActual("../../utils/imageutils"),

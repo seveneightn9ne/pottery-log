@@ -1,6 +1,6 @@
 import { Alert, AsyncStorage } from "react-native";
-import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from "expo-file-system";
+import * as DocumentPicker from "expo-document-picker";
 import * as exports from "../exports";
 import * as uploader from "../uploader";
 import * as imageutils from "../imageutils";
@@ -21,16 +21,14 @@ jest.mock("../imageutils", () => ({
 jest.mock("../../reducers/store", () => ({
   dispatch: jest.fn()
 }));
-jest.mock("expo", () => ({
-  DocumentPicker: {
-    getDocumentAsync: jest.fn()
-  },
-  Constants: {
-    appOwnership: "expo"
-  },
-  FileSystem: {
-    getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true }))
-  }
+jest.mock("expo-document-picker", () => ({
+  getDocumentAsync: jest.fn()
+}));
+jest.mock("expo-constants", () => ({
+  appOwnership: "expo"
+}));
+jest.mock("expo-file-system", () => ({
+  getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true }))
 }));
 jest.mock("Alert", () => ({
   alert: jest.fn()

@@ -5,5 +5,5 @@ module.exports = {
   transform: {
     "^.+\\.(js|ts|tsx)$": "babel-jest"
   },
-  setupFilesAfterEnv: ["<rootDir>setupTests.js"]
+  setupFilesAfterEnv: ["<rootDir>/setupTests.js"]
 };

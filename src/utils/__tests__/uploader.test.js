@@ -9,10 +9,8 @@ global.FormData = function() {
   this.append = jest.fn();
 };
 
-jest.mock("expo", () => ({
-  Constants: {
-    deviceId: "1001"
-  }
+jest.mock("expo-constants", () => ({
+  deviceId: "1001"
 }));
 
 function mockFetchJson(val) {

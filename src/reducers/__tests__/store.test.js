@@ -10,12 +10,10 @@ jest.mock("../../utils/sync", () => ({
   }
 }));
 
-jest.mock("expo", () => ({
-  FileSystem: {
-    makeDirectoryAsync: jest.fn(() => Promise.resolve())
-  },
-  Constants: {}
+jest.mock("expo-file-system", () => ({
+  makeDirectoryAsync: jest.fn(() => Promise.resolve())
 }));
+jest.mock("expo-constants");
 
 describe("store", () => {
   afterEach(() => {

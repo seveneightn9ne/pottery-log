@@ -2,16 +2,9 @@ import React from "react";
 import App from "../App";
 import { shallow, mount } from "enzyme";
 
-jest.mock("expo", () => ({
-  FileSystem: {
-    makeDirectoryAsync: jest.fn(() => Promise.resolve()),
-    getInfoAsync: jest.fn(() => Promise.resolve())
-  },
-  Constants: {},
-  Font: {
-    loadAsync: jest.fn(() => Promise.resolve())
-  }
-}));
+jest.mock("expo-file-system");
+jest.mock("expo-constants");
+jest.mock("expo-font");
 
 describe("App", () => {
   it("matches the snapshot after font loaded", async () => {
