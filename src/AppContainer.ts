@@ -190,6 +190,12 @@ export const mapDispatchToProps = (
       });
     }
   },
+  onResetImageLoad: (oldUri: string, newUri: string) =>
+    dispatch({
+      type: 'image-reset-loaded',
+      oldUri,
+      newUri,
+    }),
   addBackButtonHandler: () => {
     const handler = () => dispatch(handleBackButton());
     BackHandler.addEventListener('hardwareBackPress', handler);

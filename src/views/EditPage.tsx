@@ -38,6 +38,7 @@ interface EditPageProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (newUri: string, oldUri: string) => void;
 }
 
 export default class EditPage extends React.Component<EditPageProps, {}> {
@@ -112,6 +113,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
               onDeleteImage={this.onDeleteImage}
               onImageLoad={this.props.onImageLoad}
               onImageLoadFailure={this.props.onImageLoadFailure}
+              onResetImageLoad={this.props.onResetImageLoad}
             />
             <StatusSwitcher
               fontLoaded={this.props.fontLoaded}

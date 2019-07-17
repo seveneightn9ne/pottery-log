@@ -17,6 +17,7 @@ interface ImageListProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 export default function ImageList(props: ImageListProps) {

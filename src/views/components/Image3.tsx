@@ -1,7 +1,7 @@
-// import { FileSystem } from 'expo';
 import React from 'react';
 import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
 import { ImageState } from '../../reducers/types';
+import { resetDirectory } from '../../utils/imageutils';
 
 interface Image3Props {
   image: ImageState | null;
@@ -12,12 +12,15 @@ interface Image3Props {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 interface Image3State {
   failed: boolean;
   tries: number;
   uri: string; // URI is changed when tries is changed, to force a reload
+  baseUriIfReset?: string;
+  originalUriIfReset?: string;
 }
 
 export default class Image3 extends React.Component<Image3Props, Image3State> {
@@ -85,7 +88,7 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     );
   }
 
-  private uri = (props = this.props) => {
+  private baseUriFromProps = (props = this.props) => {
     if (!props.image) {
       return '';
     }
@@ -94,15 +97,13 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
       props.image.localUri ||
       props.image.remoteUri ||
       '';
-    return fullUri + '?r' + Date.now();
+    return fullUri;
   }
 
-  /*
-  private resetDirectory(uri: string): string {
-    const parts = uri.split("/");
-    return FileSystem.documentDirectory + parts[parts.length - 2] + '/' + parts[parts.length - 1];
-  }
-  */
+  private baseUri = (props?: Image3Props) =>
+    (this.state && this.state.baseUriIfReset) || this.baseUriFromProps(props)
+  private uniqueUri = (baseUri: string) => baseUri + '?r' + Date.now();
+  private uri = (props?: Image3Props) => this.uniqueUri(this.baseUri(props));
 
   private onLoad = () => {
     if (!this.props.image) {
@@ -111,6 +112,13 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     if (!this.props.image.fileUri) {
       // Skip unnecessary actions because we only care about loads that will cause a download
       this.props.onImageLoad(this.props.image.name);
+    }
+    if (this.state.originalUriIfReset) {
+      // Resetting the document directory fixed the image
+      this.props.onResetImageLoad(
+        this.state.originalUriIfReset,
+        this.state.uri,
+      );
     }
     const tries = Image3.defaultTries(this.props);
     this.setState({ failed: false, tries });
@@ -134,16 +142,21 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
       return;
     }
     if (this.props.image.fileUri) {
-      // The fileUri failed 3 times. It's gone.
-
-      // Debugging
-      // console.log(this.props.image.name, 'loaded FAILURE');
-      // FileSystem.getInfoAsync(this.state.uri).then((info) => {
-      //  console.log("Loaded file info.", info);
-      // });
-
-      this.props.onImageLoadFailure(this.props.image.fileUri, 'file');
-      this.setState({ failed: true, tries: this.state.tries });
+      if (!this.state.originalUriIfReset) {
+        // Try resetting the document directory
+        const baseUri = resetDirectory(this.props.image.fileUri);
+        this.setState((state) => ({
+          tries: Image3.defaultTries(this.props),
+          failed: false,
+          baseUriIfReset: baseUri,
+          originalUriIfReset: state.uri,
+          uri: this.uniqueUri(baseUri),
+        }));
+      } else {
+        // failed despite reset. It's gone.
+        this.props.onImageLoadFailure(this.props.image.fileUri, 'file');
+        this.setState({ failed: true, tries: this.state.tries });
+      }
     } else if (this.props.image.localUri) {
       // The localUri failed 3 times. It's gone.
       this.props.onImageLoadFailure(this.props.image.name, 'local');

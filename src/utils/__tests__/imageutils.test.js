@@ -1,12 +1,12 @@
 import dispatcher from "../../reducers/store";
-import * as FileSystem from 'expo-file-system';
-import { saveToFile } from "../imageutils";
+import * as FileSystem from "expo-file-system";
+import { saveToFile, nameFromUri, resetDirectory } from "../imageutils";
 
 jest.mock("../uploader");
 jest.mock("../../reducers/store");
 jest.mock("expo", () => ({
   FileSystem: {
-    documentDirectory: "test://document/directory/",
+    documentDirectory: "test://document/directory",
     makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
     getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true })),
     downloadAsync: jest.fn().mockReturnValue(Promise.resolve()),
@@ -99,5 +99,25 @@ describe("saveToFile", () => {
     await saveToFile(uri, false);
     jest.runAllTimers();
     expectError(uri);
+  });
+});
+
+describe("nameFromUri", () => {
+  it("removes the directory and param", () => {
+    const uri = "file:///doc/dir/thing/12345/myFile.png?getRidOfThis";
+    const name = nameFromUri(uri);
+    expect(name).toBe("myFile.png");
+  });
+});
+
+describe("resetDirectory", () => {
+  const mockedDocDir = "test://document/directory";
+  it("resets the doc dir", () => {
+    const newUri = resetDirectory("file:///this/is/bad/file.png");
+    expect(newUri).toBe(mockedDocDir + "/file.png");
+  });
+  it("preserves the random dir", () => {
+    const newUri = resetDirectory("file:///this/is/bad/23456/file.png");
+    expect(newUri).toBe(mockedDocDir + "/23456/file.png");
   });
 });

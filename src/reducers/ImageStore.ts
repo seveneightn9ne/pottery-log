@@ -117,8 +117,29 @@ export function reduceImages(
     case 'image-error-file': {
       const uri = action.uri;
       const documentDirectory = FileSystem.documentDirectory;
-      ImageUploader.debug('image-error-file', { uri, documentDirectory });
+      ImageUploader.debug('image-error-file', {
+        uri,
+        documentDirectory,
+        despiteReset: true,
+      });
       return state;
+    }
+    case 'image-reset-loaded': {
+      const name = utils.nameFromUri(action.oldUri);
+      const fileUri = action.newUri.split('?')[0];
+      const i = state.images[name];
+      const newImage = { ...i, fileUri };
+      const newState = {
+        ...state,
+        images: {
+          ...state.images,
+          [name]: newImage,
+        },
+      };
+
+      ImageUploader.debug('image-reset-loaded', action);
+
+      return newState;
     }
     case 'image-remote-failed': {
       // TODO(jessk) handle... by deleting the image

@@ -53,6 +53,7 @@ export interface AppViewDispatchProps {
     nameOrUri: string,
     type: 'local' | 'file' | 'remote',
   ) => void;
+  onResetImageLoad: (oldUri: string, newUri: string) => void;
   addBackButtonHandler: () => () => void;
   removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
@@ -111,6 +112,7 @@ class AppView extends React.Component<
             onCopy={props.onCopy}
             onImageLoad={props.onImageLoad}
             onImageLoadFailure={props.onImageLoadFailure}
+            onResetImageLoad={props.onResetImageLoad}
           />
         );
       case 'settings':

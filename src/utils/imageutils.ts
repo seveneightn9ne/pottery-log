@@ -64,7 +64,8 @@ export function deleteFile(uri: string) {
 
 export function nameFromUri(uri: string): string {
   const uriParts = uri.split('/');
-  return uriParts[uriParts.length - 1];
+  const nameAndParam = uriParts[uriParts.length - 1];
+  return nameAndParam.split('?')[0];
 }
 
 export async function deleteUnusedImage(image: ImageState) {
@@ -84,4 +85,19 @@ export async function deleteUnusedImage(image: ImageState) {
       console.warn(e);
     }
   }
+}
+
+export function resetDirectory(uri: string): string {
+  const parts = uri.split('/');
+  const fileName = parts[parts.length - 1];
+  const maybeRandomDir = parts[parts.length - 2];
+  let newDir = FileSystem.documentDirectory;
+  if (newDir == null) {
+    throw Error('FileSystem.documentDirectory is null');
+  }
+  if (/^\d+$/.test(maybeRandomDir)) {
+    // that does look like a random dir, i.e. not part of the documentDirectory
+    newDir += '/' + maybeRandomDir;
+  }
+  return newDir + '/' + fileName;
 }

@@ -26,7 +26,8 @@ type ImageAction =
   | ImageErrorFile
   | ImageRemoteFailed
   | ImageFileCreated
-  | ImageFileFailed;
+  | ImageFileFailed
+  | ImageResetLoaded;
 
 type PotAction =
   | New
@@ -187,6 +188,12 @@ interface ImageRemoteFailed {
 interface ImageLoaded {
   type: 'image-loaded';
   name: string;
+}
+
+interface ImageResetLoaded {
+  type: 'image-reset-loaded';
+  oldUri: string;
+  newUri: string;
 }
 
 interface ImageFileCreated {
