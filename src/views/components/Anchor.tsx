@@ -1,33 +1,32 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { Clipboard, Linking, Text, ToastAndroid } from 'react-native';
 import styles from '../../style';
 
-export default class Anchor extends React.Component<{
+interface Props {
   href: string;
   onPress?: () => void;
-}> {
-  public render() {
-    return (
-      <Text
-        {...this.props}
-        onPress={this.handlePress}
-        onLongPress={this.handleLongPress}
-        style={styles.anchor}
-      >
-        {this.props.children || this.props.href}
-      </Text>
-    );
-  }
-
-  private handlePress = () => {
-    Linking.openURL(this.props.href);
-    if (this.props.onPress) {
-      this.props.onPress();
-    }
-  }
-
-  private handleLongPress = () => {
-    Clipboard.setString(this.props.href);
-    ToastAndroid.show('Copied to clipboard', ToastAndroid.SHORT);
-  }
 }
+
+const Anchor: FunctionComponent<Props> = (props) => {
+  const handlePress = () => {
+    Linking.openURL(props.href);
+    if (props.onPress) {
+      props.onPress();
+    }
+  };
+  const handleLongPress = () => {
+    Clipboard.setString(props.href);
+    ToastAndroid.show('Copied to clipboard', ToastAndroid.SHORT);
+  };
+  return (
+    <Text
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+      style={styles.anchor}
+    >
+      {props.children || props.href}
+    </Text>
+  );
+};
+
+export default Anchor;
