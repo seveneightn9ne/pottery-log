@@ -7,59 +7,59 @@ import * as uploader from './uploader';
 /**
  * Errors are always caught. Dispatches 'image-file-created' or 'image-file-failed'.
  */
-export function saveToFile(uri: string, isRemote = false): Promise<void> {
-  const onError = (e: Error | string) => {
-    console.warn('saveToFile failure:', e);
-    store.dispatch({ type: 'image-file-failed', uri });
-  };
+export function deprecatedSaveToFileImpure(
+  uri: string,
+  isRemote = false,
+): Promise<void> {
+  return saveToFilePure(uri, isRemote)
+    .then((fileUri) => {
+      store.dispatch({
+        type: 'image-file-created',
+        name: nameFromUri(fileUri),
+        fileUri,
+      });
+    })
+    .catch((e) => {
+      console.warn('saveToFile failure:', e);
+      store.dispatch({ type: 'image-file-failed', uri });
+    });
+}
+
+/** Promise is rejected on any failure to save the file */
+export async function saveToFilePure(
+  uri: string,
+  isRemote = false,
+): Promise<string> {
   if (!uri) {
-    console.warn('No URI passed to saveToFile');
-    setTimeout(onError, 0);
-    return Promise.resolve();
+    throw Error('No URI passed to saveToFile');
   }
   const name = nameFromUri(uri);
   const random = Math.floor(Math.random() * 1000000 + 1);
   if (FileSystem.documentDirectory == null) {
-    console.warn('No document directory');
-    setTimeout(onError, 0);
-    return Promise.resolve();
+    // Should be impossible, just for typescript to know it's not null
+    throw Error('No document directory');
   }
   const dir = FileSystem.documentDirectory + random;
-  return FileSystem.makeDirectoryAsync(dir, { intermediates: true })
-    .catch(() => {
-      return FileSystem.getInfoAsync(dir).then((result) => {
-        if (!result.exists) {
-          return Promise.reject('The directory was not created: ' + dir);
-        }
-        console.log('resolving makedirectory');
-        // makeDirectoryAsync errored but the directory exists, so we can continue.
-        return Promise.resolve();
-      });
-    })
-    .then(() => {
-      const fileUri = dir + '/' + name;
-      const afterCopy = () => {
-        store.dispatch({
-          type: 'image-file-created',
-          name,
-          fileUri,
-        });
-      };
-      if (isRemote) {
-        return FileSystem.downloadAsync(uri, fileUri)
-          .then(afterCopy)
-          .catch(onError);
-      } else {
-        return FileSystem.copyAsync({ from: uri, to: fileUri })
-          .then(afterCopy)
-          .catch(onError);
-      }
-    })
-    .catch(onError);
+  try {
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+  } catch (e) {
+    const result = await FileSystem.getInfoAsync(dir);
+    if (!result.exists) {
+      throw Error('The directory was not created: ' + dir);
+    }
+    // Otherwise, we got an error but the directory was created, so we can continue
+  }
+  const fileUri = dir + '/' + name;
+  if (isRemote) {
+    await FileSystem.downloadAsync(uri, fileUri);
+  } else {
+    await FileSystem.copyAsync({ from: uri, to: fileUri });
+  }
+  return fileUri;
 }
 
 export function deleteFile(uri: string) {
-  FileSystem.deleteAsync(uri, { idempotent: true });
+  return FileSystem.deleteAsync(uri, { idempotent: true });
 }
 
 export function nameFromUri(uri: string): string {

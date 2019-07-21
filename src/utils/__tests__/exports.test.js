@@ -16,7 +16,7 @@ jest.mock("../uploader", () => ({
 }));
 jest.mock("AsyncStorage");
 jest.mock("../imageutils", () => ({
-  saveToFile: jest.fn().mockReturnValue(Promise.resolve())
+  deprecatedSaveToFileImpure: jest.fn().mockReturnValue(Promise.resolve())
 }));
 jest.mock("../../reducers/store", () => ({
   dispatch: jest.fn()
@@ -74,7 +74,7 @@ describe("exporting", () => {
         "f.jpg",
         expect.any(Function)
       );
-      expect(imageutils.saveToFile).not.toHaveBeenCalled();
+      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
     });
   });
 
@@ -86,7 +86,10 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.saveToFile).toHaveBeenCalledWith("r.jpg", true);
+      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+        "r.jpg",
+        true
+      );
     });
   });
 
@@ -97,7 +100,10 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.saveToFile).toHaveBeenCalledWith("l.jpg", false);
+      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+        "l.jpg",
+        false
+      );
     });
   });
 
@@ -106,7 +112,7 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.saveToFile).not.toHaveBeenCalled();
+      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
     });
   });
 
@@ -195,7 +201,10 @@ describe("importing", () => {
     jest.useFakeTimers();
     exports.importImage("r.png");
     jest.runAllTimers();
-    expect(imageutils.saveToFile).toHaveBeenCalledWith("r.png", true);
+    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      "r.png",
+      true
+    );
     expect(dispatcher.dispatch).toHaveBeenCalledWith({
       type: "image-timeout",
       uri: "r.png"

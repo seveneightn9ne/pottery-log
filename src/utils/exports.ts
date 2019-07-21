@@ -4,7 +4,7 @@ import { Alert, AsyncStorage } from 'react-native';
 import store from '../reducers/store';
 import { ImageState } from '../reducers/types';
 import { reloadFromImport } from '../thunks/loadInitial';
-import { saveToFile } from './imageutils';
+import { deprecatedSaveToFileImpure } from './imageutils';
 import * as uploader from './uploader';
 
 const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
@@ -44,7 +44,7 @@ function exportImage(
   if (!imageState.fileUri) {
     const uri = imageState.remoteUri || imageState.localUri;
     const isRemote = uri === imageState.remoteUri;
-    const p = uri ? saveToFile(uri, isRemote) : Promise.resolve();
+    const p = uri ? deprecatedSaveToFileImpure(uri, isRemote) : Promise.resolve();
     // console.log("returning promise", promise);
     return {
       willExport: false,
@@ -157,7 +157,7 @@ async function importMetadataNow(metadata: string) {
 
 function importImage(remoteUri: string) {
   // console.log("importImage");
-  saveToFile(remoteUri, true /* isRemote */);
+  deprecatedSaveToFileImpure(remoteUri, true /* isRemote */);
   setTimeout(
     () =>
       store.dispatch({

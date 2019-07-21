@@ -327,12 +327,12 @@ export function _saveImagesToFiles(images: ImageStoreState) {
     }
     if (image.remoteUri) {
       promises.push(
-        imageutils.saveToFile(image.remoteUri, true /* isRemote */),
+        imageutils.deprecatedSaveToFileImpure(image.remoteUri, true /* isRemote */),
       );
       return;
     }
     if (image.localUri) {
-      promises.push(imageutils.saveToFile(image.localUri));
+      promises.push(imageutils.deprecatedSaveToFileImpure(image.localUri));
       return;
     }
   });

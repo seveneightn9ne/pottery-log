@@ -1,6 +1,10 @@
 import dispatcher from "../../reducers/store";
 import * as FileSystem from "expo-file-system";
-import { saveToFile, nameFromUri, resetDirectory } from "../imageutils";
+import {
+  deprecatedSaveToFileImpure,
+  nameFromUri,
+  resetDirectory
+} from "../imageutils";
 
 jest.mock("../uploader");
 jest.mock("../../reducers/store");
@@ -34,7 +38,7 @@ describe("saveToFile", () => {
 
   it("saves remote image", async () => {
     const uri = "https://fake-url/image.png";
-    await saveToFile(uri, true);
+    await deprecatedSaveToFileImpure(uri, true);
     jest.runAllTimers();
     expect(FileSystem.downloadAsync).toBeCalledWith(uri, expect.any(String));
     expect(dispatcher.dispatch).toBeCalledWith({
@@ -46,7 +50,7 @@ describe("saveToFile", () => {
 
   it("saves local image", async () => {
     const uri = "file://fake-url/image.png";
-    await saveToFile(uri, false);
+    await deprecatedSaveToFileImpure(uri, false);
     jest.runAllTimers();
     expect(FileSystem.copyAsync).toBeCalledWith({
       from: uri,
@@ -60,7 +64,7 @@ describe("saveToFile", () => {
   });
 
   it("dispatches error when no uri", async () => {
-    await saveToFile("", false);
+    await deprecatedSaveToFileImpure("", false);
     jest.runAllTimers();
     expectError("");
   });
@@ -69,7 +73,7 @@ describe("saveToFile", () => {
     FileSystem.makeDirectoryAsync.mockReturnValue(Promise.reject("error"));
     FileSystem.getInfoAsync.mockReturnValue(Promise.resolve({ exists: false }));
     const uri = "http://fake-uri/image.png";
-    await saveToFile(uri, true);
+    await deprecatedSaveToFileImpure(uri, true);
     jest.runAllTimers();
     expectError(uri);
   });
@@ -78,7 +82,7 @@ describe("saveToFile", () => {
   it.skip("succeed when makeDirectory pretends to fail", async () => {
     FileSystem.makeDirectoryAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await saveToFile(uri, true);
+    await deprecatedSaveToFileImpure(uri, true);
     jest.runAllTimers();
     expectSuccess();
   });
@@ -86,7 +90,7 @@ describe("saveToFile", () => {
   it("fails when download fails", async () => {
     FileSystem.downloadAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await saveToFile(uri, true);
+    await deprecatedSaveToFileImpure(uri, true);
     jest.runAllTimers();
     expectError(uri);
   });
@@ -94,7 +98,7 @@ describe("saveToFile", () => {
   it("fails when copy fails", async () => {
     FileSystem.copyAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await saveToFile(uri, false);
+    await deprecatedSaveToFileImpure(uri, false);
     jest.runAllTimers();
     expectError(uri);
   });

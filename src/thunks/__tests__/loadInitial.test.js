@@ -20,7 +20,7 @@ jest.mock("expo-constants", () => ({
 }));
 jest.mock("../../utils/imageutils", () => ({
   ...jest.requireActual("../../utils/imageutils"),
-  saveToFile: jest.fn().mockReturnValue(Promise.resolve())
+  deprecatedSaveToFileImpure: jest.fn().mockReturnValue(Promise.resolve())
 }));
 
 const emptyPotState = {
@@ -216,7 +216,9 @@ describe("loadInitial", () => {
       },
       isImport: false
     });
-    expect(imageutils.saveToFile).toHaveBeenCalledWith("l/img.jpg");
+    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      "l/img.jpg"
+    );
   });
 
   it("loads pot with images2 that was already migrated", async () => {
@@ -438,7 +440,12 @@ describe("_saveImagesToFiles", () => {
       }
     };
     await _saveImagesToFiles(inImages);
-    expect(imageutils.saveToFile).toHaveBeenCalledWith("r/a.jpg", true);
-    expect(imageutils.saveToFile).toHaveBeenCalledWith("l/b.jpg");
+    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      "r/a.jpg",
+      true
+    );
+    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      "l/b.jpg"
+    );
   });
 });

@@ -80,7 +80,6 @@ export function reduceImages(
           },
         },
       };
-      utils.saveToFile(action.localUri);
       return newState;
     }
     case 'pot-copy': {
@@ -154,9 +153,9 @@ export function reduceImages(
         return state;
       }
       if (i.localUri) {
-        utils.saveToFile(i.localUri);
+        utils.deprecatedSaveToFileImpure(i.localUri);
       } else if (i.remoteUri) {
-        utils.saveToFile(i.remoteUri, true);
+        utils.deprecatedSaveToFileImpure(i.remoteUri, true);
       }
       return state;
     }

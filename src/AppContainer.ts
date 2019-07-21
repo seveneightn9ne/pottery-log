@@ -6,8 +6,8 @@ import { newPot, Pot } from './models/Pot';
 import { StatusString } from './models/Status';
 import { FullState } from './reducers/types';
 import { handleBackButton } from './thunks/back';
+import { addImage } from './thunks/images';
 import { loadInitial } from './thunks/loadInitial';
-import { addImage } from './thunks/pickImage';
 import AppView, {
   AppViewDispatchProps,
   AppViewStateProps,
