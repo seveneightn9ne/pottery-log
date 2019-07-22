@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Dimensions,
   Text,
   TextInput,
@@ -9,33 +10,109 @@ import {
 import Button from 'react-native-button';
 import ElevatedView from 'react-native-elevated-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { connect } from 'react-redux';
 import { Pot } from '../models/Pot';
 import Status, { StatusString } from '../models/Status';
-import { EditUiState, ImageStoreState } from '../reducers/types';
+import { EditUiState, FullState } from '../reducers/types';
 import styles from '../style';
+import { addImage } from '../thunks/images';
+import { PLThunkDispatch } from '../thunks/types';
+import { deleteImage } from './components/Alerts';
 import ImageList from './components/ImageList';
 import StatusDetail from './components/StatusDetail';
 import StatusSwitcher from './components/StatusSwitcher';
 
-interface EditPageProps {
+interface OwnProps {
   pot: Pot;
-  images: ImageStoreState;
-  ui: EditUiState;
   fontLoaded: boolean;
-  onChangeTitle: (potId: string, text: string) => void;
-  onChangeNote: (currentPot: Pot, status: StatusString, text: string) => void;
-  onNavigateToList: () => void;
-  onAddImage: (currentPot: Pot) => void;
-  onSetMainImage: (currentPot: Pot, imageName: string) => void;
-  onDeleteImage: (currentPot: Pot, imageName: string) => void;
-  onExpandImage: (imageName: string) => void;
-  setStatus: (currentPot: Pot, newStatus: StatusString) => void;
-  setStatusDate: (currentPot: Pot, date: Date) => void;
-  onDelete: (currentPot: Pot) => void;
-  onCopy: (currentPot: Pot) => void;
 }
 
-export default class EditPage extends React.Component<EditPageProps, {}> {
+// TODO move more computed values into mapStateToProps
+const mapStateToProps = (state: FullState) => ({
+  images: state.images,
+  ui: state.ui as EditUiState,
+});
+
+type PropsFromState = ReturnType<typeof mapStateToProps>;
+
+const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
+  onChangeTitle: (potId: string, newTitle: string) =>
+    dispatch({
+      type: 'pot-edit-field',
+      field: 'title',
+      value: newTitle,
+      potId,
+    }),
+  onChangeNote: (currentPot: Pot, statusText: StatusString, noteText: string) =>
+    dispatch({
+      type: 'pot-edit-field',
+      field: 'notes2',
+      value: currentPot.notes2.withNoteForStatus(statusText, noteText),
+      potId: currentPot.uuid,
+    }),
+  onNavigateToList: () =>
+    dispatch({
+      type: 'page-list',
+    }),
+  onAddImage: (currentPot: Pot) => dispatch(addImage(currentPot)),
+  onExpandImage: (name: string) =>
+    dispatch({
+      type: 'page-image',
+      imageId: name,
+    }),
+  setStatus: (currentPot: Pot, newStatus: StatusString) => {
+    const newFullStatus = currentPot.status.withStatus(newStatus);
+    dispatch({
+      type: 'pot-edit-field',
+      field: 'status',
+      value: newFullStatus,
+      potId: currentPot.uuid,
+    });
+  },
+  setStatusDate: (currentPot: Pot, date: Date) => {
+    const currentStatus = currentPot.status.currentStatus();
+    if (!currentStatus) {
+      throw Error("Cannot set date when there's no status");
+    }
+    const newFullStatus = currentPot.status.withStatus(currentStatus, date);
+    dispatch({
+      type: 'pot-edit-field',
+      field: 'status',
+      value: newFullStatus,
+      potId: currentPot.uuid,
+    });
+  },
+  onDelete: (currentPot: Pot) => {
+    Alert.alert('Delete this pot?', undefined, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        onPress: () => {
+          dispatch({
+            type: 'pot-delete',
+            potId: currentPot.uuid,
+            imageNames: currentPot.images3,
+          });
+        },
+      },
+    ]);
+  },
+  onDeleteImage: (currentPot: Pot, name: string) =>
+    deleteImage(dispatch, currentPot, name),
+  onCopy: (currentPot: Pot) =>
+    dispatch({
+      type: 'pot-copy',
+      potId: currentPot.uuid,
+      newPotId: String(Math.random()).substring(2),
+      imageNames: currentPot.images3,
+    }),
+});
+
+type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
+
+type EditPageProps = OwnProps & PropsFromState & PropsFromDispatch;
+
+class EditPage extends React.Component<EditPageProps, {}> {
   public titleInput: React.RefObject<TextInput>;
   constructor(props: EditPageProps) {
     super(props);
@@ -154,3 +231,8 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
     }
   }
 }
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps, FullState>(
+  mapStateToProps,
+  mapDispatchToProps,
+)(EditPage);

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { Pot } from '../models/Pot';
-import { StatusString } from '../models/Status';
 import {
   ExportState,
   ImageStoreState,
@@ -26,19 +25,9 @@ export interface AppViewStateProps {
 }
 export interface AppViewDispatchProps {
   onNew: () => void;
-  onChangeTitle: (potId: string, text: string) => void;
-  onChangeNote: (currentPot: Pot, status: StatusString, text: string) => void;
   onEdit: (potId: string) => void;
   onNavigateToList: () => void;
   onNavigateToSettings: () => void;
-  onAddImage: (currentPot: Pot) => void;
-  onSetMainImage: (currentPot: Pot, name: string) => void;
-  onDeleteImage: (currentPot: Pot, name: string) => void;
-  onExpandImage: (name: string) => void;
-  setStatus: (currentPot: Pot, newStatus: StatusString) => void;
-  setStatusDate: (currentPot: Pot, date: Date) => void;
-  onDelete: (currentPot: Pot) => void;
-  onCopy: (currentPot: Pot) => void;
   onOpenSearch: () => void;
   onCloseSearch: () => void;
   onSearch: (search: string) => void;
@@ -51,6 +40,8 @@ export interface AppViewDispatchProps {
   addBackButtonHandler: () => () => void;
   removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
+  onSetMainImage: (currentPot: Pot, name: string) => void;
+  onDeleteImage: (currentPot: Pot, name: string) => void;
 }
 
 class AppView extends React.Component<
@@ -88,20 +79,7 @@ class AppView extends React.Component<
         return (
           <EditPage
             pot={props.pots.pots[props.ui.editPotId]}
-            ui={props.ui}
-            images={props.images}
             fontLoaded={props.fontLoaded}
-            onChangeTitle={props.onChangeTitle}
-            onChangeNote={props.onChangeNote}
-            onNavigateToList={props.onNavigateToList}
-            onAddImage={props.onAddImage}
-            onDeleteImage={props.onDeleteImage}
-            onSetMainImage={props.onSetMainImage}
-            onExpandImage={props.onExpandImage}
-            setStatus={props.setStatus}
-            setStatusDate={props.setStatusDate}
-            onDelete={props.onDelete}
-            onCopy={props.onCopy}
           />
         );
       case 'settings':

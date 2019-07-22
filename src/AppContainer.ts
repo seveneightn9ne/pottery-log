@@ -1,17 +1,16 @@
-import { Alert, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import * as types from './action';
 import { newPot, Pot } from './models/Pot';
-import { StatusString } from './models/Status';
 import { FullState } from './reducers/types';
 import { handleBackButton } from './thunks/back';
-import { addImage } from './thunks/images';
 import { loadInitial } from './thunks/loadInitial';
 import AppView, {
   AppViewDispatchProps,
   AppViewStateProps,
 } from './views/AppView';
+import { deleteImage } from './views/components/Alerts';
 
 const mapStateToProps = (
   state: FullState,
@@ -34,20 +33,6 @@ export const mapDispatchToProps = (
     dispatch({
       type: 'page-edit-pot',
       potId,
-    }),
-  onChangeTitle: (potId: string, newTitle: string) =>
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'title',
-      value: newTitle,
-      potId,
-    }),
-  onChangeNote: (currentPot: Pot, statusText: StatusString, noteText: string) =>
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'notes2',
-      value: currentPot.notes2.withNoteForStatus(statusText, noteText),
-      potId: currentPot.uuid,
     }),
   onNavigateToList: () =>
     dispatch({
@@ -72,84 +57,6 @@ export const mapDispatchToProps = (
       text,
     });
   },
-  onAddImage: (currentPot: Pot) => dispatch(addImage(currentPot)),
-  onSetMainImage: (currentPot: Pot, name: string) =>
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'images3',
-      value: [name, ...currentPot.images3.filter((i) => i !== name)],
-      potId: currentPot.uuid,
-    }),
-  onExpandImage: (name: string) =>
-    dispatch({
-      type: 'page-image',
-      imageId: name,
-    }),
-  setStatus: (currentPot: Pot, newStatus: StatusString) => {
-    const newFullStatus = currentPot.status.withStatus(newStatus);
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'status',
-      value: newFullStatus,
-      potId: currentPot.uuid,
-    });
-  },
-  setStatusDate: (currentPot: Pot, date: Date) => {
-    const currentStatus = currentPot.status.currentStatus();
-    if (!currentStatus) {
-      throw Error("Cannot set date when there's no status");
-    }
-    const newFullStatus = currentPot.status.withStatus(currentStatus, date);
-    dispatch({
-      type: 'pot-edit-field',
-      field: 'status',
-      value: newFullStatus,
-      potId: currentPot.uuid,
-    });
-  },
-  onDelete: (currentPot: Pot) => {
-    Alert.alert('Delete this pot?', undefined, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        onPress: () => {
-          dispatch({
-            type: 'pot-delete',
-            potId: currentPot.uuid,
-            imageNames: currentPot.images3,
-          });
-        },
-      },
-    ]);
-  },
-  onDeleteImage: (currentPot: Pot, name: string) => {
-    Alert.alert('Delete this image?', undefined, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        onPress: () => {
-          dispatch({
-            type: 'pot-edit-field',
-            field: 'images3',
-            value: currentPot.images3.filter((i) => i !== name),
-            potId: currentPot.uuid,
-          });
-          dispatch({
-            type: 'image-delete-from-pot',
-            imageName: name,
-            potId: currentPot.uuid,
-          });
-        },
-      },
-    ]);
-  },
-  onCopy: (currentPot: Pot) =>
-    dispatch({
-      type: 'pot-copy',
-      potId: currentPot.uuid,
-      newPotId: String(Math.random()).substring(2),
-      imageNames: currentPot.images3,
-    }),
   onCollapse: (section: string) =>
     dispatch({
       type: 'list-collapse',
@@ -182,6 +89,16 @@ export const mapDispatchToProps = (
   loadInitial: () => {
     dispatch(loadInitial());
   },
+
+  onSetMainImage: (currentPot: Pot, name: string) =>
+    dispatch({
+      type: 'pot-edit-field',
+      field: 'images3',
+      value: [name, ...currentPot.images3.filter((i) => i !== name)],
+      potId: currentPot.uuid,
+    }),
+  onDeleteImage: (currentPot: Pot, name: string) =>
+    deleteImage(dispatch, currentPot, name),
 });
 
 export default connect(
