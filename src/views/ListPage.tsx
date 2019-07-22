@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { ReactNode } from 'react';
 import {
   Dimensions,
@@ -10,30 +11,18 @@ import {
   View,
 } from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
-import { Pot } from '../models/Pot';
-import Status, { capitalize, StatusString } from '../models/Status';
-import {
-  ImageStoreState,
-  ListUiState,
-  PotsStoreState,
-  SearchingUiState,
-} from '../reducers/types';
+import { connect } from 'react-redux';
+import { newPot, Pot } from '../models/Pot';
+import Status, { capitalize } from '../models/Status';
+import { FullState } from '../reducers/types';
+import { filterBySearchTerm, filterByStatus, sort } from '../selectors/pots';
 import styles from '../style';
+import { PLThunkDispatch } from '../thunks/types';
 import NewPotButton from './components/NewPotButton';
 import PotListItem from './components/PotListItem';
 
-interface ListPageProps {
-  pots: PotsStoreState;
-  images: ImageStoreState;
-  ui: ListUiState | SearchingUiState;
+interface OwnProps {
   fontLoaded: boolean;
-  onNewPot: () => void;
-  onClickPot: (potId: string) => void;
-  onOpenSearch: () => void;
-  onCloseSearch: () => void;
-  onSearch: (search: string) => void;
-  onNavigateToSettings: () => void;
-  onCollapse: (section: string) => void;
 }
 
 interface SectionT {
@@ -46,46 +35,84 @@ interface SectionData {
   data: Pot[];
 }
 
-function filterSortedPots(
-  allPots: Pot[],
-  status: StatusString,
-  searchTerm: string,
-) {
-  return allPots
-    .filter((pot) => pot.status.currentStatus() === status)
-    .filter((pot) => {
-      // Filter for search
-      if (!searchTerm) {
-        return true;
-      }
-      if (pot.title.includes(searchTerm)) {
-        return true;
-      }
-      if (pot.notes2.includes(searchTerm)) {
-        return true;
-      }
-      return false;
-    })
-    .sort((potA, potB) => {
-      // Sort the pots by date most recent at bottom.
-      // Except sort pots with that are 'Finished' most recent at top.
-      const dA = potA.status.date();
-      const dB = potB.status.date();
-      if (!dA || !dB) {
-        // one of the dates is undefined. whatever
-        return 0;
-      }
-      const tA = dA.getTime();
-      const tB = dB.getTime();
-      let cmp = tA < tB ? -1 : tA > tB ? 1 : 0;
-      if (potA.status.currentStatus() === 'pickedup') {
-        cmp *= -1;
-      }
-      return cmp;
-    });
-}
+const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
+  onNewPot: () =>
+    dispatch({
+      type: 'new',
+      pot: newPot(),
+    }),
+  onClickPot: (potId: string) =>
+    dispatch({
+      type: 'page-edit-pot',
+      potId,
+    }),
 
-export class ListPage extends React.Component<ListPageProps, {}> {
+  onOpenSearch: () =>
+    dispatch({
+      type: 'list-search-open',
+    }),
+  onCloseSearch: () =>
+    dispatch({
+      type: 'list-search-close',
+    }),
+  onSearch: (text: string) => {
+    console.log('search', text);
+    dispatch({
+      type: 'list-search-term',
+      text,
+    });
+  },
+  onCollapse: (section: string) =>
+    dispatch({
+      type: 'list-collapse',
+      section,
+    }),
+  onNavigateToSettings: () =>
+    dispatch({
+      type: 'page-settings',
+    }),
+});
+
+type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
+
+const mapStateToProps = (state: FullState) => {
+  const isSearching = 'searching' in state.ui && state.ui.searching;
+  const searchTerm = ('searching' in state.ui && state.ui.searchTerm) || '';
+
+  return {
+    potsHaveLoaded: state.pots.hasLoaded,
+    pots: filterBySearchTerm(
+      sort(state.pots.potIds.map((potId) => state.pots.pots[potId])),
+      searchTerm,
+    ),
+    images: _.chain(state.pots.potIds)
+      .keyBy((i) => i) // map keys are potId
+      .mapValues((potId) => {
+        // map values are pot.images3[0]
+        const i3 = state.pots.pots[potId].images3;
+        return i3.length ? state.images.images[i3[0]] : null;
+      })
+      .value(), // as { [potId: string]: ImageState },
+    searchTerm,
+    isSearching,
+    collapsed: _.defaults(
+      _.chain(state.ui.list.collapsed)
+        .keyBy((s) => s)
+        .mapValues(() => true)
+        .value(), // the statuses in collapsed are 'true'
+      _.chain(Status.ordered())
+        .keyBy((s) => s)
+        .mapValues(() => false)
+        .value(), // the rest of the statuses are 'false'
+    ), // as unknown) as { [s: string]: boolean },
+  };
+};
+
+type PropsFromState = ReturnType<typeof mapStateToProps>;
+
+type ListPageProps = OwnProps & PropsFromState & PropsFromDispatch;
+
+class ListPage extends React.Component<ListPageProps, {}> {
   private width: number;
 
   constructor(props: ListPageProps) {
@@ -95,7 +122,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
   }
 
   public render(): ReactNode {
-    const potsLoaded = this.props.pots.hasLoaded;
+    const potsLoaded = this.props.potsHaveLoaded;
 
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.props.onCloseSearch}>
@@ -104,7 +131,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     ) : null;
 
     let header;
-    if ('searching' in this.props.ui && this.props.ui.searching) {
+    if (this.props.isSearching) {
       header = (
         <ElevatedView style={styles.header} elevation={4}>
           {backButton}
@@ -115,7 +142,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
             onChangeText={this.props.onSearch}
             autoFocus={true}
             placeholder={'search'}
-            value={this.props.ui.searchTerm || ''}
+            value={this.props.searchTerm}
           />
         </ElevatedView>
       );
@@ -161,7 +188,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       );
     }
 
-    if (this.props.pots.potIds.length === 0) {
+    if (this.props.pots.length === 0) {
       return (
         <View style={styles.container}>
           {header}
@@ -171,23 +198,17 @@ export class ListPage extends React.Component<ListPageProps, {}> {
       );
     }
 
-    const allPots = this.props.pots.potIds.map(
-      (id: string) => this.props.pots.pots[id],
-    );
-    const searchTerm =
-      ('searching' in this.props.ui && this.props.ui.searchTerm) || '';
-
     const sections: SectionT[] = Status.ordered()
       .reverse()
       .map((status) => {
         return {
-          data: filterSortedPots(allPots, status, searchTerm),
+          data: filterByStatus(this.props.pots, status),
           title: capitalize(Status.longterm(status)),
         };
       })
       .filter((section) => section.data.length > 0)
       .map((section) =>
-        this.collapsed(section.title)
+        this.props.collapsed[section.title]
           ? {
               data: [],
               title: section.title + ' (' + section.data.length + ')',
@@ -232,12 +253,6 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     return section;
   }
 
-  private collapsed = (section: string) => {
-    return (
-      this.props.ui.list.collapsed.indexOf(this.stripCount(section)) !== -1
-    );
-  }
-
   private sectionItemLayout = (layoutData: any, index: number) => {
     const itemSize = this.width / 2 - 2;
     return {
@@ -248,14 +263,11 @@ export class ListPage extends React.Component<ListPageProps, {}> {
   }
 
   private renderPotListItem = (data: { item: Pot }): JSX.Element => {
-    const image =
-      data.item.images3.length &&
-      this.props.images.images[data.item.images3[0]];
     return (
       <PotListItem
         key={data.item.uuid}
         pot={data.item}
-        image={image || null}
+        image={this.props.images[data.item.uuid]}
         onPress={this.onClickPot(data.item)}
         {...this.props}
       />
@@ -286,7 +298,7 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     const section = info.section;
     const content = this.props.fontLoaded ? (
       <Text style={styles.collapse}>
-        {this.collapsed(section.title)
+        {this.props.collapsed[section.title]
           ? 'keyboard_arrow_down'
           : 'keyboard_arrow_up'}
       </Text>
@@ -305,3 +317,8 @@ export class ListPage extends React.Component<ListPageProps, {}> {
     return () => this.props.onCollapse(this.stripCount(section));
   }
 }
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps, FullState>(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ListPage);

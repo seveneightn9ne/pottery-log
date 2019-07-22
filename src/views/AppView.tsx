@@ -11,7 +11,7 @@ import {
 import styles from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
-import { ListPage } from './ListPage';
+import ListPage from './ListPage';
 import SettingsPage from './SettingsPage';
 
 export interface AppViewStateProps {
@@ -24,17 +24,11 @@ export interface AppViewStateProps {
   fontLoaded: boolean;
 }
 export interface AppViewDispatchProps {
-  onNew: () => void;
   onEdit: (potId: string) => void;
   onNavigateToList: () => void;
-  onNavigateToSettings: () => void;
-  onOpenSearch: () => void;
-  onCloseSearch: () => void;
-  onSearch: (search: string) => void;
   onStartExport: () => void;
   onStartImport: () => void;
   onStartUrlImport: (url: string) => void;
-  onCollapse: (section: string) => void;
   onResumeImport: () => void;
   onCancelResumeImport: () => void;
   addBackButtonHandler: () => () => void;
@@ -60,21 +54,7 @@ class AppView extends React.Component<
     const props = this.props;
     switch (props.ui.page) {
       case 'list':
-        return (
-          <ListPage
-            pots={props.pots}
-            ui={props.ui}
-            images={props.images}
-            fontLoaded={props.fontLoaded}
-            onNewPot={props.onNew}
-            onClickPot={props.onEdit}
-            onOpenSearch={props.onOpenSearch}
-            onCloseSearch={props.onCloseSearch}
-            onSearch={props.onSearch}
-            onNavigateToSettings={props.onNavigateToSettings}
-            onCollapse={props.onCollapse}
-          />
-        );
+        return <ListPage fontLoaded={props.fontLoaded} />;
       case 'edit-pot':
         return (
           <EditPage

@@ -2,7 +2,7 @@ import { BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import * as types from './action';
-import { newPot, Pot } from './models/Pot';
+import { Pot } from './models/Pot';
 import { FullState } from './reducers/types';
 import { handleBackButton } from './thunks/back';
 import { loadInitial } from './thunks/loadInitial';
@@ -24,48 +24,16 @@ const mapStateToProps = (
 export const mapDispatchToProps = (
   dispatch: ThunkDispatch<FullState, never, types.Action>,
 ): AppViewDispatchProps => ({
-  onNew: () =>
+  onNavigateToList: () =>
     dispatch({
-      type: 'new',
-      pot: newPot(),
+      type: 'page-list',
     }),
+
   onEdit: (potId: string) =>
     dispatch({
       type: 'page-edit-pot',
       potId,
     }),
-  onNavigateToList: () =>
-    dispatch({
-      type: 'page-list',
-    }),
-  onNavigateToSettings: () =>
-    dispatch({
-      type: 'page-settings',
-    }),
-  onOpenSearch: () =>
-    dispatch({
-      type: 'list-search-open',
-    }),
-  onCloseSearch: () =>
-    dispatch({
-      type: 'list-search-close',
-    }),
-  onSearch: (text: string) => {
-    console.log('search', text);
-    dispatch({
-      type: 'list-search-term',
-      text,
-    });
-  },
-  onCollapse: (section: string) =>
-    dispatch({
-      type: 'list-collapse',
-      section,
-    }),
-  /*onScrollTo: (y: number) => dispatch({
-    type: 'list-scroll', y,
-  }),*/
-
   onStartExport: () => dispatch({ type: 'export-initiate' }),
   onStartImport: () => dispatch({ type: 'import-initiate' }),
   onStartUrlImport: (url: string) =>
