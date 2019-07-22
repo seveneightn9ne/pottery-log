@@ -80,6 +80,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
         />
       ));
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
+    const images = pot.images3.map((name) => this.props.images.images[name]);
     return (
       <View style={styles.container}>
         <ElevatedView style={styles.header} elevation={8}>
@@ -100,8 +101,7 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
           <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
             <ImageList
               size={mainImgSize}
-              images={pot.images3}
-              imageState={this.props.images}
+              images={images}
               onAddImage={this.onAddImage}
               onClickImage={this.props.onExpandImage}
               onDeleteImage={this.onDeleteImage}

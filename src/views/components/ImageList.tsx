@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native';
-import { getImageState } from '../../reducers/ImageStore';
-import { ImageStoreState } from '../../reducers/types';
+import { ImageState } from '../../reducers/types';
 import Image3 from './Image3';
 import ImagePicker from './ImagePicker';
 
 interface ImageListProps {
-  images: string[];
-  imageState: ImageStoreState;
+  images: ImageState[];
   size: number;
   onAddImage: () => void;
   onClickImage: (name: string) => void;
@@ -15,23 +13,15 @@ interface ImageListProps {
 }
 
 export default function ImageList(props: ImageListProps) {
-  const images = props.images.map((name) => {
-    const imageState = getImageState(props.imageState, name);
-    return (
-      <TouchableOpacity
-        onPress={onClickImage(props, name)}
-        key={name}
-        onLongPress={onDeleteImage(props, name)}
-        style={{ marginRight: 4 }}
-      >
-        <Image3
-          key={Image3.key(imageState)}
-          image={imageState}
-          style={{ height: props.size, width: props.size }}
-        />
-      </TouchableOpacity>
-    );
-  });
+  const images = props.images.map((image) => (
+    <ImageListItem
+      image={image}
+      onClick={() => props.onClickImage(image.name)}
+      onDelete={() => props.onDeleteImage(image.name)}
+      size={props.size}
+      key={image.name}
+    />
+  ));
   return (
     <ScrollView horizontal={true} style={{ paddingLeft: 4, paddingTop: 4 }}>
       {images}
@@ -47,10 +37,26 @@ export default function ImageList(props: ImageListProps) {
   );
 }
 
-function onClickImage(props: ImageListProps, name: string) {
-  return () => props.onClickImage(name);
+interface ImageListItemProps {
+  onClick: () => void;
+  onDelete: () => void;
+  image: ImageState;
+  size: number;
+  key: string;
 }
-
-function onDeleteImage(props: ImageListProps, name: string) {
-  return () => props.onDeleteImage(name);
-}
+const ImageListItem: FunctionComponent<ImageListItemProps> = ({
+  onClick,
+  onDelete,
+  image,
+  size,
+}) => {
+  return (
+    <TouchableOpacity
+      onPress={onClick}
+      onLongPress={onDelete}
+      style={{ marginRight: 4 }}
+    >
+      <Image3 image={image} style={{ height: size, width: size }} />
+    </TouchableOpacity>
+  );
+};
