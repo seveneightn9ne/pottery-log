@@ -27,62 +27,61 @@ interface OwnProps {
   fontLoaded: boolean;
 }
 
-// TODO move more computed values into mapStateToProps
-const mapStateToProps = (state: FullState) => ({
-  images: state.images,
-  ui: state.ui as EditUiState,
+const mapStateToProps = (state: FullState, { pot }: OwnProps) => ({
+  images: pot.images3.map((name) => state.images.images[name]),
+  new: (state.ui as EditUiState).new,
 });
 
 type PropsFromState = ReturnType<typeof mapStateToProps>;
 
-const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
-  onChangeTitle: (potId: string, newTitle: string) =>
+const mapDispatchToProps = (dispatch: PLThunkDispatch, { pot }: OwnProps) => ({
+  onChangeTitle: (newTitle: string) =>
     dispatch({
       type: 'pot-edit-field',
       field: 'title',
       value: newTitle,
-      potId,
+      potId: pot.uuid,
     }),
-  onChangeNote: (currentPot: Pot, statusText: StatusString, noteText: string) =>
+  onChangeNote: (statusText: StatusString, noteText: string) =>
     dispatch({
       type: 'pot-edit-field',
       field: 'notes2',
-      value: currentPot.notes2.withNoteForStatus(statusText, noteText),
-      potId: currentPot.uuid,
+      value: pot.notes2.withNoteForStatus(statusText, noteText),
+      potId: pot.uuid,
     }),
   onNavigateToList: () =>
     dispatch({
       type: 'page-list',
     }),
-  onAddImage: (currentPot: Pot) => dispatch(addImage(currentPot)),
+  onAddImage: () => dispatch(addImage(pot)),
   onExpandImage: (name: string) =>
     dispatch({
       type: 'page-image',
       imageId: name,
     }),
-  setStatus: (currentPot: Pot, newStatus: StatusString) => {
-    const newFullStatus = currentPot.status.withStatus(newStatus);
+  setStatus: (newStatus: StatusString) => {
+    const newFullStatus = pot.status.withStatus(newStatus);
     dispatch({
       type: 'pot-edit-field',
       field: 'status',
       value: newFullStatus,
-      potId: currentPot.uuid,
+      potId: pot.uuid,
     });
   },
-  setStatusDate: (currentPot: Pot, date: Date) => {
-    const currentStatus = currentPot.status.currentStatus();
+  setStatusDate: (date: Date) => {
+    const currentStatus = pot.status.currentStatus();
     if (!currentStatus) {
       throw Error("Cannot set date when there's no status");
     }
-    const newFullStatus = currentPot.status.withStatus(currentStatus, date);
+    const newFullStatus = pot.status.withStatus(currentStatus, date);
     dispatch({
       type: 'pot-edit-field',
       field: 'status',
       value: newFullStatus,
-      potId: currentPot.uuid,
+      potId: pot.uuid,
     });
   },
-  onDelete: (currentPot: Pot) => {
+  onDelete: () => {
     Alert.alert('Delete this pot?', undefined, [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -90,21 +89,20 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
         onPress: () => {
           dispatch({
             type: 'pot-delete',
-            potId: currentPot.uuid,
-            imageNames: currentPot.images3,
+            potId: pot.uuid,
+            imageNames: pot.images3,
           });
         },
       },
     ]);
   },
-  onDeleteImage: (currentPot: Pot, name: string) =>
-    deleteImage(dispatch, currentPot, name),
-  onCopy: (currentPot: Pot) =>
+  onDeleteImage: (name: string) => deleteImage(dispatch, pot, name),
+  onCopy: () =>
     dispatch({
       type: 'pot-copy',
-      potId: currentPot.uuid,
+      potId: pot.uuid,
       newPotId: String(Math.random()).substring(2),
-      imageNames: currentPot.images3,
+      imageNames: pot.images3,
     }),
 });
 
@@ -153,11 +151,10 @@ class EditPage extends React.Component<EditPageProps, {}> {
           date={pot.status.status[s] || new Date()}
           first={i === 0}
           last={i === numStatusDetails - 1}
-          onChangeNote={this.onChangeNote}
+          onChangeNote={this.props.onChangeNote}
         />
       ));
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
-    const images = pot.images3.map((name) => this.props.images.images[name]);
     return (
       <View style={styles.container}>
         <ElevatedView style={styles.header} elevation={8}>
@@ -167,10 +164,10 @@ class EditPage extends React.Component<EditPageProps, {}> {
             ref={this.titleInput}
             underlineColorAndroid="transparent"
             placeholderTextColor="#FFCCBC"
-            onChangeText={this.onChangeTitle}
+            onChangeText={this.props.onChangeTitle}
             value={pot.title}
             selectTextOnFocus={true}
-            autoFocus={this.props.ui.new}
+            autoFocus={this.props.new}
           />
           {editButton}
         </ElevatedView>
@@ -178,19 +175,19 @@ class EditPage extends React.Component<EditPageProps, {}> {
           <View style={/*{elevation: 4, backgroundColor: '#fff'}*/null}>
             <ImageList
               size={mainImgSize}
-              images={images}
-              onAddImage={this.onAddImage}
+              images={this.props.images}
+              onAddImage={this.props.onAddImage}
               onClickImage={this.props.onExpandImage}
-              onDeleteImage={this.onDeleteImage}
+              onDeleteImage={this.props.onDeleteImage}
             />
             <StatusSwitcher
               fontLoaded={this.props.fontLoaded}
               status={pot.status}
-              setStatus={this.setStatus}
+              setStatus={this.props.setStatus}
               note={currentNoteText}
-              onChangeNote={this.onChangeNote}
+              onChangeNote={this.props.onChangeNote}
               date={pot.status.date()}
-              onPickDate={this.onSetStatusDate}
+              onPickDate={this.props.setStatusDate}
             />
           </View>
           {details}
@@ -200,30 +197,22 @@ class EditPage extends React.Component<EditPageProps, {}> {
           style={styles.bottomBar}
           elevation={details.length ? 8 : 0}
         >
-          <Button onPress={this.onDelete} style={[styles.button3, styles.bbb]}>
+          <Button
+            onPress={this.props.onDelete}
+            style={[styles.button3, styles.bbb]}
+          >
             DELETE POT
           </Button>
-          <Button onPress={this.onCopy} style={[styles.button3, styles.bbb]}>
+          <Button
+            onPress={this.props.onCopy}
+            style={[styles.button3, styles.bbb]}
+          >
             COPY POT
           </Button>
         </ElevatedView>
       </View>
     );
   }
-
-  private onAddImage = () => this.props.onAddImage(this.props.pot);
-  private onChangeTitle = (text: string) =>
-    this.props.onChangeTitle(this.props.pot.uuid, text)
-  private onChangeNote = (status: StatusString, note: string) =>
-    this.props.onChangeNote(this.props.pot, status, note)
-  private onDeleteImage = (imageName: string) =>
-    this.props.onDeleteImage(this.props.pot, imageName)
-  private setStatus = (newStatus: StatusString) =>
-    this.props.setStatus(this.props.pot, newStatus)
-  private onSetStatusDate = (newDate: Date) =>
-    this.props.setStatusDate(this.props.pot, newDate)
-  private onCopy = () => this.props.onCopy(this.props.pot);
-  private onDelete = () => this.props.onDelete(this.props.pot);
 
   private focusTitle = () => {
     if (this.titleInput.current) {
