@@ -48,12 +48,6 @@ export interface AppViewDispatchProps {
   onCollapse: (section: string) => void;
   onResumeImport: () => void;
   onCancelResumeImport: () => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
   addBackButtonHandler: () => () => void;
   removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
@@ -88,9 +82,6 @@ class AppView extends React.Component<
             onSearch={props.onSearch}
             onNavigateToSettings={props.onNavigateToSettings}
             onCollapse={props.onCollapse}
-            onImageLoad={props.onImageLoad}
-            onImageLoadFailure={props.onImageLoadFailure}
-            onResetImageLoad={props.onResetImageLoad}
           />
         );
       case 'edit-pot':
@@ -111,9 +102,6 @@ class AppView extends React.Component<
             setStatusDate={props.setStatusDate}
             onDelete={props.onDelete}
             onCopy={props.onCopy}
-            onImageLoad={props.onImageLoad}
-            onImageLoadFailure={props.onImageLoadFailure}
-            onResetImageLoad={props.onResetImageLoad}
           />
         );
       case 'settings':
@@ -140,9 +128,6 @@ class AppView extends React.Component<
             onDeleteImage={props.onDeleteImage}
             onSetMainImage={props.onSetMainImage}
             onBack={props.onEdit}
-            onImageLoad={props.onImageLoad}
-            onImageLoadFailure={props.onImageLoadFailure}
-            onResetImageLoad={props.onResetImageLoad}
           />
         );
       default:

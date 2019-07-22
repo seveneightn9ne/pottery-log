@@ -34,12 +34,6 @@ interface ListPageProps {
   onSearch: (search: string) => void;
   onNavigateToSettings: () => void;
   onCollapse: (section: string) => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 interface SectionT {

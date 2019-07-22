@@ -12,12 +12,6 @@ interface ImageListProps {
   onAddImage: () => void;
   onClickImage: (name: string) => void;
   onDeleteImage: (name: string) => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 export default function ImageList(props: ImageListProps) {
@@ -34,7 +28,6 @@ export default function ImageList(props: ImageListProps) {
           key={Image3.key(imageState)}
           image={imageState}
           style={{ height: props.size, width: props.size }}
-          {...props}
         />
       </TouchableOpacity>
     );

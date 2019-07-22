@@ -33,12 +33,6 @@ interface EditPageProps {
   setStatusDate: (currentPot: Pot, date: Date) => void;
   onDelete: (currentPot: Pot) => void;
   onCopy: (currentPot: Pot) => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (newUri: string, oldUri: string) => void;
 }
 
 export default class EditPage extends React.Component<EditPageProps, {}> {
@@ -111,9 +105,6 @@ export default class EditPage extends React.Component<EditPageProps, {}> {
               onAddImage={this.onAddImage}
               onClickImage={this.props.onExpandImage}
               onDeleteImage={this.onDeleteImage}
-              onImageLoad={this.props.onImageLoad}
-              onImageLoadFailure={this.props.onImageLoadFailure}
-              onResetImageLoad={this.props.onResetImageLoad}
             />
             <StatusSwitcher
               fontLoaded={this.props.fontLoaded}

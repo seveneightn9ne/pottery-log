@@ -168,34 +168,6 @@ export const mapDispatchToProps = (
     }),
   onResumeImport: () => dispatch({ type: 'import-resume-affirm' }),
   onCancelResumeImport: () => dispatch({ type: 'import-resume-cancel' }),
-  onImageLoad: (name: string) => dispatch({ type: 'image-loaded', name }),
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => {
-    if (type === 'file') {
-      dispatch({
-        type: 'image-error-file',
-        uri: nameOrUri,
-      });
-    } else if (type === 'local') {
-      dispatch({
-        type: 'image-error-local',
-        name: nameOrUri,
-      });
-    } else {
-      dispatch({
-        type: 'image-error-remote',
-        name: nameOrUri,
-      });
-    }
-  },
-  onResetImageLoad: (oldUri: string, newUri: string) =>
-    dispatch({
-      type: 'image-reset-loaded',
-      oldUri,
-      newUri,
-    }),
   addBackButtonHandler: () => {
     const handler = () => dispatch(handleBackButton());
     BackHandler.addEventListener('hardwareBackPress', handler);

@@ -13,12 +13,6 @@ interface ImagePageProps {
   onBack: (potId: string) => void;
   onSetMainImage: (currentPot: Pot, image: string) => void;
   onDeleteImage: (currentPot: Pot, image: string) => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 export default class ImagePage extends React.Component<ImagePageProps> {
@@ -56,11 +50,7 @@ export default class ImagePage extends React.Component<ImagePageProps> {
             {deleteButton}
           </View>
         </ElevatedView>
-        <Image3
-          key={Image3.key(this.props.image)}
-          style={{ width, height: width }}
-          {...this.props}
-        />
+        <Image3 style={{ width, height: width }} image={this.props.image} />
       </View>
     );
   }

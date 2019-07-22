@@ -1,18 +1,14 @@
 import React from 'react';
 import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
+import { connect } from 'react-redux';
 import { ImageState } from '../../reducers/types';
+import { PLThunkDispatch } from '../../thunks/types';
 import { resetDirectory } from '../../utils/imageutils';
 
-interface Image3Props {
+interface OwnProps {
   image: ImageState | null;
   style: any;
-  key: string; // TODO why pass in key?
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
+  key?: string;
 }
 
 interface Image3State {
@@ -23,7 +19,26 @@ interface Image3State {
   originalUriIfReset?: string;
 }
 
-export default class Image3 extends React.Component<Image3Props, Image3State> {
+const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
+  onImageLoad: (name: string) => dispatch({ type: 'image-loaded', name }),
+  onFileLoadFailure: (uri: string) =>
+    dispatch({ type: 'image-error-file', uri }),
+  onLocalLoadFailure: (name: string) =>
+    dispatch({ type: 'image-error-local', name }),
+  onRemoteLoadFailure: (name: string) =>
+    dispatch({ type: 'image-error-remote', name }),
+  onResetImageLoad: (oldUri: string, newUri: string) =>
+    dispatch({
+      type: 'image-reset-loaded',
+      oldUri,
+      newUri,
+    }),
+});
+type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
+
+type Props = OwnProps & PropsFromDispatch;
+
+class Image3 extends React.Component<Props, Image3State> {
   public static key(imageState: ImageState | null): string {
     if (!imageState) {
       return '';
@@ -34,7 +49,7 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
   // 0 tries for local because iOS doesn't reload the image unless
   // the URI changed, so in order to load remote we need to try that
   // on the first failure.
-  private static defaultTries(props: Image3Props) {
+  private static defaultTries(props: Props) {
     if (!props.image) {
       return 0;
     }
@@ -47,7 +62,7 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     }
   }
 
-  constructor(props: Image3Props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       failed: false,
@@ -100,10 +115,10 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
     return fullUri;
   }
 
-  private baseUri = (props?: Image3Props) =>
+  private baseUri = (props?: Props) =>
     (this.state && this.state.baseUriIfReset) || this.baseUriFromProps(props)
   private uniqueUri = (baseUri: string) => baseUri + '?r' + Date.now();
-  private uri = (props?: Image3Props) => this.uniqueUri(this.baseUri(props));
+  private uri = (props?: Props) => this.uniqueUri(this.baseUri(props));
 
   private onLoad = () => {
     if (!this.props.image) {
@@ -154,17 +169,22 @@ export default class Image3 extends React.Component<Image3Props, Image3State> {
         }));
       } else {
         // failed despite reset. It's gone.
-        this.props.onImageLoadFailure(this.props.image.fileUri, 'file');
+        this.props.onFileLoadFailure(this.props.image.fileUri);
         this.setState({ failed: true, tries: this.state.tries });
       }
     } else if (this.props.image.localUri) {
       // The localUri failed 3 times. It's gone.
-      this.props.onImageLoadFailure(this.props.image.name, 'local');
+      this.props.onLocalLoadFailure(this.props.image.name);
       this.setState({ failed: true, tries: this.state.tries });
     } else if (this.props.image.remoteUri) {
       // Remote image failed, what can you do?
-      this.props.onImageLoadFailure(this.props.image.name, 'remote');
+      this.props.onRemoteLoadFailure(this.props.image.name);
       this.setState({ failed: true, tries: this.state.tries });
     }
   }
 }
+
+export default connect<{}, PropsFromDispatch, OwnProps>(
+  null,
+  mapDispatchToProps,
+)(Image3);

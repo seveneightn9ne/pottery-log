@@ -10,19 +10,13 @@ interface PotListItemProps {
   image: ImageState | null;
   fontLoaded: boolean;
   onPress: () => void;
-  onImageLoad: (name: string) => void;
-  onImageLoadFailure: (
-    nameOrUri: string,
-    type: 'local' | 'file' | 'remote',
-  ) => void;
-  onResetImageLoad: (oldUri: string, newUri: string) => void;
 }
 
 export default function(props: PotListItemProps) {
   const { width } = Dimensions.get('window');
   const size = { width: width / 2 - 6, height: width / 2 - 6 };
   const img = props.image ? (
-    <Image3 style={size} key={Image3.key(props.image)} {...props} />
+    <Image3 style={size} image={props.image} />
   ) : (
     <View style={[styles.liImagePlaceholder, size]}>
       <Image
