@@ -38,11 +38,12 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch, ownProps: OwnProps) => ({
 
 type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
 
-const mapStateToProps = (state: FullState) => {
+const mapStateToProps = (state: FullState, ownProps: OwnProps) => {
   const potId =
     state.ui.page === 'image' ? state.ui.editPotId : (undefined as never);
   const pot = state.pots.pots[potId];
-  return { pot };
+  const isMainImage = pot.images3[0] === ownProps.image.name;
+  return { isMainImage, pot };
 };
 
 type PropsFromState = ReturnType<typeof mapStateToProps>;
@@ -62,46 +63,43 @@ const mergeProps = (
 
 type ImagePageProps = ReturnType<typeof mergeProps>;
 
-class ImagePage extends React.Component<ImagePageProps> {
-  public render() {
-    const { width } = Dimensions.get('window');
-    const isMainImage = this.props.pot.images3[0] === this.props.image.name;
-    const star = isMainImage ? 'star' : 'star_border';
-    const backButton = this.props.fontLoaded ? (
-      <TouchableOpacity onPress={this.props.onBack}>
-        <Text style={styles.searchBack}>close</Text>
-      </TouchableOpacity>
-    ) : null;
-    const starButton = this.props.fontLoaded ? (
-      <TouchableOpacity onPress={this.props.onSetMainImage}>
-        <Text style={styles.search}>{star}</Text>
-      </TouchableOpacity>
-    ) : null;
-    const deleteButton = this.props.fontLoaded ? (
-      <TouchableOpacity onPress={this.props.onDeleteImage}>
-        <Text style={styles.search}>delete</Text>
-      </TouchableOpacity>
-    ) : null;
-    return (
-      <View style={[styles.container, styles.imagePage]}>
-        <ElevatedView style={styles.imageBar} elevation={4}>
-          {backButton}
-          <View
-            style={{
-              flexDirection: 'row',
-              flex: 1,
-              justifyContent: 'flex-end',
-            }}
-          >
-            {starButton}
-            {deleteButton}
-          </View>
-        </ElevatedView>
-        <Image3 style={{ width, height: width }} image={this.props.image} />
-      </View>
-    );
-  }
-}
+const ImagePage: React.FunctionComponent<ImagePageProps> = (props) => {
+  const { width } = Dimensions.get('window');
+  const star = props.isMainImage ? 'star' : 'star_border';
+  const backButton = props.fontLoaded ? (
+    <TouchableOpacity onPress={props.onBack}>
+      <Text style={styles.searchBack}>close</Text>
+    </TouchableOpacity>
+  ) : null;
+  const starButton = props.fontLoaded ? (
+    <TouchableOpacity onPress={props.onSetMainImage}>
+      <Text style={styles.search}>{star}</Text>
+    </TouchableOpacity>
+  ) : null;
+  const deleteButton = props.fontLoaded ? (
+    <TouchableOpacity onPress={props.onDeleteImage}>
+      <Text style={styles.search}>delete</Text>
+    </TouchableOpacity>
+  ) : null;
+  return (
+    <View style={[styles.container, styles.imagePage]}>
+      <ElevatedView style={styles.imageBar} elevation={4}>
+        {backButton}
+        <View
+          style={{
+            flexDirection: 'row',
+            flex: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
+          {starButton}
+          {deleteButton}
+        </View>
+      </ElevatedView>
+      <Image3 style={{ width, height: width }} image={props.image} />
+    </View>
+  );
+};
 
 // connect<PropsFromState, PropsFromDispatch, OwnProps, ImagePageProps, FullState>(
 export default connect(
