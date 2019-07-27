@@ -60,7 +60,7 @@ function pickImage(
       }
       localUri = result.uri;
     } catch (e) {
-      console.warn('Failed to get image from camera', e);
+      console.warn('Failed to get image from camera/library', e);
       // We ignore this error because it's probably that the user declined the permissions
       // or chose not to pick an image.
       return;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { Pot } from '../models/Pot';
 import {
   ExportState,
   ImageStoreState,
@@ -24,7 +23,6 @@ export interface AppViewStateProps {
   fontLoaded: boolean;
 }
 export interface AppViewDispatchProps {
-  onEdit: (potId: string) => void;
   onNavigateToList: () => void;
   onStartExport: () => void;
   onStartImport: () => void;
@@ -34,8 +32,6 @@ export interface AppViewDispatchProps {
   addBackButtonHandler: () => () => void;
   removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
-  onSetMainImage: (currentPot: Pot, name: string) => void;
-  onDeleteImage: (currentPot: Pot, name: string) => void;
 }
 
 class AppView extends React.Component<
@@ -81,11 +77,7 @@ class AppView extends React.Component<
         return (
           <ImagePage
             image={props.images.images[props.ui.imageId]}
-            pot={props.pots.pots[props.ui.editPotId]}
             fontLoaded={props.fontLoaded}
-            onDeleteImage={props.onDeleteImage}
-            onSetMainImage={props.onSetMainImage}
-            onBack={props.onEdit}
           />
         );
       default:
