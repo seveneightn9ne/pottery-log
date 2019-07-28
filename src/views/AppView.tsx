@@ -1,12 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import {
-  ExportState,
-  ImageStoreState,
-  ImportState,
-  PotsStoreState,
-  UIState,
-} from '../reducers/types';
+import { ImageStoreState, PotsStoreState, UIState } from '../reducers/types';
 import styles from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
@@ -15,20 +9,11 @@ import SettingsPage from './SettingsPage';
 
 export interface AppViewStateProps {
   pots: PotsStoreState;
-  ui: UIState;
   images: ImageStoreState;
-  exports: ExportState;
-  imports: ImportState;
-
+  ui: UIState;
   fontLoaded: boolean;
 }
 export interface AppViewDispatchProps {
-  onNavigateToList: () => void;
-  onStartExport: () => void;
-  onStartImport: () => void;
-  onStartUrlImport: (url: string) => void;
-  onResumeImport: () => void;
-  onCancelResumeImport: () => void;
   addBackButtonHandler: () => () => void;
   removeBackButtonHandler: (handler: undefined | (() => void)) => undefined;
   loadInitial: () => void;
@@ -59,20 +44,7 @@ class AppView extends React.Component<
           />
         );
       case 'settings':
-        return (
-          <SettingsPage
-            exports={props.exports}
-            imports={props.imports}
-            fontLoaded={props.fontLoaded}
-            onNavigateToList={props.onNavigateToList}
-            onStartExport={props.onStartExport}
-            onStartImport={props.onStartImport}
-            onStartUrlImport={props.onStartUrlImport}
-            resumeImport={props.ui.resumeImport}
-            onResumeImport={props.onResumeImport}
-            onCancelResumeImport={props.onCancelResumeImport}
-          />
-        );
+        return <SettingsPage fontLoaded={props.fontLoaded} />;
       case 'image':
         return (
           <ImagePage

@@ -14,7 +14,9 @@ const mapStateToProps = (
   state: FullState,
   props?: { fontLoaded: boolean },
 ): AppViewStateProps => ({
-  ...state,
+  pots: state.pots,
+  images: state.images,
+  ui: state.ui,
   fontLoaded: !!(props && props.fontLoaded),
 });
 
@@ -22,20 +24,6 @@ const mapStateToProps = (
 export const mapDispatchToProps = (
   dispatch: ThunkDispatch<FullState, never, types.Action>,
 ): AppViewDispatchProps => ({
-  onNavigateToList: () =>
-    dispatch({
-      type: 'page-list',
-    }),
-
-  onStartExport: () => dispatch({ type: 'export-initiate' }),
-  onStartImport: () => dispatch({ type: 'import-initiate' }),
-  onStartUrlImport: (url: string) =>
-    dispatch({
-      type: 'import-initiate-url',
-      url,
-    }),
-  onResumeImport: () => dispatch({ type: 'import-resume-affirm' }),
-  onCancelResumeImport: () => dispatch({ type: 'import-resume-cancel' }),
   addBackButtonHandler: () => {
     const handler = () => dispatch(handleBackButton());
     BackHandler.addEventListener('hardwareBackPress', handler);
@@ -56,4 +44,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(AppView);
-// export default Container.createFunctional(AppView, getStores, getState, {withProps: true});

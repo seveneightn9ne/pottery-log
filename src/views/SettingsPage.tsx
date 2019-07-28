@@ -8,31 +8,57 @@ import {
   View,
 } from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
-import { ExportState, ImportState } from '../reducers/types';
+import { connect } from 'react-redux';
+import { FullState } from '../reducers/types';
 import styles from '../style';
+import { PLThunkDispatch } from '../thunks/types';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
 import Modal from './components/Modal';
 
-interface SettingsPageProps {
-  onNavigateToList: () => void;
-  onStartExport: () => void;
-  onStartImport: () => void;
-  onStartUrlImport: (url: string) => void;
-  onResumeImport: () => void;
-  onCancelResumeImport: () => void;
+interface OwnProps {
   fontLoaded: boolean;
-  exports: ExportState;
-  imports: ImportState;
-  resumeImport: boolean;
 }
+
+const mapStateToProps = (state: FullState) => ({
+  resumeImport:
+    state.ui.page === 'settings' ? state.ui.resumeImport : (undefined as never),
+  statusMessage:
+    state.exports.statusMessage ||
+    state.imports.statusMessage ||
+    'Exporting will save your Pottery Log data so you can move your data to a new phone.',
+  exportUri: 'exportUri' in state.exports ? state.exports.exportUri : undefined,
+  exporting: state.exports.exporting,
+  importing: state.imports.importing,
+});
+type PropsFromState = ReturnType<typeof mapStateToProps>;
+
+const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
+  onNavigateToList: () =>
+    dispatch({
+      type: 'page-list',
+    }),
+
+  onStartExport: () => dispatch({ type: 'export-initiate' }),
+  onStartImport: () => dispatch({ type: 'import-initiate' }),
+  onStartUrlImport: (url: string) =>
+    dispatch({
+      type: 'import-initiate-url',
+      url,
+    }),
+  onResumeImport: () => dispatch({ type: 'import-resume-affirm' }),
+  onCancelResumeImport: () => dispatch({ type: 'import-resume-cancel' }),
+});
+type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
+
+type SettingsPageProps = PropsFromState & PropsFromDispatch & OwnProps;
 
 interface SettingsPageState {
   linkModalOpen: boolean;
   linkText: string;
 }
 
-export default class SettingsPage extends React.Component<
+class SettingsPage extends React.Component<
   SettingsPageProps,
   SettingsPageState
 > {
@@ -49,13 +75,12 @@ export default class SettingsPage extends React.Component<
     ) : null;
 
     let body;
-    if ('exportUri' in this.props.exports) {
+    if (this.props.exportUri) {
       body = (
         <View>
           <Text style={styles.settingsText}>The export is available at:</Text>
           <Text style={styles.settingsText}>
-            <Anchor href={this.props.exports.exportUri} /> (long press the link
-            to copy)
+            <Anchor href={this.props.exportUri} /> (long press the link to copy)
           </Text>
           <Text style={styles.settingsText}>
             This link will be active for one week. You can copy the link to a
@@ -64,25 +89,18 @@ export default class SettingsPage extends React.Component<
           </Text>
         </View>
       );
-    } else if (this.props.exports.exporting || this.props.imports.importing) {
-      const status = this.props.exports.exporting
-        ? this.props.exports.statusMessage
-        : this.props.imports.statusMessage;
+    } else if (this.props.exporting || this.props.importing) {
       body = (
         <View style={{ flexDirection: 'row', paddingLeft: 20 }}>
           <ActivityIndicator size="small" />
-          <Text style={styles.settingsText}>{status}</Text>
+          <Text style={styles.settingsText}>{this.props.statusMessage}</Text>
         </View>
       );
     } else {
       // There may be an export or import failure message
-      const status =
-        this.props.exports.statusMessage ||
-        this.props.imports.statusMessage ||
-        'Exporting will save your Pottery Log data so you can move your data to a new phone.';
       body = (
         <View style={{ padding: 20, paddingTop: 0 }}>
-          <Text style={styles.settingsText}>{status}</Text>
+          <Text style={styles.settingsText}>{this.props.statusMessage}</Text>
           <Button title="Export" onPress={this.props.onStartExport} />
           <View style={{ height: 20 }} />
           <Button title="Import" onPress={this.importPopup} />
@@ -138,15 +156,17 @@ export default class SettingsPage extends React.Component<
     );
   }
 
+  private startUrlImport = () =>
+    this.props.onStartUrlImport(this.state.linkText)
+  private setLinkText = (linkText: string) => this.setState({ linkText });
+
   private renderModal() {
     let belowInput: JSX.Element | null = null;
     const buttons = [
       { text: 'CANCEL' },
       {
         text: 'IMPORT',
-        onPress: () => {
-          this.props.onStartUrlImport(this.state.linkText);
-        },
+        onPress: this.startUrlImport,
         disabled: true,
       },
     ];
@@ -168,23 +188,24 @@ export default class SettingsPage extends React.Component<
         buttons[1].disabled = false;
       }
     }
+    const modalBody = (
+      <View>
+        <ExpandingTextInput
+          value={this.state.linkText}
+          multiline={true}
+          numberOfLines={1}
+          style={styles.modalInput}
+          onChangeText={this.setLinkText}
+          autoFocus={true}
+          onSubmit={this.doNothing}
+        />
+        {belowInput}
+      </View>
+    );
     return (
       <Modal
         header={'Paste link'}
-        body={
-          <View>
-            <ExpandingTextInput
-              value={this.state.linkText}
-              multiline={true}
-              numberOfLines={1}
-              style={styles.modalInput}
-              onChangeText={(text) => this.setState({ linkText: text })}
-              autoFocus={true}
-              onSubmit={() => {}}
-            />
-            {belowInput}
-          </View>
-        }
+        body={modalBody}
         buttons={buttons}
         open={this.state.linkModalOpen}
         close={this.closeModal}
@@ -192,8 +213,10 @@ export default class SettingsPage extends React.Component<
     );
   }
 
+  private doNothing = () => {};
+
   private onBack = () => {
-    if (this.props.exports.exporting && !('exportUri' in this.props.exports)) {
+    if (this.props.exporting && !this.props.exportUri) {
       Alert.alert('Cancel this export?', undefined, [
         { text: 'Stay here', style: 'cancel' },
         { text: 'Cancel export', onPress: this.props.onNavigateToList },
@@ -203,3 +226,8 @@ export default class SettingsPage extends React.Component<
     }
   }
 }
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SettingsPage);
