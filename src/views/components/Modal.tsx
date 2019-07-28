@@ -12,48 +12,46 @@ interface ModalProps {
   close: () => void;
 }
 
-export default class Modal extends React.Component<ModalProps> {
-  public render() {
-    return (
-      <RNModal
-        transparent={true}
-        visible={this.props.open}
-        onRequestClose={this.props.close}
-        onDismiss={this.props.close}
+export default function Modal(props: ModalProps) {
+  return (
+    <RNModal
+      transparent={true}
+      visible={props.open}
+      onRequestClose={props.close}
+      onDismiss={props.close}
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-          }}
-        >
-          <ElevatedView style={styles.modal} elevation={24}>
-            <Text style={styles.modalHeader}>{this.props.header}</Text>
-            {this.props.body}
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-              {this.props.buttons.map(({ text, onPress, disabled }) => (
-                <Button
-                  onPress={() => {
-                    this.props.close();
-                    onPress && onPress();
-                  }}
-                  style={[
-                    styles.button3,
-                    styles.modalButton,
-                    disabled ? styles.disabledButton : null,
-                  ]}
-                  key={text}
-                  disabled={!!disabled}
-                >
-                  {text}
-                </Button>
-              ))}
-            </View>
-          </ElevatedView>
-        </View>
-      </RNModal>
-    );
-  }
+        <ElevatedView style={styles.modal} elevation={24}>
+          <Text style={styles.modalHeader}>{props.header}</Text>
+          {props.body}
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            {props.buttons.map(({ text, onPress, disabled }) => (
+              <Button
+                onPress={() => {
+                  props.close();
+                  onPress && onPress();
+                }}
+                style={[
+                  styles.button3,
+                  styles.modalButton,
+                  disabled ? styles.disabledButton : null,
+                ]}
+                key={text}
+                disabled={!!disabled}
+              >
+                {text}
+              </Button>
+            ))}
+          </View>
+        </ElevatedView>
+      </View>
+    </RNModal>
+  );
 }
