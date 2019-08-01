@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Action } from '../action';
 import * as utils from '../utils/imageutils';
 import * as ImageUploader from '../utils/uploader';
-import { ImageState, ImageStoreState } from './types';
+import { ImageStoreState } from './types';
 
 export function getInitialState(): ImageStoreState {
   return {
@@ -187,16 +187,4 @@ export function reduceImages(
     default:
       return state;
   }
-}
-
-export function getImageState(
-  state: ImageStoreState,
-  name: string,
-): ImageState | null {
-  const i = state.images[name];
-  if (!i) {
-    console.log('That image named ' + name + ' is not in the image store.');
-    return null;
-  }
-  return i;
 }

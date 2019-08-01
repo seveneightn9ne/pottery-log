@@ -28,7 +28,7 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state: FullState, { pot }: OwnProps) => ({
-  images: pot.images3.map((name) => state.images.images[name]),
+  images: pot.images3.map((name) => state.images.images[name]).filter((i) => !!i),
   new: (state.ui as EditUiState).new,
 });
 

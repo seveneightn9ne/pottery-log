@@ -29,31 +29,24 @@ export function loadInitial(): PLThunkAction {
 
 function load(isImport: boolean): PLThunkAction {
   return async (dispatch: PLThunkDispatch) => {
-    // console.log("starting load");
     let images = await loadInitialImages();
     let { pots, images2 } = await loadInitialPots(isImport);
-    // console.log("pots n images before migrating");
-    // console.log(pots, images);
+
     images2.forEach(([image, potId]) => {
-      // console.log("migrate an image", image, potId);
       images = migrateFromImages2(images, image, potId);
     });
-    // console.log("pots n images before fixing");
-    // console.log(pots, images);
+
     const fixed = _fixPotsAndImages(pots, images);
     pots = fixed.pots;
     images = fixed.images;
-    // console.log("pots n images ter fixing");
-    // console.log(pots, images);
+
     const importt = isImport ? null : await loadInitialImport();
-    // console.log("will dispatch loaded-everything");
     dispatch({
       type: 'loaded-everything',
       pots,
       images,
       isImport,
     });
-    // console.log("loaded everything");
 
     // Save remote/local URIs
     // we probably don't care about the result of promise, since it's opportunistic
@@ -159,14 +152,9 @@ function loadPotFromJson(
     return { pot: null, images2: [] };
   }
   const images2: Array<[Image2, string]> = [];
-  let loaded;
-  try {
-    loaded = JSON.parse(loadedJson);
-  } catch (error) {
-    console.log('Pot failed to parse: ' + loadedJson);
-    console.warn(error);
-    return { pot: null, images2: [] };
-  }
+  // Don't catch, we want to know if this fails
+  const loaded = JSON.parse(loadedJson);
+
   // Add all fields, for version compatibility
   const pot: IntermediatePot = { ...loaded };
   pot.status =
@@ -207,7 +195,6 @@ function loadPotFromJson(
 }
 
 async function loadInitialImages(): Promise<ImageStoreState> {
-  console.log('Loading ImageStore');
   const json = await AsyncStorage.getItem('@ImageStore');
 
   if (!json) {
@@ -222,9 +209,8 @@ async function loadInitialImages(): Promise<ImageStoreState> {
 export const IMPORT_STORAGE_KEY = '@Import';
 
 async function loadInitialImport(): Promise<ImportStatePersisted | null> {
-  // console.log("loading improt");
   const json = await AsyncStorage.getItem(IMPORT_STORAGE_KEY);
-  // console.log("from asyncstorage got", json);
+
   if (!json) {
     return null;
   }
@@ -233,6 +219,7 @@ async function loadInitialImport(): Promise<ImportStatePersisted | null> {
     existing = JSON.parse(json);
   } catch (e) {
     // Import state is not really vital so we're ok catching
+    console.log('Ignoring invalid saved import data: ', json);
     return null;
   }
   if (existing.imageMap && Object.keys(existing.imageMap).length > 0) {
@@ -252,12 +239,23 @@ function migrateFromImages2(
   if (newState.images[name]) {
     // This image exists for another pot already
     if (newState.images[name].pots.indexOf(potId) === -1) {
+      console.log(
+        'images2-3 migration: adding a pot to the existing image: ',
+        name,
+        potId,
+      );
       newState.images[name] = {
         ...newState.images[name],
         pots: [...newState.images[name].pots, potId],
       };
+    } else {
+      console.log(
+        'images2-3 migration: doing nothing for this image because it exists already: ',
+        name,
+      );
     }
   } else {
+    console.log('images2-3 migration: Adding a new image: ', name);
     // New image
     newState.images[name] = {
       ...image,
@@ -295,6 +293,9 @@ function deleteImagesWithNoUri(images: ImageStoreState): ImageStoreState {
       toDelete.push(image.name);
     }
   });
+  if (toDelete.length) {
+    console.log('Deleting images with no uri: ', toDelete);
+  }
   const newImages = { ...images, images: { ...images.images } };
   toDelete.forEach((imageName) => delete newImages.images[imageName]);
   return newImages;
@@ -310,6 +311,7 @@ function fixImagesPotListsAndDeleteUnused(
     newImage.pots = potsUsingImage(image.name, pots);
     if (newImage.pots.length === 0) {
       // No pots are using the image
+      console.log('Deleting unused image: ', image.name);
       imageutils.deleteUnusedImage(newImage);
       delete newState.images[image.name];
     } else {
@@ -327,7 +329,10 @@ export function _saveImagesToFiles(images: ImageStoreState) {
     }
     if (image.remoteUri) {
       promises.push(
-        imageutils.deprecatedSaveToFileImpure(image.remoteUri, true /* isRemote */),
+        imageutils.deprecatedSaveToFileImpure(
+          image.remoteUri,
+          true, /* isRemote */
+        ),
       );
       return;
     }

@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
 import { applyMiddleware, createStore, Middleware, Reducer } from 'redux';
 import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { Action } from '../action';
@@ -27,10 +26,11 @@ import { FullState } from './types';
 import { getInitialState as getInitialUiState, reduceUi } from './UIStore';
 
 const logger: Middleware = (_) => (next) => (action: Action) => {
-  if (Constants.appOwnership === 'standalone') {
-    // Skip logs in prod, for great speed
-    return next(action);
-  }
+  // I think we might want the logs in prod, in case of errors
+  // if (Constants.appOwnership === 'standalone') {
+  //   // Skip logs in prod, for great speed
+  //   return next(action);
+  // }
 
   if (action.type === 'loaded-everything') {
     console.log('Action: loaded-everything (body omitted)');
