@@ -1,15 +1,8 @@
 import { Alert } from 'react-native';
-import { ThunkAction } from 'redux-thunk';
-import { Action } from '../action';
-import { FullState } from '../reducers/types';
+import { PLSyncThunkAction, tSync as t } from './types';
 
-export function handleBackButton(): ThunkAction<
-  boolean,
-  FullState,
-  undefined,
-  Action
-> {
-  return (dispatch, getState) => {
+export function handleBackButton(): PLSyncThunkAction<boolean> {
+  return t('handleBackButton', {}, (dispatch, getState) => {
     const { ui, exports } = getState();
     if (ui.page === 'list') {
       if ('searching' in ui) {
@@ -38,5 +31,5 @@ export function handleBackButton(): ThunkAction<
       type: 'page-list',
     });
     return true;
-  };
+  });
 }

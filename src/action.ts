@@ -18,7 +18,6 @@ export type Action =
   | Reload;
 
 type ImageAction =
-  | ImageLoaded
   | ImageAdd
   | ImageDeleteFromPot
   | ImageErrorRemote
@@ -182,11 +181,6 @@ interface ImageErrorFile {
 
 interface ImageRemoteFailed {
   type: 'image-remote-failed';
-  name: string;
-}
-
-interface ImageLoaded {
-  type: 'image-loaded';
   name: string;
 }
 

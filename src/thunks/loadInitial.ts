@@ -9,10 +9,10 @@ import {
   PotsStoreState,
 } from '../reducers/types';
 import * as imageutils from '../utils/imageutils';
-import { PLThunkAction, PLThunkDispatch } from './types';
+import { PLThunkAction, PLThunkDispatch, t } from './types';
 
 export function reloadFromImport(): PLThunkAction {
-  return async (dispatch: PLThunkDispatch) => {
+  return t('reloadFromImport', {}, async (dispatch: PLThunkDispatch) => {
     dispatch({
       type: 'initial-pots-images',
     });
@@ -20,7 +20,7 @@ export function reloadFromImport(): PLThunkAction {
     dispatch({
       type: 'imported-metadata',
     });
-  };
+  });
 }
 
 export function loadInitial(): PLThunkAction {
@@ -28,7 +28,7 @@ export function loadInitial(): PLThunkAction {
 }
 
 function load(isImport: boolean): PLThunkAction {
-  return async (dispatch: PLThunkDispatch) => {
+  return t('load', { isImport }, async (dispatch: PLThunkDispatch) => {
     let images = await loadInitialImages();
     let { pots, images2 } = await loadInitialPots(isImport);
 
@@ -65,7 +65,7 @@ function load(isImport: boolean): PLThunkAction {
         data: importt,
       });
     }
-  };
+  });
 }
 
 async function loadInitialPots(

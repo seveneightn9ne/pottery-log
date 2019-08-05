@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
 import { connect } from 'react-redux';
 import { ImageState } from '../../reducers/types';
+import { waitAndSaveToFile } from '../../thunks/images';
 import { PLThunkDispatch } from '../../thunks/types';
 import { resetDirectory } from '../../utils/imageutils';
 
@@ -20,7 +21,7 @@ interface Image3State {
 }
 
 const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
-  onImageLoad: (name: string) => dispatch({ type: 'image-loaded', name }),
+  onImageLoad: (name: string) => dispatch(waitAndSaveToFile(name)),
   onFileLoadFailure: (uri: string) =>
     dispatch({ type: 'image-error-file', uri }),
   onLocalLoadFailure: (name: string) =>

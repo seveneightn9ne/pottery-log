@@ -146,19 +146,6 @@ export function reduceImages(
       // OR... who cares since we use files now
       return state;
     }
-    case 'image-loaded': {
-      // Convert to a fileUri if needed
-      const i = state.images[action.name];
-      if (!i || i.fileUri) {
-        return state;
-      }
-      if (i.localUri) {
-        utils.deprecatedSaveToFileImpure(i.localUri);
-      } else if (i.remoteUri) {
-        utils.deprecatedSaveToFileImpure(i.remoteUri, true);
-      }
-      return state;
-    }
     case 'image-file-created': {
       if (state.images[action.name] === undefined) {
         console.warn(

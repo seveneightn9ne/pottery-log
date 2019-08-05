@@ -6,6 +6,7 @@ import {
   subscribeToPersistImportStore,
   subscribeToPersistPotStore,
 } from '../thunks/persist';
+import { PLThunkDispatch } from '../thunks/types';
 import {
   getInitialState as getInitialExportState,
   reduceExport,
@@ -25,14 +26,20 @@ import {
 import { FullState } from './types';
 import { getInitialState as getInitialUiState, reduceUi } from './UIStore';
 
-const logger: Middleware = (_) => (next) => (action: Action) => {
+const logger: Middleware<
+  {},
+  FullState,
+  PLThunkDispatch
+> = (_) => (next) => (action) => {
   // I think we might want the logs in prod, in case of errors
   // if (Constants.appOwnership === 'standalone') {
   //   // Skip logs in prod, for great speed
   //   return next(action);
   // }
 
-  if (action.type === 'loaded-everything') {
+  if (typeof action === 'function') {
+    console.log('Thunk Action:', action.thunkName, action.thunkArgs);
+  } else if (action.type === 'loaded-everything') {
     console.log('Action: loaded-everything (body omitted)');
   } else {
     console.log('Action:', action.type, action);
@@ -79,7 +86,7 @@ function reducer(): Reducer<FullState, Action> {
 export function makeStore() {
   const store = createStore(
     reducer(),
-    applyMiddleware(thunk as ThunkMiddleware<FullState, Action>, logger),
+    applyMiddleware(logger, thunk as ThunkMiddleware<FullState, Action>),
   );
   subscribeToPersistPotStore(store);
   subscribeToPersistImageStore(store);
