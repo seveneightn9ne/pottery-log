@@ -134,8 +134,6 @@ export function reduceImages(
         },
       };
 
-      ImageUploader.debug('image-reset-loaded', action);
-
       return newState;
     }
     case 'image-remote-failed': {
@@ -146,9 +144,6 @@ export function reduceImages(
     }
     case 'image-file-created': {
       if (state.images[action.name] === undefined) {
-        console.warn(
-          'Image file created, but no image exists for it! This is quite bad, probably.',
-        );
         return state;
       }
       const newImage = {
@@ -156,7 +151,6 @@ export function reduceImages(
         fileUri: action.fileUri,
       };
       if (newImage.remoteUri) {
-        ImageUploader.remove(newImage.remoteUri);
         delete newImage.remoteUri;
       }
       delete newImage.localUri;

@@ -8,6 +8,7 @@ import {
   nameFromUri,
   saveToFilePure,
 } from '../utils/imageutils';
+import * as ImageUploader from '../utils/uploader';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
 
 export function addImage(pot: Pot): PLThunkAction {
@@ -141,18 +142,26 @@ function pickImage(
   });
 }
 
-function saveToFile(localUri: string, isRemote: boolean): PLThunkAction<void> {
+export function saveToFile(
+  localUri: string,
+  isRemote: boolean,
+): PLThunkAction<void> {
   return t(
     'saveToFile',
     { localUri, isRemote },
-    async (dispatch: PLThunkDispatch) => {
+    async (dispatch: PLThunkDispatch, getState: () => FullState) => {
       try {
         const fileUri = await saveToFilePure(localUri, isRemote);
+        const name = nameFromUri(localUri);
         dispatch({
           type: 'image-file-created',
-          name: nameFromUri(localUri),
+          name,
           fileUri,
         });
+
+        // Remove remote image now that we have a file
+        // Not awaiting, no need to wait for this
+        deleteRemoteImage(name, getState);
       } catch (e) {
         console.warn('saveToFile failed:', e);
         dispatch({
@@ -162,6 +171,25 @@ function saveToFile(localUri: string, isRemote: boolean): PLThunkAction<void> {
       }
     },
   );
+}
+
+async function deleteRemoteImage(name: string, getState: () => FullState) {
+  const state = getState();
+  if (!state) {
+    console.warn('No state (should only happen in tests)');
+    return;
+  }
+  const image = state.images.images[name];
+  if (!image) {
+    // ought to be impossible, maybe raced with deletion
+    ImageUploader.debug('image-save-to-file-nonexistent', { name });
+  }
+  if (image.remoteUri) {
+    console.log('Removing remote URI ', image.remoteUri);
+    return ImageUploader.remove(image.remoteUri).catch(() => {
+      console.log('Failed to delete remote image: ', image.remoteUri);
+    });
+  }
 }
 
 // Use if the file might be being created already
@@ -174,6 +202,13 @@ export function waitAndSaveToFile(name: string): PLThunkAction<void> {
     async (dispatch: PLThunkDispatch, getState: () => FullState) => {
       const { images } = getState();
       const image = images.images[name];
+
+      if (!image) {
+        ImageUploader.debug('image-save-to-file-nonexistent', {
+          name,
+        });
+        return;
+      }
 
       if (image.fileUri) {
         console.log('Why did you try to save to file? We have a file. ', name);

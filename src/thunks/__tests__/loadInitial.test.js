@@ -6,7 +6,7 @@ import {
 import { AsyncStorage } from "react-native";
 import { newPot } from "../../models/Pot";
 import * as FileSystem from "expo-file-system";
-import * as imageutils from "../../utils/imageutils";
+import { saveToFile } from "../images";
 
 jest.mock("AsyncStorage");
 jest.mock("expo-file-system", () => ({
@@ -18,9 +18,8 @@ jest.mock("expo-file-system", () => ({
 jest.mock("expo-constants", () => ({
   appOwnership: "expo"
 }));
-jest.mock("../../utils/imageutils", () => ({
-  ...jest.requireActual("../../utils/imageutils"),
-  deprecatedSaveToFileImpure: jest.fn().mockReturnValue(Promise.resolve())
+jest.mock("../images", () => ({
+  saveToFile: jest.fn().mockReturnValue(Promise.resolve())
 }));
 
 const emptyPotState = {
@@ -216,9 +215,7 @@ describe("loadInitial", () => {
       },
       isImport: false
     });
-    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
-      "l/img.jpg"
-    );
+    expect(saveToFile).toHaveBeenCalledWith("l/img.jpg", false);
   });
 
   it("loads pot with images2 that was already migrated", async () => {
@@ -322,7 +319,7 @@ describe("loadInitial", () => {
     //l._saveImagesToFiles = jest.fn();
     const dispatch = jest.fn();
     loadInitial()(dispatch).then(() => {
-      expect(spy).toHaveBeenCalledWith({
+      expect(spy).toHaveBeenCalledWith(dispatch, {
         loaded: true,
         images: {}
       });
@@ -439,13 +436,8 @@ describe("_saveImagesToFiles", () => {
         }
       }
     };
-    await _saveImagesToFiles(inImages);
-    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
-      "r/a.jpg",
-      true
-    );
-    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
-      "l/b.jpg"
-    );
+    await _saveImagesToFiles(() => {}, inImages);
+    expect(saveToFile).toHaveBeenCalledWith("r/a.jpg", true);
+    expect(saveToFile).toHaveBeenCalledWith("l/b.jpg", false);
   });
 });

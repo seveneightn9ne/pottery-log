@@ -19,11 +19,7 @@ jest.mock("expo-image-picker", () => ({
   launchCameraAsync: jest.fn(),
   launchImageLibraryAsync: jest.fn()
 }));
-jest.mock("../../utils/imageutils", () => ({
-  ...jest.requireActual("../../utils/imageutils"),
-  saveToFilePure: jest.fn(),
-  deleteUnusedImage: jest.fn()
-}));
+jest.mock("../../utils/imageutils");
 
 function rejectPermission() {
   Permissions.askAsync.mockReturnValue(Promise.resolve({ status: "rejected" }));
@@ -41,6 +37,7 @@ describe("pickImageFromCamera", () => {
     imageutils.saveToFilePure.mockReturnValue(
       Promise.resolve("fileUri/file.png")
     );
+    imageutils.nameFromUri.mockReturnValue("file.png");
     Permissions.askAsync.mockReturnValue(
       Promise.resolve({ status: "granted" })
     );
@@ -50,7 +47,7 @@ describe("pickImageFromCamera", () => {
     const { dispatch, dispatchMock } = makeDispatch();
     const pot = newPot();
 
-    await pickImageFromCamera(pot)(dispatch);
+    await dispatch(pickImageFromCamera(pot));
     jest.runAllTimers();
 
     expect(Permissions.askAsync).toHaveBeenCalledWith(Permissions.CAMERA);

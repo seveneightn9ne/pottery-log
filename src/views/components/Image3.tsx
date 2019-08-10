@@ -5,6 +5,7 @@ import { ImageState } from '../../reducers/types';
 import { waitAndSaveToFile } from '../../thunks/images';
 import { PLThunkDispatch } from '../../thunks/types';
 import { resetDirectory } from '../../utils/imageutils';
+import { debug } from '../../utils/uploader';
 
 interface OwnProps {
   image: ImageState | null;
@@ -28,12 +29,14 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
     dispatch({ type: 'image-error-local', name }),
   onRemoteLoadFailure: (name: string) =>
     dispatch({ type: 'image-error-remote', name }),
-  onResetImageLoad: (oldUri: string, newUri: string) =>
+  onResetImageLoad: (oldUri: string, newUri: string) => {
+    debug('image-reset-loaded', { oldUri, newUri });
     dispatch({
       type: 'image-reset-loaded',
       oldUri,
       newUri,
-    }),
+    });
+  },
 });
 type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
 

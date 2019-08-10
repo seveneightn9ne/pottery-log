@@ -3,7 +3,8 @@ import * as FileSystem from "expo-file-system";
 import {
   deprecatedSaveToFileImpure,
   nameFromUri,
-  resetDirectory
+  resetDirectory,
+  saveToFilePure
 } from "../imageutils";
 
 jest.mock("../uploader");
@@ -38,69 +39,50 @@ describe("saveToFile", () => {
 
   it("saves remote image", async () => {
     const uri = "https://fake-url/image.png";
-    await deprecatedSaveToFileImpure(uri, true);
-    jest.runAllTimers();
+    const fileUri = await saveToFilePure(uri, true);
     expect(FileSystem.downloadAsync).toBeCalledWith(uri, expect.any(String));
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "image-file-created",
-      name: "image.png",
-      fileUri: FileSystem.downloadAsync.mock.calls[0][1]
-    });
+    expect(fileUri).toBe(FileSystem.downloadAsync.mock.calls[0][1]);
   });
 
   it("saves local image", async () => {
     const uri = "file://fake-url/image.png";
-    await deprecatedSaveToFileImpure(uri, false);
-    jest.runAllTimers();
+    const fileUri = await saveToFilePure(uri, false);
     expect(FileSystem.copyAsync).toBeCalledWith({
       from: uri,
       to: expect.any(String)
     });
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "image-file-created",
-      name: "image.png",
-      fileUri: FileSystem.copyAsync.mock.calls[0][0].to
-    });
+    expect(fileUri).toBe(FileSystem.copyAsync.mock.calls[0][0].to);
   });
 
   it("dispatches error when no uri", async () => {
-    await deprecatedSaveToFileImpure("", false);
-    jest.runAllTimers();
-    expectError("");
+    expect(saveToFilePure("", false)).rejects;
   });
 
   it("fails when makeDirectory fails", async () => {
     FileSystem.makeDirectoryAsync.mockReturnValue(Promise.reject("error"));
     FileSystem.getInfoAsync.mockReturnValue(Promise.resolve({ exists: false }));
     const uri = "http://fake-uri/image.png";
-    await deprecatedSaveToFileImpure(uri, true);
-    jest.runAllTimers();
-    expectError(uri);
+    expect(saveToFilePure(uri, true)).rejects;
   });
 
   // This test passes in isolation and failse when run with the suite.
   it.skip("succeed when makeDirectory pretends to fail", async () => {
     FileSystem.makeDirectoryAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await deprecatedSaveToFileImpure(uri, true);
-    jest.runAllTimers();
-    expectSuccess();
+    const fileUri = await saveToFilePure(uri, true);
+    expect(fileUri).toBeTruthy();
   });
 
   it("fails when download fails", async () => {
     FileSystem.downloadAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await deprecatedSaveToFileImpure(uri, true);
-    jest.runAllTimers();
-    expectError(uri);
+    expect(saveToFilePure(uri, true)).rejects;
   });
 
   it("fails when copy fails", async () => {
     FileSystem.copyAsync.mockReturnValue(Promise.reject("error"));
     const uri = "http://fake-uri/image.png";
-    await deprecatedSaveToFileImpure(uri, false);
-    jest.runAllTimers();
-    expectError(uri);
+    expect(saveToFilePure(uri, false)).rejects;
   });
 });
 

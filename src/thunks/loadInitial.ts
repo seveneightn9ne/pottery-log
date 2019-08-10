@@ -9,6 +9,7 @@ import {
   PotsStoreState,
 } from '../reducers/types';
 import * as imageutils from '../utils/imageutils';
+import { saveToFile } from './images';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
 
 export function reloadFromImport(): PLThunkAction {
@@ -54,8 +55,7 @@ function load(isImport: boolean): PLThunkAction {
     // especially since we don't want to delay offering to resume the import
     // btw, it had to be after we dispatch "loaded-everything"
     // so that the image store won't ignore saves to files
-    // @ts-ignore
-    const promise = _saveImagesToFiles(images);
+    _saveImagesToFiles(dispatch, images);
 
     // console.log("will check importt");
     if (importt) {
@@ -321,24 +321,22 @@ function fixImagesPotListsAndDeleteUnused(
   return newState;
 }
 
-export function _saveImagesToFiles(images: ImageStoreState) {
+export async function _saveImagesToFiles(
+  dispatch: PLThunkDispatch,
+  images: ImageStoreState,
+): Promise<void[]> {
   const promises: Array<Promise<void>> = [];
-  _.forOwn(images.images, (image) => {
+  _.forOwn(images.images, async (image) => {
     if (image.fileUri) {
+      console.log(image.name, ' already has a file');
       return;
     }
     if (image.remoteUri) {
-      promises.push(
-        imageutils.deprecatedSaveToFileImpure(
-          image.remoteUri,
-          true, /* isRemote */
-        ),
-      );
+      promises.push(dispatch(saveToFile(image.remoteUri, true /* isRemote */)));
       return;
     }
     if (image.localUri) {
-      promises.push(imageutils.deprecatedSaveToFileImpure(image.localUri));
-      return;
+      promises.push(dispatch(saveToFile(image.localUri, false /* isRemote */)));
     }
   });
   return Promise.all(promises);
