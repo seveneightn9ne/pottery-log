@@ -166,6 +166,7 @@ const handleImportFailure = (e: string | Error) =>
   store.dispatch({ type: 'import-failure', error: e });
 
 export async function debug(name: string, data: any) {
+  console.log('DEBUG: ', name, data);
   return post(
     DEBUG,
     {
