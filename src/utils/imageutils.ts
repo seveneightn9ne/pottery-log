@@ -93,9 +93,12 @@ export function resetDirectory(uri: string): string {
   if (newDir == null) {
     throw Error('FileSystem.documentDirectory is null');
   }
+  if (!newDir.endsWith('/')) {
+    newDir += '/';
+  }
   if (/^\d+$/.test(maybeRandomDir)) {
     // that does look like a random dir, i.e. not part of the documentDirectory
-    newDir += '/' + maybeRandomDir;
+    newDir += maybeRandomDir;
   }
-  return newDir + '/' + fileName;
+  return newDir + fileName;
 }
