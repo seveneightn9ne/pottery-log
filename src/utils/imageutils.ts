@@ -58,10 +58,6 @@ export async function saveToFilePure(
   return fileUri;
 }
 
-export function deleteFile(uri: string) {
-  return FileSystem.deleteAsync(uri, { idempotent: true });
-}
-
 export function nameFromUri(uri: string): string {
   const uriParts = uri.split('/');
   const nameAndParam = uriParts[uriParts.length - 1];
@@ -71,6 +67,7 @@ export function nameFromUri(uri: string): string {
 export async function deleteUnusedImage(image: ImageState) {
   if (image.remoteUri) {
     try {
+      console.log('Deleting remote image: ', image.remoteUri);
       await uploader.remove(image.remoteUri);
     } catch (e) {
       console.warn('Failed to remove remote uri:', image.remoteUri);
@@ -79,7 +76,8 @@ export async function deleteUnusedImage(image: ImageState) {
   }
   if (image.fileUri) {
     try {
-      await deleteFile(image.fileUri);
+      console.log('Deleting file: ', image.fileUri);
+      await FileSystem.deleteAsync(image.fileUri, { idempotent: true });
     } catch (e) {
       console.warn('Failed to delete unused image:', image.fileUri);
       console.warn(e);

@@ -47,11 +47,11 @@ console.error = message => {
   originalConsoleError(message);
 };
 
-function makeDispatch() {
+function makeDispatch(getState = () => undefined) {
   const dispatchMock = jest.fn().mockImplementation(a => a);
   async function dispatch(arg) {
     if (typeof arg == "function") {
-      return await dispatch(await arg(dispatch));
+      return await dispatch(await arg(dispatch, getState));
     } else {
       return dispatchMock(arg);
     }

@@ -15,7 +15,7 @@ import { Pot } from '../models/Pot';
 import Status, { StatusString } from '../models/Status';
 import { EditUiState, FullState } from '../reducers/types';
 import styles from '../style';
-import { addImage } from '../thunks/images';
+import { addImage, deletePot } from '../thunks/images';
 import { PLThunkDispatch } from '../thunks/types';
 import { deleteImage } from './components/Alerts';
 import ImageList from './components/ImageList';
@@ -87,11 +87,7 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch, { pot }: OwnProps) => ({
       {
         text: 'Delete',
         onPress: () => {
-          dispatch({
-            type: 'pot-delete',
-            potId: pot.uuid,
-            imageNames: pot.images3,
-          });
+          dispatch(deletePot(pot));
         },
       },
     ]);

@@ -3,7 +3,11 @@ import * as Permissions from 'expo-permissions';
 import { Alert } from 'react-native';
 import { Pot } from '../models/Pot';
 import { FullState } from '../reducers/types';
-import { nameFromUri, saveToFilePure } from '../utils/imageutils';
+import {
+  deleteUnusedImage,
+  nameFromUri,
+  saveToFilePure,
+} from '../utils/imageutils';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
 
 export function addImage(pot: Pot): PLThunkAction {
@@ -20,6 +24,61 @@ export function addImage(pot: Pot): PLThunkAction {
     ]);
     return Promise.resolve();
   });
+}
+
+export function deletePot(pot: Pot): PLThunkAction {
+  return t(
+    'deletePot',
+    { pot },
+    async (dispatch: PLThunkDispatch, getState: () => FullState) => {
+      const oldState = getState();
+      dispatch({
+        type: 'pot-delete',
+        potId: pot.uuid,
+        imageNames: pot.images3,
+      });
+      const newState = getState();
+      await deleteUnusedImageFiles(oldState, newState);
+    },
+  );
+}
+
+export function deleteImage(name: string, pot: Pot): PLThunkAction {
+  return t(
+    'deleteImage',
+    { name, pot },
+    async (dispatch: PLThunkDispatch, getState: () => FullState) => {
+      if (pot.images3.indexOf(name) === -1) {
+        console.warn('The image is not in the pot');
+        return;
+      }
+      const oldState = getState();
+      dispatch({
+        type: 'image-delete-from-pot',
+        imageName: name,
+        potId: pot.uuid,
+      });
+      const newState = getState();
+      await deleteUnusedImageFiles(oldState, newState);
+    },
+  );
+}
+
+/** Deletes files for images that have been removed from the newState */
+async function deleteUnusedImageFiles(
+  oldState: FullState,
+  newState: FullState,
+) {
+  const unusedImages = Object.keys(oldState.images.images).filter(
+    (imageName) => !newState.images.images[imageName],
+  );
+  console.log(unusedImages);
+  return Promise.all(
+    unusedImages.map((imageName) => {
+      const image = oldState.images.images[imageName];
+      return deleteUnusedImage(image);
+    }),
+  );
 }
 
 export function pickImageFromCamera(pot: Pot): PLThunkAction {

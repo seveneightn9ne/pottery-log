@@ -1,8 +1,14 @@
 import { newPot } from "../../models/Pot";
 import * as imageutils from "../../utils/imageutils";
-import { pickImageFromCamera, pickImageFromLibrary } from "../images";
+import {
+  pickImageFromCamera,
+  pickImageFromLibrary,
+  deletePot
+} from "../images";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
+import { getInitialState as getInitialImageState } from "../../reducers/ImageStore";
+import { getInitialState } from "../../reducers/PotsStore";
 
 jest.useFakeTimers();
 
@@ -15,7 +21,8 @@ jest.mock("expo-image-picker", () => ({
 }));
 jest.mock("../../utils/imageutils", () => ({
   ...jest.requireActual("../../utils/imageutils"),
-  saveToFilePure: jest.fn()
+  saveToFilePure: jest.fn(),
+  deleteUnusedImage: jest.fn()
 }));
 
 function rejectPermission() {
@@ -196,5 +203,106 @@ describe("pickImageFromImageLibrary", () => {
     expect(ImagePicker.launchImageLibraryAsync).not.toHaveBeenCalled();
     expect(imageutils.saveToFilePure).not.toHaveBeenCalled();
     expect(dispatchMock).not.toHaveBeenCalledWith(expect.any(Object));
+  });
+});
+
+describe("deletePot", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  const initialStateOnePotManyImages = (pot, imagesList) => {
+    const images = getInitialImageState();
+    const pots = getInitialState();
+    pots.pots[pot.uuid] = pot;
+    pots.potIds = [pot.uuid];
+
+    imagesList.forEach(image => {
+      if (pot.images3.indexOf(image.name) === -1) {
+        pot.images3.push(image.name);
+      }
+      image.potIds = [pot.uuid];
+      images.images[image.name] = image;
+    });
+    return { images, pots };
+  };
+  const initialStateTwoPotsOneImage = (pot1, pot2, image) => {
+    const images = getInitialImageState();
+    const pots = getInitialState();
+    pots.pots[pot1.uuid] = pot1;
+    pots.pots[pot2.uuid] = pot2;
+    pots.potIds = [pot1.uuid, pot2.uuid];
+
+    pot1.images3 = [image.name];
+    pot2.images3 = [image.name];
+
+    image.potIds = [...pots.potIds];
+    images.images[image.name] = image;
+
+    return { pots, images };
+  };
+  const makeGetState = (initialState, nextState) => {
+    let calls = 0;
+    return () => {
+      calls++;
+      if (calls === 1) {
+        return initialState;
+      } else if (calls === 2) {
+        if (nextState) {
+          return nextState;
+        }
+        const images = getInitialImageState();
+        const pots = getInitialState();
+        return { pots, images };
+      }
+    };
+  };
+  it("deletes the images", async () => {
+    const pot = newPot();
+    const image1 = {
+      name: "image1",
+      fileUri: "file://dir/f/image1"
+    };
+    const image2 = {
+      name: "image2",
+      remoteUri: "https://potterylog/image1"
+    };
+    const { dispatch, dispatchMock } = makeDispatch(
+      makeGetState(initialStateOnePotManyImages(pot, [image1, image2]))
+    );
+
+    await dispatch(deletePot(pot));
+
+    expect(dispatchMock).toHaveBeenCalledWith({
+      type: "pot-delete",
+      potId: pot.uuid,
+      imageNames: [image1.name, image2.name]
+    });
+    expect(imageutils.deleteUnusedImage).toHaveBeenCalledWith(image1);
+    expect(imageutils.deleteUnusedImage).toHaveBeenCalledWith(image2);
+  });
+
+  it("doesn't delete still-used image", async () => {
+    const pot1 = newPot();
+    const pot2 = newPot();
+    const image = {
+      name: "image2",
+      fileUri: "file://d/d/image2"
+    };
+
+    const { dispatch, dispatchMock } = makeDispatch(
+      makeGetState(
+        initialStateTwoPotsOneImage(pot1, pot2, image),
+        initialStateOnePotManyImages(pot2, [image])
+      )
+    );
+
+    await dispatch(deletePot(pot1));
+
+    expect(dispatchMock).toHaveBeenCalledWith({
+      type: "pot-delete",
+      potId: pot1.uuid,
+      imageNames: [image.name]
+    });
+
+    expect(imageutils.deleteUnusedImage).not.toHaveBeenCalled();
   });
 });

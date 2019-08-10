@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import { Pot } from '../../models/Pot';
+import { deleteImage as deleteImageThunk } from '../../thunks/images';
 import { PLThunkDispatch } from '../../thunks/types';
 
 export function deleteImage(
@@ -18,11 +19,7 @@ export function deleteImage(
           value: currentPot.images3.filter((i) => i !== name),
           potId: currentPot.uuid,
         });
-        dispatch({
-          type: 'image-delete-from-pot',
-          imageName: name,
-          potId: currentPot.uuid,
-        });
+        dispatch(deleteImageThunk(name, currentPot));
       },
     },
   ]);

@@ -42,7 +42,6 @@ export function reduceImages(
       }
       im.pots = im.pots.filter((p) => p !== action.potId);
       if (im.pots.length === 0) {
-        utils.deleteUnusedImage(im); // wee oo wee oo
         delete newState.images[action.imageName];
       }
       return newState;
@@ -59,7 +58,6 @@ export function reduceImages(
           pots: oldI.pots.filter((p) => p !== action.potId),
         };
         if (newI.pots.length === 0) {
-          utils.deleteUnusedImage(newI);
           delete newState.images[name];
         } else {
           newState.images[name] = newI;
