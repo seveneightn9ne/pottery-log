@@ -39,11 +39,7 @@ export function reducePots(
     case 'pot-delete': {
       const newPots = { ...state.pots };
       delete newPots[action.potId];
-      const newPotIds = [...state.potIds];
-      const potIndex = state.potIds.indexOf(action.potId);
-      if (potIndex > -1) {
-        newPotIds.splice(potIndex, 1);
-      }
+      const newPotIds = state.potIds.filter((potId) => potId !== action.potId);
       const newState = {
         hasLoaded: true,
         pots: newPots,

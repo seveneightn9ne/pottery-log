@@ -121,12 +121,14 @@ function loadInitialPotsFromJson(
   }
   const pots: { [uuid: string]: Pot } = {};
   const allImages2: Array<[Image2, string]> = [];
+  const newPotIds: string[] = [];
   potIds.forEach((id) => {
     const json = allPotsJson[id];
     if (!json) {
       console.warn(`@Pots has ${id} but there is no @Pot:${id} key`);
       return;
     }
+    newPotIds.push(id);
     const { pot, images2 } = loadPotFromJson(json);
     if (pot) {
       pots[id] = pot;
@@ -137,7 +139,7 @@ function loadInitialPotsFromJson(
       });
     }
   });
-  return { pots, potIds, images2: allImages2 };
+  return { pots, potIds: newPotIds, images2: allImages2 };
 }
 
 // async function loadPot(dispatch: Dispatch, uuid: string): Promise<Pot | null> {
