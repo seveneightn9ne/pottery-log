@@ -1,3 +1,4 @@
+import { FileSystem } from 'expo';
 import React from 'react';
 import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
 import { connect } from 'react-redux';
@@ -23,12 +24,10 @@ interface Image3State {
 
 const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
   onImageLoad: (name: string) => dispatch(waitAndSaveToFile(name)),
-  onFileLoadFailure: (uri: string) =>
-    dispatch({ type: 'image-error-file', uri }),
-  onLocalLoadFailure: (name: string) =>
-    dispatch({ type: 'image-error-local', name }),
-  onRemoteLoadFailure: (name: string) =>
-    dispatch({ type: 'image-error-remote', name }),
+  onLocalLoadFailure: (name: string) => {
+    console.log('Removing failed local URI for image ' + name);
+    dispatch({ type: 'image-error-local', name });
+  },
   onResetImageLoad: (oldUri: string, newUri: string) => {
     debug('image-reset-loaded', { oldUri, newUri });
     dispatch({
@@ -173,7 +172,7 @@ class Image3 extends React.Component<Props, Image3State> {
         }));
       } else {
         // failed despite reset. It's gone.
-        this.props.onFileLoadFailure(this.props.image.fileUri);
+        this.onFileLoadFailure(this.props.image.fileUri);
         this.setState({ failed: true, tries: this.state.tries });
       }
     } else if (this.props.image.localUri) {
@@ -182,9 +181,17 @@ class Image3 extends React.Component<Props, Image3State> {
       this.setState({ failed: true, tries: this.state.tries });
     } else if (this.props.image.remoteUri) {
       // Remote image failed, what can you do?
-      this.props.onRemoteLoadFailure(this.props.image.name);
       this.setState({ failed: true, tries: this.state.tries });
     }
+  }
+  private onFileLoadFailure(uri: string) {
+    // Permanent Failure
+    const documentDirectory = FileSystem.documentDirectory;
+    debug('image-error-file', {
+      uri,
+      documentDirectory,
+      despiteReset: true,
+    });
   }
 }
 

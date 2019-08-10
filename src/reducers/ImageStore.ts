@@ -1,8 +1,6 @@
-import * as FileSystem from 'expo-file-system';
 import _ from 'lodash';
 import { Action } from '../action';
-import * as utils from '../utils/imageutils';
-import * as ImageUploader from '../utils/uploader';
+import { nameFromUri } from '../utils/imageutils';
 import { ImageStoreState } from './types';
 
 export function getInitialState(): ImageStoreState {
@@ -66,7 +64,7 @@ export function reduceImages(
       return newState;
     }
     case 'image-add': {
-      const name = utils.nameFromUri(action.localUri);
+      const name = nameFromUri(action.localUri);
       const newState = {
         loaded: true,
         images: {
@@ -93,10 +91,6 @@ export function reduceImages(
     case 'initial-pots-images': {
       return getInitialState();
     }
-    case 'image-error-remote': {
-      // There's nothing to do, I guess
-      return state;
-    }
     case 'image-error-local': {
       const i = state.images[action.name];
       const newImage = { ...i };
@@ -107,22 +101,11 @@ export function reduceImages(
           [action.name]: newImage,
         },
       };
-      console.log('Removing failed local URI for image ' + i.name);
       delete newImage.localUri;
       return newState;
     }
-    case 'image-error-file': {
-      const uri = action.uri;
-      const documentDirectory = FileSystem.documentDirectory;
-      ImageUploader.debug('image-error-file', {
-        uri,
-        documentDirectory,
-        despiteReset: true,
-      });
-      return state;
-    }
     case 'image-reset-loaded': {
-      const name = utils.nameFromUri(action.oldUri);
+      const name = nameFromUri(action.oldUri);
       const fileUri = action.newUri.split('?')[0];
       const i = state.images[name];
       const newImage = { ...i, fileUri };

@@ -20,9 +20,7 @@ export type Action =
 type ImageAction =
   | ImageAdd
   | ImageDeleteFromPot
-  | ImageErrorRemote
   | ImageErrorLocal
-  | ImageErrorFile
   | ImageRemoteFailed
   | ImageFileCreated
   | ImageFileFailed
@@ -164,19 +162,9 @@ interface ImageAdd {
   localUri: string;
 }
 
-interface ImageErrorRemote {
-  type: 'image-error-remote';
-  name: string;
-}
-
 interface ImageErrorLocal {
   type: 'image-error-local';
   name: string;
-}
-
-interface ImageErrorFile {
-  type: 'image-error-file';
-  uri: string;
 }
 
 interface ImageRemoteFailed {
