@@ -330,7 +330,6 @@ export async function _saveImagesToFiles(
   const promises: Array<Promise<void>> = [];
   _.forOwn(images.images, async (image) => {
     if (image.fileUri) {
-      console.log(image.name, ' already has a file');
       return;
     }
     if (image.remoteUri) {

@@ -51,8 +51,10 @@ export async function saveToFilePure(
   }
   const fileUri = dir + '/' + name;
   if (isRemote) {
+    console.log('Downloading file: ', uri, ' to ', fileUri);
     await FileSystem.downloadAsync(uri, fileUri);
   } else {
+    console.log('Saving file: ', uri, ' to ', fileUri);
     await FileSystem.copyAsync({ from: uri, to: fileUri });
   }
   return fileUri;
