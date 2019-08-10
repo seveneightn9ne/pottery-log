@@ -98,7 +98,7 @@ export function resetDirectory(uri: string): string {
   }
   if (/^\d+$/.test(maybeRandomDir)) {
     // that does look like a random dir, i.e. not part of the documentDirectory
-    newDir += maybeRandomDir;
+    newDir += maybeRandomDir + '/';
   }
   return newDir + fileName;
 }
