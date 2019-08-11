@@ -68,7 +68,7 @@ function reducer(): Reducer<FullState, Action> {
     newState.ui = reduceUi(newState.ui, action);
     // reduceImages depends on recducePots having been run first on the current action.
     newState.images = reduceImages(newState.images, action);
-    newState.exports = reduceExport(newState.exports, action, newState);
+    newState.exports = reduceExport(newState.exports, action);
     newState.imports = reduceImport(newState.imports, action);
     /*return {
       pots: reducePots(state.pots, action),

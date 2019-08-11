@@ -11,6 +11,7 @@ import ElevatedView from 'react-native-elevated-view';
 import { connect } from 'react-redux';
 import { FullState } from '../reducers/types';
 import styles from '../style';
+import { exportEverything } from '../thunks/export';
 import { PLThunkDispatch } from '../thunks/types';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
@@ -39,7 +40,7 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
       type: 'page-list',
     }),
 
-  onStartExport: () => dispatch({ type: 'export-initiate' }),
+  onStartExport: () => dispatch(exportEverything()),
   onStartImport: () => dispatch({ type: 'import-initiate' }),
   onStartUrlImport: (url: string) =>
     dispatch({
