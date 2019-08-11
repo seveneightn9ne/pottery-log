@@ -2,7 +2,6 @@ import Notes from './models/Notes';
 import { Pot } from './models/Pot';
 import Status from './models/Status';
 import {
-  ImageState,
   ImageStoreState,
   ImportStatePersisted,
   PotsStoreState,
@@ -62,13 +61,7 @@ type ImportAction =
   | ImportResumeAffirm
   | ImportResumeCancel;
 
-type ExportAction =
-  | ExportInitiate
-  | ExportStarted
-  | ExportImage
-  | ExportImageFailure
-  | ExportFinished
-  | ExportFailure;
+type ExportAction = ExportStatus | ExportFinished;
 
 type SettingsAction = SetDarkModeSetting;
 
@@ -242,39 +235,17 @@ interface ImportResumeCancel {
   type: 'import-resume-cancel';
 }
 
-interface ExportInitiate {
-  type: 'export-initiate';
-}
-
-interface ExportStarted {
-  type: 'export-started';
+interface ExportStatus {
+  type: 'export-status';
   exportId: number;
-  images: { [name: string]: ImageState };
-}
-
-interface ExportImage {
-  type: 'export-image';
-  exportId: number;
-  uri: string;
-}
-
-interface ExportImageFailure {
-  type: 'export-image-failure';
-  exportId: number;
-  uri: string;
-  reason: string;
+  exporting: boolean;
+  status: string;
 }
 
 interface ExportFinished {
   type: 'export-finished';
   exportId: number;
   uri: string;
-}
-
-interface ExportFailure {
-  type: 'export-failure';
-  exportId: number;
-  error: string | Error;
 }
 
 interface PageEditPot {

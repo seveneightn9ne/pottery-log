@@ -20,6 +20,7 @@ import { FullState } from '../reducers/types';
 import { getDerivedDarkMode, getSystemPreference } from '../selectors/settings';
 import style, {radioColor} from '../style';
 import { setDarkMode } from '../thunks/settings';
+import { exportEverything } from '../thunks/export';
 import { PLThunkDispatch } from '../thunks/types';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
@@ -53,7 +54,7 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
       type: 'page-list',
     }),
 
-  onStartExport: () => dispatch({ type: 'export-initiate' }),
+  onStartExport: () => dispatch(exportEverything()),
   onStartImport: () => dispatch({ type: 'import-initiate' }),
   onStartUrlImport: (url: string) =>
     dispatch({

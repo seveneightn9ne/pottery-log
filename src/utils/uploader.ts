@@ -13,12 +13,16 @@ export const IMPORT = apiPrefix + 'import';
 export const IMAGE_DELETE = 'https://jesskenney.com/pottery-log-images/delete';
 export const DEBUG = apiPrefix + 'debug';
 
-async function post<Req, Res>(
+async function post<Req>(path: string, kvs: Req): Promise<void> {
+  return postAndReturn(path, kvs, () => {});
+}
+
+async function postAndReturn<Req, Res, Ret>(
   path: string,
   kvs: Req,
-  onSuccess: (data: Res) => void,
-  onError: (e: string | Error) => void,
-) {
+  onSuccess: (data: Res) => Ret,
+  onError?: (e: string | Error) => Ret,
+): Promise<Ret> {
   const formData = new FormData();
   _.forOwn(kvs, (val, key) => {
     formData.append(key, val);
@@ -54,7 +58,10 @@ async function post<Req, Res>(
       error = reason;
     }
   }
-  return onError(error);
+  if (onError) {
+    return onError(error);
+  }
+  throw error;
 }
 
 function mimeFromUri(uri: string) {
@@ -68,7 +75,7 @@ function mimeFromUri(uri: string) {
 }
 
 export async function remove(uri: string) {
-  return post(
+  return postAndReturn(
     IMAGE_DELETE,
     { uri },
     () => {},
@@ -83,49 +90,33 @@ export async function startExport(
   metadata: any,
   images: { [imageName: string]: ImageState },
 ) {
-  return post(
-    EXPORT_START,
-    {
-      metadata: JSON.stringify(metadata),
-      deviceId: Constants.deviceId,
-    },
-    () => store.dispatch({ type: 'export-started', exportId: id, images }),
-    (e) => store.dispatch({ type: 'export-failure', exportId: id, error: e }),
-  );
+  return post(EXPORT_START, {
+    metadata: JSON.stringify(metadata),
+    deviceId: Constants.deviceId,
+  });
 }
 
-export async function exportImage(
-  id: number,
-  uri: string,
-  onError: (reason: any, ctx: string) => void,
-) {
-  return post(
-    EXPORT_IMAGE,
-    {
-      deviceId: Constants.deviceId,
-      image: {
-        uri,
-        name: nameFromUri(uri),
-        type: mimeFromUri(uri),
-      },
+export async function exportImage(uri: string) {
+  return post(EXPORT_IMAGE, {
+    deviceId: Constants.deviceId,
+    image: {
+      uri,
+      name: nameFromUri(uri),
+      type: mimeFromUri(uri),
     },
-    () => store.dispatch({ type: 'export-image', exportId: id, uri }),
-    (e) => onError(e, 'uploader.exportImage'),
-  );
+  });
 }
 
 export async function finishExport(id: number) {
-  return post(
+  return postAndReturn(
     EXPORT_FINISH,
     { deviceId: Constants.deviceId },
-    (res: { uri: string }) =>
-      store.dispatch({ type: 'export-finished', exportId: id, uri: res.uri }),
-    (e) => store.dispatch({ type: 'export-failure', exportId: id, error: e }),
+    (res: { uri: string }) => res.uri,
   );
 }
 
 export async function startImport(uri: string) {
-  return post(
+  return postAndReturn(
     IMPORT,
     {
       deviceId: Constants.deviceId,
@@ -141,7 +132,7 @@ export async function startImport(uri: string) {
 }
 
 export async function startUrlImport(uri: string) {
-  return post(
+  return postAndReturn(
     IMPORT,
     {
       deviceId: Constants.deviceId,
@@ -155,27 +146,23 @@ export async function startUrlImport(uri: string) {
 const handleImportResponse = (res: {
   metadata: string;
   image_map: { [i: string]: string };
-}) =>
+}) => {
   store.dispatch({
     type: 'import-started',
     metadata: res.metadata,
     imageMap: res.image_map,
   });
+};
 
 const handleImportFailure = (e: string | Error) =>
   store.dispatch({ type: 'import-failure', error: e });
 
 export async function debug(name: string, data: any) {
   console.log('DEBUG: ', name, data);
-  return post(
-    DEBUG,
-    {
-      appOwnership: Constants.appOwnership,
-      deviceId: Constants.deviceId,
-      data: JSON.stringify(data),
-      name,
-    },
-    () => true,
-    () => true,
-  );
+  return post(DEBUG, {
+    appOwnership: Constants.appOwnership,
+    deviceId: Constants.deviceId,
+    data: JSON.stringify(data),
+    name,
+  });
 }

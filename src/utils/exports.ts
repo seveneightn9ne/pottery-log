@@ -1,16 +1,13 @@
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
-import { AsyncStorage } from 'react-native';
-import { Alert } from 'react-native';
+import { Alert, AsyncStorage } from 'react-native';
 import store from '../reducers/store';
-import { ImageState } from '../reducers/types';
 import { reloadFromImport } from '../thunks/loadInitial';
 import { deprecatedSaveToFileImpure } from './deprecated_imageutils';
 import * as uploader from './uploader';
 
 const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
 
-const keyIsExportable = (key: string) => {
+export const keyIsExportable = (key: string) => {
   for (const prefix of EXPORT_KEY_PREFIX) {
     if (key.indexOf(prefix) === 0) {
       return true;
@@ -19,80 +16,6 @@ const keyIsExportable = (key: string) => {
   return false;
 };
 const keyIsImportable = keyIsExportable;
-
-async function getExportMetadata() {
-  const allKeys = (await AsyncStorage.getAllKeys()).filter(keyIsExportable);
-  const pairs = await AsyncStorage.multiGet(allKeys);
-  const snapshot: { [key: string]: string } = {};
-  pairs.forEach((pair) => {
-    snapshot[pair[0]] = pair[1];
-  });
-  return snapshot;
-}
-
-async function startExport(
-  id: number,
-  images: { [imageName: string]: ImageState },
-) {
-  const metadata = await getExportMetadata();
-  uploader.startExport(id, metadata, images);
-}
-
-function exportImage(
-  id: number,
-  imageState: Partial<ImageState>,
-): { willExport: boolean; promise: Promise<void> } {
-  if (!imageState.fileUri) {
-    const uri = imageState.remoteUri || imageState.localUri;
-    const isRemote = uri === imageState.remoteUri;
-    const p = uri ? deprecatedSaveToFileImpure(uri, isRemote) : Promise.resolve();
-    // console.log("returning promise", promise);
-    return {
-      willExport: false,
-      promise: p,
-    };
-  }
-
-  const onImageError = (e: any, ctx: string) => {
-    let eStr = 'unknown error';
-    if (typeof e === 'string') {
-      eStr = e;
-    } else if ('message' in e) {
-      eStr = e.message;
-    }
-    if (ctx !== '') {
-      eStr = ctx + ': ' + eStr;
-    }
-    store.dispatch({
-      type: 'export-image-failure',
-      exportId: id,
-      uri: imageState.fileUri as string,
-      reason: eStr,
-    });
-  };
-  const promise = FileSystem.getInfoAsync(imageState.fileUri)
-    .then((i) => {
-      if (i.exists) {
-        return uploader.exportImage(
-          id,
-          imageState.fileUri as string,
-          onImageError,
-        );
-      } else {
-        onImageError('Image file does not exist', '');
-        return;
-      }
-    })
-    .catch((e) => onImageError(e, 'getInfoAsync'));
-  return {
-    willExport: true,
-    promise,
-  };
-}
-
-async function finishExport(id: number) {
-  return uploader.finishExport(id);
-}
 
 async function startImport(): Promise<void> {
   const docResult = await DocumentPicker.getDocumentAsync();
@@ -170,9 +93,6 @@ function importImage(remoteUri: string) {
 }
 
 export {
-  startExport,
-  exportImage,
-  finishExport,
   startImport,
   startUrlImport,
   importMetadata,

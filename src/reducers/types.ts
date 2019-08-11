@@ -26,9 +26,17 @@ export interface PotsStoreState {
 
 export type ExportState =
   | PreExportingState
+  | ExportingState
+  | PostExportingState
+  // TODO remove the 2 below
   | StartExportingState
-  | ExportingImagesState
-  | PostExportingState;
+  | ExportingImagesState;
+
+interface ExportingState {
+  exporting: true;
+  statusMessage: string;
+  exportId: number;
+}
 
 interface PreExportingState {
   exporting: false;
