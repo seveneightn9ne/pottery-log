@@ -1,13 +1,16 @@
 import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 import { Alert, AsyncStorage } from 'react-native';
+import { Action } from '../action';
 import store from '../reducers/store';
+import { FullState, ImageState } from '../reducers/types';
 import { reloadFromImport } from '../thunks/loadInitial';
 import { deprecatedSaveToFileImpure } from './deprecated_imageutils';
 import * as uploader from './uploader';
 
 const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];
 
-export const keyIsExportable = (key: string) => {
+const keyIsExportable = (key: string) => {
   for (const prefix of EXPORT_KEY_PREFIX) {
     if (key.indexOf(prefix) === 0) {
       return true;
@@ -92,10 +95,53 @@ function importImage(remoteUri: string) {
   );
 }
 
+const isStillExporting = (exportId: number, getState: () => FullState) => {
+  const state = getState();
+  console.log('REAL isStillExporting');
+  return (
+    state && state.exports.exporting && state.exports.exportId === exportId
+  );
+};
+
+async function exportImage(image: ImageState) {
+  if (!image.fileUri) {
+    return;
+  }
+  const info = await FileSystem.getInfoAsync(image.fileUri);
+  if (info.exists) {
+    return uploader.exportImage(image.fileUri);
+  } else {
+    throw new Error('Image file does not exist');
+  }
+}
+
+const status = (id: number, statusText: string): Action => {
+  return {
+    type: 'export-status',
+    exportId: id,
+    exporting: true,
+    status: statusText,
+  };
+};
+
+async function getExportMetadata() {
+  const allKeys = (await AsyncStorage.getAllKeys()).filter(keyIsExportable);
+  const pairs = await AsyncStorage.multiGet(allKeys);
+  const snapshot: { [key: string]: string } = {};
+  pairs.forEach((pair) => {
+    snapshot[pair[0]] = pair[1];
+  });
+  return snapshot;
+}
+
 export {
   startImport,
   startUrlImport,
   importMetadata,
   importMetadataNow,
   importImage,
+  isStillExporting,
+  exportImage,
+  status,
+  getExportMetadata,
 };

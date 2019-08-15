@@ -1,8 +1,12 @@
-import { loadInitial } from '../loadInitial';
 import { AsyncStorage } from 'react-native';
 import { newPot } from '../../models/Pot';
 import * as FileSystem from 'expo-file-system';
 import { saveToFile } from '../images';
+import {
+  loadInitial,
+  _fixPotsAndImages,
+  _saveImagesToFiles
+} from "../loadInitial";
 
 jest.mock("react-native-appearance");
 jest.mock('expo-file-system', () => ({

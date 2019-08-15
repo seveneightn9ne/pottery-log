@@ -10,17 +10,21 @@ export function reduceExport(
   state: ExportState = getInitialState(),
   action: Action,
 ): ExportState {
-  if (action.type === 'page-list') {
-    return getInitialState();
-  }
-  if (action.type === 'page-settings') {
-    // Make sure it's re-initialized when you navigate here
-    return getInitialState();
+  if (action.type === 'page-list' || action.type === 'page-settings') {
+    return {
+      exporting: false,
+      exportId: state.exportId,
+    };
   }
   if (action.type === 'export-status') {
     if (state.exporting && action.exportId !== state.exportId) {
       // Got an action for a previous export
       console.log('Stale export action: ', action);
+      return state;
+    }
+    if (!state.exporting && state.exportId === action.exportId) {
+      // Ignore actions after no longer exporting
+      console.log('Action for finished export: ', action);
       return state;
     }
     if (action.exporting) {
@@ -32,13 +36,15 @@ export function reduceExport(
     } else {
       return {
         exporting: false,
+        exportId: action.exportId,
         statusMessage: action.status,
       };
     }
   }
-  if (action.type === 'export-finished') {
+  if (action.type === 'export-finished' && action.exportId === state.exportId) {
     return {
       exporting: false,
+      exportId: state.exportId,
       statusMessage: 'Export finished!',
       exportUri: action.uri,
     };

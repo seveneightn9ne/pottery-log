@@ -64,15 +64,11 @@ describe("uploader", () => {
     const metadata = { whatever: "whatever" };
     const metadataJSON = JSON.stringify(metadata);
 
-    await uploader.startExport(id, metadata);
+    await uploader.startExport(metadata);
     expect(fetch).toHaveBeenCalled();
     expect(fetch.mock.calls[0][0]).toBe(uploader.EXPORT_START);
     expectFormValue(fetch, "deviceId", "1001");
     expectFormValue(fetch, "metadata", metadataJSON);
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-started",
-      exportId: id
-    });
   });
 
   it("startExport error", async () => {
@@ -80,12 +76,8 @@ describe("uploader", () => {
     const id = 1;
     const metadata = { whatever: "whatever" };
 
-    await uploader.startExport(id, metadata);
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-failure",
-      exportId: id,
-      error: "something is wrong"
-    });
+    const p = uploader.startExport(metadata);
+    expect(p).rejects;
   });
 
   it("startExport error2", async () => {
@@ -93,21 +85,15 @@ describe("uploader", () => {
     const id = 1;
     const metadata = { whatever: "whatever" };
 
-    await uploader.startExport(id, metadata);
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-failure",
-      exportId: id,
-      error: "something is wrong"
-    });
+    const p = uploader.startExport(metadata);
+    expect(p).rejects;
   });
 
   it("exportImage", async () => {
     const fetch = mockFetchJson({ status: "ok" });
-    const id = 1;
     const uri = "local/image.png";
-    const onError = jest.fn();
 
-    await uploader.exportImage(id, uri, onError);
+    await uploader.exportImage(uri);
     expect(fetch).toHaveBeenCalled();
     expect(fetch.mock.calls[0][0]).toBe(uploader.EXPORT_IMAGE);
     expectFormValue(fetch, "deviceId", "1001");
@@ -116,21 +102,14 @@ describe("uploader", () => {
       name: "image.png",
       type: "image/png"
     });
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-image",
-      exportId: id,
-      uri: uri
-    });
   });
 
   it("exportImage error", async () => {
-    const fetch = mockFetchError();
-    const id = 1;
+    mockFetchError();
     const uri = "local/image.png";
-    const onError = jest.fn();
 
-    await uploader.exportImage(id, uri, onError);
-    expect(onError).toHaveBeenCalled();
+    const p = uploader.exportImage(uri);
+    expect(p).rejects;
   });
 
   it("finishExport", async () => {
@@ -138,29 +117,18 @@ describe("uploader", () => {
       status: "ok",
       uri: "s3-uri"
     });
-    const id = 1;
 
-    await uploader.finishExport(id);
+    const uri = await uploader.finishExport();
     expect(fetch).toHaveBeenCalled();
     expect(fetch.mock.calls[0][0]).toBe(uploader.EXPORT_FINISH);
     expectFormValue(fetch, "deviceId", "1001");
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-finished",
-      exportId: id,
-      uri: "s3-uri"
-    });
+    expect(uri).toBe("s3-uri");
   });
 
   it("finishExport error", async () => {
-    const fetch = mockFetchError();
-    const id = 1;
-
-    await uploader.finishExport(id);
-    expect(dispatcher.dispatch).toBeCalledWith({
-      type: "export-failure",
-      exportId: id,
-      error: "something is wrong"
-    });
+    mockFetchError();
+    const p = uploader.finishExport();
+    expect(p).rejects;
   });
 
   it("startImport", async () => {
