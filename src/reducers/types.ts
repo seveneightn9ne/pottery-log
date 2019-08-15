@@ -26,10 +26,7 @@ export interface PotsStoreState {
 export type ExportState =
   | PreExportingState
   | ExportingState
-  | PostExportingState
-  // TODO remove the 2 below
-  | StartExportingState
-  | ExportingImagesState;
+  | PostExportingState;
 
 interface ExportingState {
   exporting: true;
@@ -39,27 +36,13 @@ interface ExportingState {
 
 interface PreExportingState {
   exporting: false;
+  exportId?: number;
   statusMessage?: string;
-}
-
-interface StartExportingState {
-  exporting: true;
-  exportId: number;
-  statusMessage: string;
-}
-
-interface ExportingImagesState {
-  exporting: true;
-  exportId: number;
-  exportingImages: true;
-  // awaitingFile?: number,
-  imagesExported: number;
-  totalImages: number;
-  statusMessage: string;
 }
 
 interface PostExportingState {
   exporting: false;
+  exportId: number;
   exportUri: string;
   statusMessage: string;
 }

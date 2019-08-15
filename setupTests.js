@@ -51,7 +51,10 @@ function makeDispatch(getState = () => undefined) {
   const dispatchMock = jest.fn().mockImplementation(a => a);
   async function dispatch(arg) {
     if (typeof arg == "function") {
-      return await dispatch(await arg(dispatch, getState));
+      const r = await arg(dispatch, getState);
+      if (r) {
+        return await dispatch(r);
+      }
     } else {
       return dispatchMock(arg);
     }

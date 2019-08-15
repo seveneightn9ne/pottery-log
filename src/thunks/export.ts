@@ -1,9 +1,11 @@
-import { FileSystem } from 'expo';
 import _ from 'lodash';
-import { AsyncStorage } from 'react-native';
-import { Action } from '../action';
 import { FullState, ImageState } from '../reducers/types';
-import { keyIsExportable } from '../utils/exports';
+import {
+  exportImage,
+  getExportMetadata,
+  isStillExporting,
+  status,
+} from '../utils/exports';
 import { saveToFilePure } from '../utils/imageutils';
 import * as uploader from '../utils/uploader';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
@@ -25,7 +27,7 @@ export function exportEverything(): PLThunkAction {
         }
 
         const images = getState().images.images;
-        await uploader.startExport(id, metadata, images);
+        await uploader.startExport(metadata);
         if (!isStillExporting(id, getState)) {
           return;
         }
@@ -110,7 +112,7 @@ export function exportEverything(): PLThunkAction {
 
 async function finish(dispatch: PLThunkDispatch, id: number) {
   dispatch(status(id, 'Finishing export...'));
-  const uri = await uploader.finishExport(id);
+  const uri = await uploader.finishExport();
   dispatch({
     type: 'export-finished',
     exportId: id,
@@ -129,27 +131,6 @@ function fail(dispatch: PLThunkDispatch, id: number) {
   };
 }
 
-async function exportImage(image: ImageState) {
-  if (!image.fileUri) {
-    return;
-  }
-  const info = await FileSystem.getInfoAsync(image.fileUri);
-  if (info.exists) {
-    return uploader.exportImage(image.fileUri);
-  } else {
-    throw new Error('Image file does not exist');
-  }
-}
-
-const status = (id: number, statusText: string): Action => {
-  return {
-    type: 'export-status',
-    exportId: id,
-    exporting: true,
-    status: statusText,
-  };
-};
-
 const prepareImages = (images: { [name: string]: ImageState }) => {
   const imagesToExport: ImageState[] = [];
   const imagesToSave: ImageState[] = [];
@@ -162,20 +143,3 @@ const prepareImages = (images: { [name: string]: ImageState }) => {
   });
   return { imagesToExport, imagesToSave };
 };
-
-const isStillExporting = (exportId: number, getState: () => FullState) => {
-  const state = getState();
-  return (
-    state && state.exports.exporting && state.exports.exportId === exportId
-  );
-};
-
-async function getExportMetadata() {
-  const allKeys = (await AsyncStorage.getAllKeys()).filter(keyIsExportable);
-  const pairs = await AsyncStorage.multiGet(allKeys);
-  const snapshot: { [key: string]: string } = {};
-  pairs.forEach((pair) => {
-    snapshot[pair[0]] = pair[1];
-  });
-  return snapshot;
-}

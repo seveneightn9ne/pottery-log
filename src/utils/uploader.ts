@@ -1,7 +1,6 @@
 import Constants from 'expo-constants';
 import _ from 'lodash';
 import store from '../reducers/store';
-import { ImageState } from '../reducers/types';
 import { nameFromUri } from './imageutils';
 
 // Routes
@@ -85,11 +84,7 @@ export async function remove(uri: string) {
   );
 }
 
-export async function startExport(
-  id: number,
-  metadata: any,
-  images: { [imageName: string]: ImageState },
-) {
+export async function startExport(metadata: any) {
   return post(EXPORT_START, {
     metadata: JSON.stringify(metadata),
     deviceId: Constants.deviceId,
@@ -107,7 +102,7 @@ export async function exportImage(uri: string) {
   });
 }
 
-export async function finishExport(id: number) {
+export async function finishExport() {
   return postAndReturn(
     EXPORT_FINISH,
     { deviceId: Constants.deviceId },

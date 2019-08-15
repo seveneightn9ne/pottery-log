@@ -1,5 +1,4 @@
 import { Alert, AsyncStorage } from "react-native";
-import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 import * as exports from "../exports";
 import * as uploader from "../uploader";
@@ -34,94 +33,27 @@ jest.mock("Alert", () => ({
   alert: jest.fn()
 }));
 jest.mock("../../thunks/loadInitial");
-//jest.mock("FileSystem", () => ({
-//  getInfoAsync: Promise.resolve({ exists: true })
-//}));
 
 describe("exporting", () => {
   afterEach(() => jest.clearAllMocks());
 
-  it("startExport", async () => {
-    AsyncStorage.getAllKeys.mockReturnValue(
-      Promise.resolve(["@Pots", "@ImageStore", "@DoNotExport"])
-    );
-    AsyncStorage.multiGet.mockReturnValue(
-      Promise.resolve([["@Pots", "{pots}"], ["@ImageStore", "{images}"]])
-    );
-    const images = { image1: { localUri: "a.png", remoteUri: "b.png" } };
-    await exports.startExport(12345, images);
-
-    expect(uploader.startExport).toHaveBeenCalledWith(
-      12345,
-      {
-        "@Pots": "{pots}",
-        "@ImageStore": "{images}"
-      },
-      images
-    );
-  });
-
-  it("exportImage file", () => {
-    const { willExport, promise } = exports.exportImage(12345, {
+  it("exportImage file", async () => {
+    await exports.exportImage({
       localUri: "l.jpg",
       remoteUri: "r.jpg",
       fileUri: "f.jpg"
     });
-    expect(willExport).toBeTruthy();
-    return promise.then(() => {
-      expect(uploader.exportImage).toHaveBeenCalledWith(
-        12345,
-        "f.jpg",
-        expect.any(Function)
-      );
-      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
-    });
+    expect(uploader.exportImage).toHaveBeenCalledWith("f.jpg");
+    expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
   });
 
-  it("exportImage save remote first", () => {
-    const { willExport, promise } = exports.exportImage(12345, {
-      localUri: "l.jpg",
-      remoteUri: "r.jpg"
-    });
-    expect(willExport).toBeFalsy();
-    return promise.then(() => {
-      expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
-        "r.jpg",
-        true
-      );
-    });
-  });
-
-  it("exportImage save local first", () => {
-    const { willExport, promise } = exports.exportImage(12345, {
-      localUri: "l.jpg"
-    });
-    expect(willExport).toBeFalsy();
-    return promise.then(() => {
-      expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
-        "l.jpg",
-        false
-      );
-    });
-  });
-
-  it("exportImage not exportable", () => {
-    const { willExport, promise } = exports.exportImage(12345, {});
-    expect(willExport).toBeFalsy();
-    return promise.then(() => {
-      expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
-    });
+  it("exportImage not exportable", async () => {
+    await exports.exportImage({ localUri: "not-sufficient.jpg" });
+    expect(uploader.exportImage).not.toHaveBeenCalled();
+    expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
   });
 
   // TODO(jessk) test for exportImage when file not exists
-
-  it("finishExport", () => {
-    exports.finishExport(12345);
-    expect(uploader.finishExport).toHaveBeenCalledWith(12345);
-  });
 });
 
 describe("importing", () => {

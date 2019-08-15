@@ -73,7 +73,6 @@ async function deleteUnusedImageFiles(
   const unusedImages = Object.keys(oldState.images.images).filter(
     (imageName) => !newState.images.images[imageName],
   );
-  console.log(unusedImages);
   return Promise.all(
     unusedImages.map((imageName) => {
       const image = oldState.images.images[imageName];
