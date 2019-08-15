@@ -228,6 +228,10 @@ export function waitAndSaveToFile(name: string): PLThunkAction<void> {
       setTimeout(() => {
         const { images } = getState();
         const image = images.images[name];
+        if (!image) {
+          // It may have been deleted quickly
+          return;
+        }
         if (!image.fileUri) {
           dispatch(saveToFile(uri, isRemote));
         }
