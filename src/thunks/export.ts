@@ -48,9 +48,6 @@ export function exportEverything(): PLThunkAction {
               fileUri = await saveToFilePure(i.remoteUri, true /* isRemote */);
             } else if (i.localUri) {
               fileUri = await saveToFilePure(i.localUri, false /* isRemote */);
-            } else {
-              console.log('Cannot export image with no URI ', i);
-              return;
             }
             imagesToExport.push({
               ...i,
@@ -137,8 +134,10 @@ const prepareImages = (images: { [name: string]: ImageState }) => {
   _.forOwn(images, (imageState) => {
     if (imageState.fileUri) {
       imagesToExport.push(imageState);
-    } else {
+    } else if (imageState.localUri || imageState.remoteUri) {
       imagesToSave.push(imageState);
+    } else {
+      console.log('Cannot export image with no URI ', imageState);
     }
   });
   return { imagesToExport, imagesToSave };
