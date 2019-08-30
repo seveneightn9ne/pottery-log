@@ -79,12 +79,37 @@ const mapStateToProps = (state: FullState) => {
   const isSearching = 'searching' in state.ui && state.ui.searching;
   const searchTerm = ('searching' in state.ui && state.ui.searchTerm) || '';
 
+  /**
+   * The idea here is to split the pots by status, then sort each group,
+   * then concatenate the resulting arrays. The order of the status-groups
+   * doesn't matter because everything (currently) using pots will filter
+   * by a status.
+   */
+  const pots = _.concat(
+    [],
+    ..._.values(
+      _.mapValues(
+        _.groupBy(
+          filterBySearchTerm(
+            state.pots.potIds.map((potId) => state.pots.pots[potId]),
+            searchTerm,
+          ),
+          (p) => {
+            if (!p || !p.status) {
+              console.warn('sorting pot with no status', p);
+              return '';
+            }
+            return p.status.currentStatus();
+          },
+        ),
+        (plist) => sort(plist),
+      ),
+    ),
+  );
+
   return {
     potsHaveLoaded: state.pots.hasLoaded,
-    pots: filterBySearchTerm(
-      sort(state.pots.potIds.map((potId) => state.pots.pots[potId])),
-      searchTerm,
-    ),
+    pots,
     images: _.chain(state.pots.potIds)
       .keyBy((i) => i) // map keys are potId
       .mapValues((potId) => {
