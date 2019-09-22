@@ -31,3 +31,13 @@ yarn start # the expo dev server
 13. Fill in the description, Add the new build, Save, Submit for review
 14. Answer "No" to encryption question
 15. Answer "Yes" to IDFA question - check the two "Attribute" boxes ([details](https://docs.expo.io/versions/latest/distribution/app-stores/#ios-specific-guidelines)}
+
+## How to update the Google Play Store app
+
+1. increment `expo.version` and `expo.android.versionCode`
+2. `./expo-cli build:android`
+3. Download the built `apk` file
+4. Go to [Play Developer Console > Release Management > App Releases > Production](https://play.google.com/apps/publish/?account=7386843897399770359#ManageReleaseTrackPlace:p=com.jesskenney.pottery_log&appid=4975800948334149640&releaseTrackId=4699032239426232860)
+5. Create Release > Upload the file
+6. Scroll to the bottom, update the text for what's new
+7. Confirm > Verify any warnings > Start Rollout to Production
