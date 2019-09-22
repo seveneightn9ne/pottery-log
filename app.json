@@ -1,10 +1,10 @@
 {
   "expo": {
-    "sdkVersion": "33.0.0",
+    "sdkVersion": "35.0.0",
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.33.1",
+    "version": "2.35.0",
     "privacy": "public",
     "assetBundlePatterns": ["./assets/*.png", "./assets/*.ttf"],
     "android": {
@@ -15,11 +15,11 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 7
+      "versionCode": 8
     },
     "ios": {
       "bundleIdentifier": "com.jesskenney.potterylog",
-      "buildNumber": "1.0.4",
+      "buildNumber": "1.0.5",
       "icon": "./assets/launcher_ios_1024.png",
       "usesIcloudStorage": true,
       "infoPlist": {

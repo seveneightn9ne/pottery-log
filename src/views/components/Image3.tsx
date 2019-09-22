@@ -1,4 +1,4 @@
-import { FileSystem } from 'expo';
+import * as  FileSystem from 'expo-file-system';
 import React from 'react';
 import { Image, ImageErrorEventData, NativeSyntheticEvent } from 'react-native';
 import { connect } from 'react-redux';

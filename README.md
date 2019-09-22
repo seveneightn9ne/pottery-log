@@ -11,6 +11,8 @@ yarn start # the expo dev server
 
 ## How to update the iOS App Store app
 
+[App Store link](https://apps.apple.com/us/app/pottery-log/id1457629627)
+
 1. increment the `expo.version` and `expo.ios.buildNumber` in `app.json`
 2. `./expo-cli build:ios`
 
@@ -24,7 +26,8 @@ yarn start # the expo dev server
 8. Click through until it tells you you're done
 9. Ignore any email from Apple about Missing Push Notification Entitlement
 10. Wait for the "completed processing" email
-11. Go to App Store Connect -> My Apps -> +Version or Platform
-12. Fill in the description, Add the new build, Save, Submit for review
-13. Answer "No" to encryption question
-14. Answer "Yes" to IDFA question - check the two "Attribute" boxes ([details](https://docs.expo.io/versions/latest/distribution/app-stores/#ios-specific-guidelines)}
+11. Go to My Apps -> Pottery Log -> +Version or Platform
+12. Set App Version to the value in `expo.ios.buildNumber` e.g. `1.0.5`
+13. Fill in the description, Add the new build, Save, Submit for review
+14. Answer "No" to encryption question
+15. Answer "Yes" to IDFA question - check the two "Attribute" boxes ([details](https://docs.expo.io/versions/latest/distribution/app-stores/#ios-specific-guidelines)}
