@@ -4,7 +4,7 @@
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.35.0",
+    "version": "2.35.1",
     "privacy": "public",
     "assetBundlePatterns": ["./assets/*.png", "./assets/*.ttf"],
     "android": {
@@ -15,7 +15,7 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 8
+      "versionCode": 9
     },
     "ios": {
       "bundleIdentifier": "com.jesskenney.potterylog",
