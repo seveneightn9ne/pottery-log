@@ -51,7 +51,7 @@
     "array-reverse-polyfill": "^1.0.9",
     "exp": "^57.2.1",
     "expo": "^35.0.0",
-    "expo-cli": "^2.21.2",
+    "expo-cli": "^3.11.1",
     "expo-constants": "~7.0.0",
     "expo-document-picker": "~7.0.0",
     "expo-file-system": "~7.0.0",
