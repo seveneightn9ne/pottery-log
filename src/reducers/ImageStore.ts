@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { Action } from '../action';
 import { nameFromUri } from '../utils/imageutils';
+import { debug } from '../utils/uploader';
 import { ImageStoreState } from './types';
 
 export function getInitialState(): ImageStoreState {
@@ -81,9 +82,16 @@ export function reduceImages(
     case 'pot-copy': {
       const newState = { loaded: true, images: { ...state.images } };
       for (const name of action.imageNames) {
+        const oldImage = newState.images[name];
+        if (!oldImage) {
+          // XXX(jessk): why can oldImage be undefined?
+          // fixing TypeError: undefined is not an object (evaluating 'S.images[A].pots')
+          debug('image-undefined', { imageState: state, missingImage: name });
+        }
+        const oldPots = oldImage ? oldImage.pots : [action.potId];
         newState.images[name] = {
-          ...newState.images[name],
-          pots: [...newState.images[name].pots, action.potId],
+          ...oldImage,
+          pots: [...oldPots, action.newPotId],
         };
       }
       return newState;
