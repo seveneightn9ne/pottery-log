@@ -7,6 +7,7 @@ const LIGHT_ORANGE = '#FFCCBC';
 const GREEN = '#4caf50';
 const GRAY = 'rgba(0,0,0,.54)';
 const LIGHT_GRAY = 'rgba(0,0,0,.10)';
+const DARK_GRAY = 'rgba(0,0,0,0.8)';
 const LIGHT_GREEN = '#C8E6C9';
 const GREEN_200 = '#c6f68d';
 const DARK_GREEN = '#388e3c';
@@ -33,6 +34,24 @@ const lightTextColor = (m: Mode) =>
   ({
     light: '#00000099',
     dark: '#999999',
+  }[m]);
+
+const grayTextColor = (m: Mode) =>
+  ({
+    light: GRAY,
+    dark: '#999999',
+  }[m]);
+
+const placeholderBackgroundColor = (m: Mode) =>
+  ({
+    light: LIGHT_GREEN,
+    dark: 'rgba(0,51,0,0.5)',
+  }[m]);
+
+const listSeparatorColor = (m: Mode) =>
+  ({
+    light: LIGHT_GRAY,
+    dark: DARK_GRAY,
   }[m]);
 
 const base = (mode: Mode) =>
@@ -143,7 +162,7 @@ const base = (mode: Mode) =>
       // paddingRight: 16,
     },
     lhText: {
-      color: GRAY,
+      color: grayTextColor(mode),
       fontSize: 14,
       fontWeight: '400',
     },
@@ -151,7 +170,7 @@ const base = (mode: Mode) =>
       fontFamily: 'material-icons',
       fontSize: 20,
       fontWeight: '400',
-      color: GRAY,
+      color: grayTextColor(mode),
     },
     listItem: {
       marginBottom: 4,
@@ -159,7 +178,7 @@ const base = (mode: Mode) =>
       alignItems: 'baseline',
     },
     liImagePlaceholder: {
-      backgroundColor: LIGHT_GREEN,
+      backgroundColor: placeholderBackgroundColor(mode),
       alignItems: 'center',
       justifyContent: 'center',
       paddingBottom: 56,
@@ -181,7 +200,7 @@ const base = (mode: Mode) =>
     },
     lisubtitle: {
       fontSize: 13,
-      color: '#fff',
+      color: '#cccccc',
       padding: 12,
       paddingTop: 0,
       paddingBottom: 8,
@@ -197,15 +216,9 @@ const base = (mode: Mode) =>
     },
     separator: {
       height: 1,
-      backgroundColor: LIGHT_GRAY,
+      backgroundColor: listSeparatorColor(mode),
     },
-    back: {
-      fontSize: 36,
-      fontWeight: 'bold',
-      padding: 10,
-      color: 'blue',
-      backgroundColor: '#fff',
-    },
+    /* Start Here on Dark Mode */
     imagePicker: {
       borderStyle: 'dashed',
       borderWidth: 4,
@@ -468,4 +481,4 @@ const base = (mode: Mode) =>
     },
   });
 
-export default base('light');
+export default base('dark');
