@@ -5,6 +5,7 @@ import {
   subscribeToPersistImageStore,
   subscribeToPersistImportStore,
   subscribeToPersistPotStore,
+  subscribeToPersistSettingsStore,
 } from '../thunks/persist';
 import { PLThunkDispatch } from '../thunks/types';
 import {
@@ -23,14 +24,16 @@ import {
   getInitialState as getInitialPotsState,
   reducePots,
 } from './PotsStore';
+import {
+  getInitialState as getInitialSettingsState,
+  reduceSettings,
+} from './settingsStore';
 import { FullState } from './types';
 import { getInitialState as getInitialUiState, reduceUi } from './UIStore';
 
-const logger: Middleware<
-  {},
-  FullState,
-  PLThunkDispatch
-> = (_) => (next) => (action) => {
+const logger: Middleware<{}, FullState, PLThunkDispatch> = (_) => (next) => (
+  action,
+) => {
   // I think we might want the logs in prod, in case of errors
   // if (Constants.appOwnership === 'standalone') {
   //   // Skip logs in prod, for great speed
@@ -55,6 +58,7 @@ function getInitialState(): FullState {
     images: getInitialImageState(),
     exports: getInitialExportState(),
     imports: getInitialImportState(),
+    settings: getInitialSettingsState(),
   };
 }
 
@@ -70,6 +74,7 @@ function reducer(): Reducer<FullState, Action> {
     newState.images = reduceImages(newState.images, action);
     newState.exports = reduceExport(newState.exports, action, newState);
     newState.imports = reduceImport(newState.imports, action);
+    newState.settings = reduceSettings(newState.settings, action);
     /*return {
       pots: reducePots(state.pots, action),
       ui: reduceUi(state.ui, action),
@@ -91,6 +96,7 @@ export function makeStore() {
   subscribeToPersistPotStore(store);
   subscribeToPersistImageStore(store);
   subscribeToPersistImportStore(store);
+  subscribeToPersistSettingsStore(store);
   return store;
 }
 

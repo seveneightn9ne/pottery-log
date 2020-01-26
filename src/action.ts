@@ -6,16 +6,18 @@ import {
   ImageStoreState,
   ImportStatePersisted,
   PotsStoreState,
+  SettingsState,
 } from './reducers/types';
 
 export type Action =
-  | LoadedEverything
+  | LoadingAction
   | PotAction
   | ImageAction
   | UiAction
   | ImportAction
-  | ExportAction
-  | Reload;
+  | ExportAction;
+
+type LoadingAction = LoadedEverything | LoadedSettings | Reload;
 
 type ImageAction =
   | ImageAdd
@@ -85,6 +87,11 @@ interface LoadedEverything {
   pots: PotsStoreState;
   images: ImageStoreState;
   isImport: boolean;
+}
+
+interface LoadedSettings {
+  type: 'loaded-settings';
+  settings: SettingsState;
 }
 
 interface New {

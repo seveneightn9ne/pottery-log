@@ -6,6 +6,7 @@ export interface FullState {
   ui: UIState;
   exports: ExportState;
   imports: ImportState;
+  settings: SettingsState;
 }
 
 //
@@ -141,4 +142,10 @@ export interface ImageUiState extends BaseUiState {
 export interface SettingsUiState extends BaseUiState {
   page: 'settings';
   resumeImport: boolean;
+}
+
+// Settings state
+
+export interface SettingsState {
+  darkMode?: boolean;
 }

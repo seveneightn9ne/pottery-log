@@ -2,8 +2,9 @@ import _ from 'lodash';
 import { Store } from 'redux';
 import { Pot } from '../models/Pot';
 import { FullState } from '../reducers/types';
-import { IMPORT_STORAGE_KEY } from '../thunks/loadInitial';
+import { IMPORT_STORAGE_KEY } from '../thunks/loadInitialImport';
 import { StorageWriter } from '../utils/sync';
+import { SETTINGS_STORAGE_KEY } from './loadInitialSettings';
 
 const makePersistingSubscriber = <T>(args: {
   name: string;
@@ -17,12 +18,12 @@ const makePersistingSubscriber = <T>(args: {
   store.subscribe(
     _.throttle(() => {
       const newState = store.getState();
-      const [shouldPersist, stuffToPersist] = args.shouldPersist(
+      const [shouldPersist, extraInfo] = args.shouldPersist(
         prevState,
         newState,
       );
       if (shouldPersist) {
-        args.persist(newState, stuffToPersist);
+        args.persist(newState, extraInfo);
       }
       prevState = newState;
     }, 250),
@@ -102,5 +103,16 @@ export const subscribeToPersistImportStore = makePersistingSubscriber({
     } else {
       StorageWriter.put(IMPORT_STORAGE_KEY, JSON.stringify(newState.imports));
     }
+  },
+});
+
+export const subscribeToPersistSettingsStore = makePersistingSubscriber({
+  name: 'settings',
+  shouldPersist: (prevState, newState) => [
+    !!prevState && prevState.settings !== newState.settings,
+    {},
+  ],
+  persist: (newState) => {
+    StorageWriter.put(SETTINGS_STORAGE_KEY, JSON.stringify(newState.settings));
   },
 });

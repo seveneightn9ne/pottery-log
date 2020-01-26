@@ -4,6 +4,7 @@ import loadInitialImages, { saveImagesToFiles } from './loadInitialImages';
 import loadInitialImport from './loadInitialImport';
 import loadInitialPots from './loadInitialPots';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
+import loadInitialSettings from './loadInitialSettings';
 
 export function reloadFromImport(): PLThunkAction {
   return t('reloadFromImport', {}, async (dispatch: PLThunkDispatch) => {
@@ -23,6 +24,16 @@ export function loadInitial(): PLThunkAction {
 
 function load(isImport: boolean): PLThunkAction {
   return t('load', { isImport }, async (dispatch: PLThunkDispatch) => {
+    if (!isImport) {
+      // Don't block settings for all the rest of this
+      loadInitialSettings().then((settings) => {
+        dispatch({
+          type: 'loaded-settings',
+          settings,
+        });
+      });
+    }
+
     let images = await loadInitialImages();
     let { pots, images2 } = await loadInitialPots(isImport);
 
