@@ -62,8 +62,6 @@ export default class StatusSwitcher extends React.Component<
         status={this.props.status.currentStatus()}
         note={this.props.note}
         onChangeNote={this.props.onChangeNote}
-        showNote={true}
-        showAddNote={false}
       />
     ) : null;
 
@@ -107,18 +105,18 @@ export default class StatusSwitcher extends React.Component<
     if (next) {
       this.props.setStatus(next);
     }
-  }
+  };
 
   private onPressDown = () => {
     const prev = this.props.status.prev();
     if (prev) {
       this.props.setStatus(prev);
     }
-  }
+  };
 
   private openModal = () => {
     if (this.modal.current) {
       this.modal.current.open();
     }
-  }
+  };
 }

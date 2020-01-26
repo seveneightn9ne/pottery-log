@@ -168,6 +168,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
             autoFocus={true}
             placeholder={'search'}
             value={this.props.searchTerm}
+            onBlur={this.onSearchBlur}
           />
         </ElevatedView>
       );
@@ -214,10 +215,13 @@ class ListPage extends React.Component<ListPageProps, {}> {
     }
 
     if (this.props.pots.length === 0) {
+      const message = this.props.isSearching
+        ? `There are no pots matching "${this.props.searchTerm}".`
+        : "You don't have any pots yet.";
       return (
         <View style={styles.container}>
           {header}
-          <Text style={styles.listMessage}>You don't have any pots yet.</Text>
+          <Text style={styles.listMessage}>{message}</Text>
           {newPotButton}
         </View>
       );
@@ -265,8 +269,14 @@ class ListPage extends React.Component<ListPageProps, {}> {
     );
   }
 
+  private onSearchBlur = () => {
+    if (this.props.isSearching && this.props.searchTerm === '') {
+      this.props.onCloseSearch();
+    }
+  };
+
   private sectionKeyExtractor = (listdata: SectionT, index: number) =>
-    listdata.title
+    listdata.title;
   private renderSectionFooter = () => <View style={styles.separator} />;
 
   private stripCount = (sectionTitle: string): string => {
@@ -276,7 +286,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
     const parts = sectionTitle.split(' ');
     const section = parts.splice(0, parts.length - 1).join(' ');
     return section;
-  }
+  };
 
   private sectionItemLayout = (layoutData: any, index: number) => {
     const itemSize = this.width / 2 - 2;
@@ -285,7 +295,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
       offset: itemSize * index,
       index,
     };
-  }
+  };
 
   private renderPotListItem = (data: { item: Pot }): JSX.Element => {
     return (
@@ -297,7 +307,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
         {...this.props}
       />
     );
-  }
+  };
 
   private onClickPot(pot: Pot) {
     return () => this.props.onClickPot(pot.uuid);
@@ -313,7 +323,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
         renderItem={this.renderPotListItem}
       />
     );
-  }
+  };
 
   private potKeyExtractor = (pot: Pot, index: number) => pot.uuid;
 
@@ -336,11 +346,11 @@ class ListPage extends React.Component<ListPageProps, {}> {
         </View>
       </TouchableOpacity>
     );
-  }
+  };
 
   private collapseSection = (section: string) => {
     return () => this.props.onCollapse(this.stripCount(section));
-  }
+  };
 }
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps, FullState>(

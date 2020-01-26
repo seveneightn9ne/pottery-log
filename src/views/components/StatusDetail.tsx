@@ -38,8 +38,6 @@ export default class StatusDetail extends React.Component<
         note={this.props.note}
         status={this.props.status}
         onChangeNote={this.props.onChangeNote}
-        showNote={true}
-        showAddNote={false}
       />
     );
     const editButton = this.props.fontLoaded ? (
@@ -96,5 +94,5 @@ export default class StatusDetail extends React.Component<
     if (this.modal.current) {
       this.modal.current.open();
     }
-  }
+  };
 }

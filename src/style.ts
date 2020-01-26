@@ -18,6 +18,12 @@ const backgroundColor = (m: Mode) =>
     dark: '#121212',
   }[m]);
 
+const elevatedBackgroundColor = (m: Mode) =>
+  ({
+    light: '#fff',
+    dark: '#272727',
+  }[m]);
+
 const headerColor = (m: Mode) =>
   ({
     light: GREEN,
@@ -30,18 +36,32 @@ const headerTextColor = (m: Mode) =>
     dark: '#e1e1e1',
   }[m]);
 
-const lightTextColor = (m: Mode) =>
+// 60% opacity
+const gray60 = (m: Mode) =>
   ({
-    light: '#00000099',
-    dark: '#999999',
+    light: 'rgba(0,0,0,0.6)',
+    dark: 'rgba(255,255,255,0.6)',
   }[m]);
 
-const grayTextColor = (m: Mode) =>
+// 20%
+const gray20 = (m: Mode) =>
   ({
-    light: GRAY,
-    dark: '#999999',
+    light: 'rgba(0,0,0,0.2)',
+    dark: 'rgba(255,255,255,0.4)',
   }[m]);
 
+// 90 %
+const gray90 = (m: Mode) =>
+  ({
+    light: 'rgba(0,0,0,0.9)',
+    dark: 'rgba(255,255,255,0.9)',
+  }[m]);
+
+const gray10 = (m: Mode) =>
+  ({
+    light: 'rgba(0,0,0,0.1)',
+    dark: 'rgba(255,255,255,0.1)',
+  }[m]);
 const placeholderBackgroundColor = (m: Mode) =>
   ({
     light: LIGHT_GREEN,
@@ -54,6 +74,18 @@ const listSeparatorColor = (m: Mode) =>
     dark: DARK_GRAY,
   }[m]);
 
+const linkColor = (m: Mode) =>
+  ({
+    light: '#0000FF',
+    dark: '#4f9cff',
+  }[m]);
+
+const secondaryButtonTextColor = (m: Mode) =>
+  ({
+    light: DARK_GREEN,
+    dark: GREEN_200,
+  }[m]);
+
 const base = (mode: Mode) =>
   StyleSheet.create({
     container: {
@@ -61,6 +93,7 @@ const base = (mode: Mode) =>
       backgroundColor: backgroundColor(mode),
       justifyContent: 'flex-start',
       position: 'relative',
+      color: gray90(mode),
       // paddingTop: 20,
     },
     imagePage: {
@@ -136,7 +169,7 @@ const base = (mode: Mode) =>
     },
     listMessage: {
       alignSelf: 'center',
-      color: lightTextColor(mode),
+      color: gray60(mode),
       textAlign: 'center',
       paddingTop: 72,
     },
@@ -162,7 +195,7 @@ const base = (mode: Mode) =>
       // paddingRight: 16,
     },
     lhText: {
-      color: grayTextColor(mode),
+      color: gray60(mode),
       fontSize: 14,
       fontWeight: '400',
     },
@@ -170,7 +203,7 @@ const base = (mode: Mode) =>
       fontFamily: 'material-icons',
       fontSize: 20,
       fontWeight: '400',
-      color: grayTextColor(mode),
+      color: gray60(mode),
     },
     listItem: {
       marginBottom: 4,
@@ -218,14 +251,13 @@ const base = (mode: Mode) =>
       height: 1,
       backgroundColor: listSeparatorColor(mode),
     },
-    /* Start Here on Dark Mode */
     imagePicker: {
       borderStyle: 'dashed',
       borderWidth: 4,
-      borderColor: '#CCC',
+      borderColor: gray20(mode),
       alignItems: 'center',
       flexDirection: 'column',
-      backgroundColor: 'white',
+      backgroundColor: backgroundColor(mode),
       // The borderRadius thing is a react-native bug with the dashed border
       borderRadius: 1,
       justifyContent: 'center',
@@ -237,7 +269,7 @@ const base = (mode: Mode) =>
     imagePickerText: {
       fontFamily: 'material-icons',
       fontSize: 72,
-      color: '#CCC',
+      color: gray20(mode),
     },
     imagePickerFullText: {},
     imagePickerSmallText: {},
@@ -260,7 +292,7 @@ const base = (mode: Mode) =>
       height: 28 * 2 - 8,
     },
     addMainNote: {
-      color: '#000000de',
+      color: gray90(mode),
       fontFamily: 'material-icons',
       fontSize: 24,
       marginLeft: 16,
@@ -290,6 +322,7 @@ const base = (mode: Mode) =>
       marginTop: 8,
       // paddingBottom: 1,
       flex: 1,
+      color: gray90(mode),
     },
     mainNote: {
       padding: 4,
@@ -301,17 +334,17 @@ const base = (mode: Mode) =>
       zIndex: -1,
     },
     mainNoteNoBar: {
-      borderColor: '#ffffff',
+      borderColor: backgroundColor(mode),
     },
     mainNoteText: {
       fontSize: 14,
-      color: '#00000099',
+      color: gray60(mode),
       alignSelf: 'center',
     },
     noteEdit: {
       fontFamily: 'material-icons',
       fontSize: 16,
-      color: '#000000de',
+      color: gray90(mode),
       padding: 16,
       marginRight: 4,
       alignSelf: 'center',
@@ -320,7 +353,7 @@ const base = (mode: Mode) =>
       height: 32,
       marginTop: 8,
       borderRadius: 16,
-      backgroundColor: '#ebebeb',
+      backgroundColor: gray10(mode),
     },
     chipInner: {
       flexDirection: 'row',
@@ -333,11 +366,11 @@ const base = (mode: Mode) =>
       fontFamily: 'material-icons',
       fontSize: 16,
       fontWeight: '400',
-      color: '#1e1e1e',
+      color: gray90(mode),
       // paddingTop: 8, paddingBottom: 8,
     },
     chipText: {
-      color: '#1e1e1e',
+      color: gray90(mode),
       fontSize: 14,
     },
     statusDetail: {
@@ -358,15 +391,16 @@ const base = (mode: Mode) =>
       fontWeight: '400',
       fontSize: 16,
       alignSelf: 'baseline',
+      color: gray90(mode),
     },
     statusDetailNote: {
       fontSize: 14,
-      color: '#00000099',
+      color: gray60(mode),
     },
     statusDetailDate: {
       // backgroundColor: '#00000022',
       // borderRadius: 12,
-      color: '#00000099',
+      color: gray60(mode),
       fontSize: 16,
       paddingLeft: 2,
       // paddingBottom: 1,
@@ -378,7 +412,7 @@ const base = (mode: Mode) =>
     },
     editDetail: {
       fontSize: 16,
-      color: '#000000de',
+      color: gray90(mode),
       padding: 16,
       marginRight: 4,
       alignSelf: 'center',
@@ -413,57 +447,45 @@ const base = (mode: Mode) =>
       // height: 12,
       height: 34,
     },
-    potDescInput: {
-      minHeight: 40,
-      paddingHorizontal: 15,
-      fontSize: 16,
-      backgroundColor: '#eee',
-    },
-    noteBlankText: {
-      fontSize: 16,
-      color: '#666',
-      fontStyle: 'italic',
-    },
     settingsText: {
       fontSize: 16,
       textAlign: 'center',
       padding: 20,
+      color: gray90(mode),
     },
     modal: {
       width: 300,
       padding: 24,
-      backgroundColor: 'white',
+      backgroundColor: elevatedBackgroundColor(mode),
       borderRadius: 4,
     },
     modalHeader: {
       fontSize: 20,
-      color: '#000000de',
+      color: gray60(mode),
       fontWeight: '400',
       marginBottom: 20,
     },
     modalInput: {
       fontSize: 16,
       marginBottom: 20,
-      color: '#00000099',
+      color: gray90(mode),
     },
     button3: {
-      backgroundColor: 'white',
+      backgroundColor: backgroundColor(mode),
       elevation: 0,
-      color: DARK_GREEN,
+      color: secondaryButtonTextColor(mode),
       fontSize: 14,
     },
     disabledButton: {
-      color: GRAY,
+      color: gray60(mode),
     },
     modalButton: {
       alignSelf: 'flex-end',
       marginLeft: 16,
-    },
-    bgGreen: {
-      // backgroundColor: LIGHT_GREEN,
+      backgroundColor: elevatedBackgroundColor(mode),
     },
     bottomBar: {
-      backgroundColor: '#ffffff',
+      backgroundColor: backgroundColor(mode),
       flexDirection: 'row',
       justifyContent: 'flex-end',
       padding: 4,
@@ -477,7 +499,7 @@ const base = (mode: Mode) =>
     },
     anchor: {
       textDecorationLine: 'underline',
-      color: '#0000FF',
+      color: linkColor(mode),
     },
   });
 
