@@ -451,6 +451,7 @@ const base = (mode: Mode) =>
       fontSize: 16,
       color: gray90(mode),
       paddingBottom: 20,
+      lineHeight: 24,
     },
     settingsItem: {
       borderColor: gray10(mode),

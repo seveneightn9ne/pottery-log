@@ -36,6 +36,8 @@ const mapStateToProps = (state: FullState) => ({
   importing: state.imports.importing,
   statusMessage:
     state.exports.statusMessage || state.imports.statusMessage || '',
+  numImages: Object.keys(state.images.images).length,
+  numPots: state.pots.potIds.length,
 });
 type PropsFromState = ReturnType<typeof mapStateToProps>;
 
@@ -62,11 +64,13 @@ type SettingsPageProps = PropsFromState & PropsFromDispatch & OwnProps;
 interface SettingsPageState {
   linkModalOpen: boolean;
   linkText: string;
+  preExportModalOpen: boolean;
 }
 
 interface SettingsItem {
   title: string;
   description: string;
+  selectable?: boolean;
   onPress: () => void;
 }
 
@@ -77,6 +81,7 @@ class SettingsPage extends React.Component<
   public state = {
     linkModalOpen: false,
     linkText: '',
+    preExportModalOpen: false,
   };
 
   public render() {
@@ -91,7 +96,7 @@ class SettingsPage extends React.Component<
         title: 'Backup',
         description:
           'Backing up your Pottery Log will save your data so you can move it to a new phone.',
-        onPress: this.props.onStartExport,
+        onPress: this.openPreExportModal,
       },
       {
         title: 'Restore',
@@ -101,6 +106,7 @@ class SettingsPage extends React.Component<
       {
         title: 'App Version',
         description: APP_VERSION,
+        selectable: true,
         onPress: () => {
           Clipboard.setString(APP_VERSION);
           ToastAndroid.show('Copied to clipboard', ToastAndroid.SHORT);
@@ -117,6 +123,7 @@ class SettingsPage extends React.Component<
         {this.renderImportUrlModal()}
         {this.renderExportImportModal()}
         {this.renderResumeImport()}
+        {this.renderPreExportModal()}
         <FlatList
           data={settingsItems}
           renderItem={this.renderSettingsItem}
@@ -127,13 +134,13 @@ class SettingsPage extends React.Component<
   }
 
   private renderSettingsItem: ListRenderItem<SettingsItem> = ({
-    item: { title, description, onPress },
+    item: { title, description, onPress, selectable },
   }) => {
     return (
       <TouchableHighlight style={styles.settingsItem} onPress={onPress}>
         <React.Fragment>
           <Text style={styles.settingsItemTitle}>{title}</Text>
-          <Text style={styles.settingsItemDescription}>{description}</Text>
+          <Text style={styles.settingsItemDescription} selectable={!!selectable}>{description}</Text>
         </React.Fragment>
       </TouchableHighlight>
     );
@@ -181,7 +188,7 @@ class SettingsPage extends React.Component<
     const buttons = [
       { text: 'CANCEL', close: true },
       {
-        text: 'IMPORT',
+        text: 'START',
         onPress: this.startUrlImport,
         disabled: true,
         close: true,
@@ -229,6 +236,41 @@ class SettingsPage extends React.Component<
       />
     );
   }
+
+  private renderPreExportModal = () => {
+    const buttons = [
+      { text: 'CANCEL', close: true },
+      {
+        text: 'START',
+        onPress: this.props.onStartExport,
+        close: true,
+      },
+    ];
+    const numMinutes = Math.round(this.props.numImages / 20);
+    const minutes = numMinutes === 1 ? 'minute' : 'minutes';
+    const pots = this.props.numPots === 1 ? 'pot' : 'pots';
+    const images = this.props.numImages === 1 ? 'image' : 'images';
+    const modalBody = (
+      <View>
+        <Text style={styles.settingsText}>
+          You have {this.props.numPots} {pots} with {this.props.numImages} {images}.
+          The backup will take about {numMinutes} {minutes}.
+        </Text>
+      </View>
+    );
+    return (
+      <Modal
+        header={'Start Backup'}
+        body={modalBody}
+        buttons={buttons}
+        open={this.state.preExportModalOpen}
+        close={this.closePreExportModal}
+      />
+    );
+  }
+
+  private openPreExportModal = () => this.setState({preExportModalOpen: true});
+  private closePreExportModal = () => this.setState({preExportModalOpen: false});
 
   private renderExportImportModal = () => {
     const header = this.props.exportModal ? 'Backup' : 'Restore';
