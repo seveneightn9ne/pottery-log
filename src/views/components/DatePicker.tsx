@@ -57,7 +57,7 @@ class ImplAndroid extends React.Component<DatePickerProps, {}> {
     } catch ({ code, message }) {
       console.warn('Cannot open date picker', message);
     }
-  }
+  };
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -84,10 +84,11 @@ class ImplIOS extends React.Component<
             />
           }
           buttons={[
-            { text: 'CANCEL' },
+            { text: 'CANCEL', close: true },
             {
               text: 'SAVE',
               onPress: () => this.props.onPickDate(this.state.datePicked),
+              close: true,
             },
           ]}
           close={this.closeModal}
@@ -102,15 +103,15 @@ class ImplIOS extends React.Component<
 
   private openModal = () => {
     this.setState({ modalVisible: true });
-  }
+  };
 
   private closeModal = () => {
     this.setState({ modalVisible: false });
-  }
+  };
 }
 
 const DatePicker = Platform.select({
-  ios: ImplIOS as (typeof ImplAndroid | typeof ImplIOS),
+  ios: ImplIOS as typeof ImplAndroid | typeof ImplIOS,
   android: ImplAndroid,
 });
 

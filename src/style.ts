@@ -449,9 +449,23 @@ const base = (mode: Mode) =>
     },
     settingsText: {
       fontSize: 16,
-      textAlign: 'center',
-      padding: 20,
       color: gray90(mode),
+      paddingBottom: 20,
+    },
+    settingsItem: {
+      borderColor: gray10(mode),
+      borderBottomWidth: 1,
+      padding: 16,
+    },
+    settingsItemTitle: {
+      color: gray90(mode),
+      fontSize: 20,
+      lineHeight: 32,
+    },
+    settingsItemDescription: {
+      color: gray60(mode),
+      fontSize: 16,
+      lineHeight: 24,
     },
     modal: {
       width: 300,
@@ -483,6 +497,7 @@ const base = (mode: Mode) =>
       alignSelf: 'flex-end',
       marginLeft: 16,
       backgroundColor: elevatedBackgroundColor(mode),
+      textTransform: 'uppercase',
     },
     bottomBar: {
       backgroundColor: backgroundColor(mode),

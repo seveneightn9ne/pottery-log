@@ -4,10 +4,17 @@ import Button from 'react-native-button';
 import ElevatedView from 'react-native-elevated-view';
 import styles from '../../style';
 
+export interface ButtonProp {
+  text: string;
+  onPress?: () => void;
+  close: boolean; // should the button close the modal
+  disabled?: boolean;
+}
+
 interface ModalProps {
   header: string;
   body: JSX.Element;
-  buttons: Array<{ text: string; onPress?: () => void; disabled?: boolean }>;
+  buttons: ButtonProp[];
   open: boolean;
   close: () => void;
 }
@@ -32,11 +39,11 @@ export default function Modal(props: ModalProps) {
           <Text style={styles.modalHeader}>{props.header}</Text>
           {props.body}
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-            {props.buttons.map(({ text, onPress, disabled }) => (
+            {props.buttons.map(({ text, onPress, disabled, close }) => (
               <Button
                 onPress={() => {
-                  props.close();
                   onPress && onPress();
+                  close && props.close();
                 }}
                 style={[
                   styles.button3,

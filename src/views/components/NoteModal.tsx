@@ -20,10 +20,10 @@ export default class NoteModal extends React.Component<
   }
   public open = () => {
     this.setState({ open: true });
-  }
+  };
   public close = () => {
     this.setState({ open: false });
-  }
+  };
   public render() {
     return (
       <Modal
@@ -39,7 +39,7 @@ export default class NoteModal extends React.Component<
             onSubmit={this.close}
           />
         }
-        buttons={[{ text: 'DONE' }]}
+        buttons={[{ text: 'DONE', close: true }]}
         open={this.state.open}
         close={this.close}
       />
@@ -48,5 +48,5 @@ export default class NoteModal extends React.Component<
 
   private onChangeNote = (t: string) => {
     this.props.onChangeNote(this.props.status, t);
-  }
+  };
 }
