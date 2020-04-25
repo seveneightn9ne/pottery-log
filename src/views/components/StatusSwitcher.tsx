@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
 import Status, { StatusString } from '../../models/Status';
-import styles from '../../style';
+import style from '../../style';
 import DatePicker from './DatePicker';
 import Note from './Note';
 import NoteModal from './NoteModal';
@@ -34,7 +34,7 @@ export default class StatusSwitcher extends React.Component<
   public render() {
     const editButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.openModal}>
-        <Text style={styles.addMainNote}>
+        <Text style={style.s.addMainNote}>
           {this.props.note ? 'mode_edit' : 'note_add'}
         </Text>
       </TouchableOpacity>
@@ -47,17 +47,17 @@ export default class StatusSwitcher extends React.Component<
         onChangeNote={this.props.onChangeNote}
       />
     );
-    let mainNoteStyle: ViewStyle | ViewStyle[] = styles.mainNote as ViewStyle;
+    let mainNoteStyle: ViewStyle | ViewStyle[] = style.s.mainNote as ViewStyle;
     if (!this.props.status.hasTimeline()) {
       mainNoteStyle = [
-        styles.mainNote as ViewStyle,
-        styles.mainNoteNoBar as ViewStyle,
+        style.s.mainNote as ViewStyle,
+        style.s.mainNoteNoBar as ViewStyle,
       ];
     }
     const mainNote = this.props.note ? (
       <Note
         style={mainNoteStyle}
-        textStyle={styles.mainNoteText as TextStyle}
+        textStyle={style.s.mainNoteText as TextStyle}
         fontLoaded={this.props.fontLoaded}
         status={this.props.status.currentStatus()}
         note={this.props.note}
@@ -66,21 +66,21 @@ export default class StatusSwitcher extends React.Component<
     ) : null;
 
     const upArrow = this.props.fontLoaded ? (
-      <TouchableOpacity style={styles.statusArrow} onPress={this.onPressUp}>
-        <Text style={styles.statusArrowText}>keyboard_arrow_up</Text>
+      <TouchableOpacity style={style.s.statusArrow} onPress={this.onPressUp}>
+        <Text style={style.s.statusArrowText}>keyboard_arrow_up</Text>
       </TouchableOpacity>
     ) : null;
 
     const downArrow = this.props.fontLoaded ? (
-      <TouchableOpacity style={styles.statusArrow} onPress={this.onPressDown}>
-        <Text style={styles.statusArrowText}>keyboard_arrow_down</Text>
+      <TouchableOpacity style={style.s.statusArrow} onPress={this.onPressDown}>
+        <Text style={style.s.statusArrowText}>keyboard_arrow_down</Text>
       </TouchableOpacity>
     ) : null;
 
     return (
       <View>
-        <View style={styles.statusSwitcher}>
-          <Text style={styles.mainStatus}>
+        <View style={style.s.statusSwitcher}>
+          <Text style={style.s.mainStatus}>
             {Status.longterm(this.props.status.currentStatus())}
           </Text>
           <DatePicker
@@ -90,7 +90,7 @@ export default class StatusSwitcher extends React.Component<
           />
           {editButton}
         </View>
-        <ElevatedView style={styles.statusArrows} elevation={4}>
+        <ElevatedView style={style.s.statusArrows} elevation={4}>
           {upArrow}
           {downArrow}
         </ElevatedView>

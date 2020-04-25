@@ -15,9 +15,10 @@ export type Action =
   | ImageAction
   | UiAction
   | ImportAction
-  | ExportAction;
+  | ExportAction
+  | SettingsAction;
 
-type LoadingAction = LoadedEverything | LoadedSettings | Reload;
+type LoadingAction = LoadedEverything | Reload;
 
 type ImageAction =
   | ImageAdd
@@ -69,6 +70,8 @@ type ExportAction =
   | ExportFinished
   | ExportFailure;
 
+type SettingsAction = SetDarkModeSetting;
+
 // interface MigrateFromImages2 {
 //     type: 'migrate-from-images2';
 //     images2: Image2[];
@@ -87,11 +90,7 @@ interface LoadedEverything {
   pots: PotsStoreState;
   images: ImageStoreState;
   isImport: boolean;
-}
-
-interface LoadedSettings {
-  type: 'loaded-settings';
-  settings: SettingsState;
+  settings: SettingsState | null; // null when isImport
 }
 
 interface New {
@@ -313,4 +312,9 @@ interface ListScroll {
 interface PageImage {
   type: 'page-image';
   imageId: string;
+}
+
+interface SetDarkModeSetting {
+  type: 'settings-set-dark-mode';
+  value: boolean | undefined;
 }

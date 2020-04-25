@@ -65,7 +65,7 @@ const gray10 = (m: Mode) =>
 const placeholderBackgroundColor = (m: Mode) =>
   ({
     light: LIGHT_GREEN,
-    dark: 'rgba(0,51,0,0.5)',
+    dark: gray10(m),
   }[m]);
 
 const listSeparatorColor = (m: Mode) =>
@@ -85,6 +85,8 @@ const secondaryButtonTextColor = (m: Mode) =>
     light: DARK_GREEN,
     dark: GREEN_200,
   }[m]);
+
+export const radioColor = secondaryButtonTextColor;
 
 const base = (mode: Mode) =>
   StyleSheet.create({
@@ -460,13 +462,13 @@ const base = (mode: Mode) =>
     },
     settingsItemTitle: {
       color: gray90(mode),
-      fontSize: 20,
-      lineHeight: 32,
+      fontSize: 18,
+      lineHeight: 28,
     },
     settingsItemDescription: {
       color: gray60(mode),
-      fontSize: 16,
-      lineHeight: 24,
+      fontSize: 14,
+      lineHeight: 20,
     },
     modal: {
       width: 300,
@@ -519,4 +521,21 @@ const base = (mode: Mode) =>
     },
   });
 
-export default base('dark');
+const darkStyle = base('dark');
+const lightStyle = base('light');
+
+export function setStyle(mode: 'light' | 'dark') {
+  if (exp.currentStyle === mode) {
+    return;
+  }
+  exp.currentStyle = mode;
+  exp.s = mode === 'light' ? lightStyle : darkStyle;
+}
+
+const exp = {
+  s: lightStyle,
+  // Note: default to light
+  currentStyle: 'light',
+};
+
+export default exp;

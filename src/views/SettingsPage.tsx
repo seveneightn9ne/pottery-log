@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -12,9 +13,12 @@ import {
   View,
 } from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
+import RadioForm from 'react-native-simple-radio-button';
 import { connect } from 'react-redux';
 import { FullState } from '../reducers/types';
-import styles from '../style';
+import { getDerivedDarkMode, getSystemPreference } from '../selectors/settings';
+import style, {radioColor} from '../style';
+import { setDarkMode } from '../thunks/settings';
 import { PLThunkDispatch } from '../thunks/types';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
@@ -38,6 +42,7 @@ const mapStateToProps = (state: FullState) => ({
     state.exports.statusMessage || state.imports.statusMessage || '',
   numImages: Object.keys(state.images.images).length,
   numPots: state.pots.potIds.length,
+  darkModeSetting: state.settings.darkMode,
 });
 type PropsFromState = ReturnType<typeof mapStateToProps>;
 
@@ -56,6 +61,7 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
     }),
   onResumeImport: () => dispatch({ type: 'import-resume-affirm' }),
   onCancelResumeImport: () => dispatch({ type: 'import-resume-cancel' }),
+  setDarkMode: (value: boolean | undefined) => dispatch(setDarkMode(value)),
 });
 type PropsFromDispatch = ReturnType<typeof mapDispatchToProps>;
 
@@ -65,6 +71,7 @@ interface SettingsPageState {
   linkModalOpen: boolean;
   linkText: string;
   preExportModalOpen: boolean;
+  darkModalOpen: boolean;
 }
 
 interface SettingsItem {
@@ -82,16 +89,24 @@ class SettingsPage extends React.Component<
     linkModalOpen: false,
     linkText: '',
     preExportModalOpen: false,
+    darkModalOpen: false,
   };
 
   public render() {
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.onBack}>
-        <Text style={styles.searchBack}>arrow_back</Text>
+        <Text style={style.s.searchBack}>arrow_back</Text>
       </TouchableOpacity>
     ) : null;
 
+    const theme = _.capitalize(getDerivedDarkMode(this.props.darkModeSetting));
+
     const settingsItems: SettingsItem[] = [
+      {
+        title: 'Theme',
+        description: theme,
+        onPress: this.openDarkModal,
+      },
       {
         title: 'Backup',
         description:
@@ -115,15 +130,16 @@ class SettingsPage extends React.Component<
     ];
 
     return (
-      <View style={styles.container}>
-        <ElevatedView style={styles.header} elevation={4}>
+      <View style={style.s.container}>
+        <ElevatedView style={style.s.header} elevation={4}>
           {backButton}
-          <Text style={[styles.h1, { flex: 1 }]}>Settings</Text>
+          <Text style={[style.s.h1, { flex: 1 }]}>Settings</Text>
         </ElevatedView>
         {this.renderImportUrlModal()}
         {this.renderExportImportModal()}
         {this.renderResumeImport()}
         {this.renderPreExportModal()}
+        {this.renderDarkModal()}
         <FlatList
           data={settingsItems}
           renderItem={this.renderSettingsItem}
@@ -137,14 +153,14 @@ class SettingsPage extends React.Component<
     item: { title, description, onPress, selectable },
   }) => {
     return (
-      <TouchableHighlight style={styles.settingsItem} onPress={onPress}>
+      <TouchableHighlight style={style.s.settingsItem} onPress={onPress}>
         <React.Fragment>
-          <Text style={styles.settingsItemTitle}>{title}</Text>
-          <Text style={styles.settingsItemDescription} selectable={!!selectable}>{description}</Text>
+          <Text style={style.s.settingsItemTitle}>{title}</Text>
+          <Text style={style.s.settingsItemDescription} selectable={!!selectable}>{description}</Text>
         </React.Fragment>
       </TouchableHighlight>
     );
-  };
+  }
 
   private settingsItemKeyExtractor = (i: SettingsItem) => i.title;
 
@@ -153,10 +169,10 @@ class SettingsPage extends React.Component<
       { text: 'Paste Link', onPress: this.openImportUrlModal },
       { text: 'Upload File', onPress: this.props.onStartImport },
     ]);
-  };
+  }
 
   private openImportUrlModal = () =>
-    this.setState({ linkModalOpen: true, linkText: '' });
+    this.setState({ linkModalOpen: true, linkText: '' })
   private closeImportUrlModal = () => this.setState({ linkModalOpen: false });
 
   private renderResumeImport = () => {
@@ -177,10 +193,10 @@ class SettingsPage extends React.Component<
       ],
       { cancelable: false },
     );
-  };
+  }
 
   private startUrlImport = () =>
-    this.props.onStartUrlImport(this.state.linkText);
+    this.props.onStartUrlImport(this.state.linkText)
   private setLinkText = (linkText: string) => this.setState({ linkText });
 
   private renderImportUrlModal() {
@@ -218,7 +234,7 @@ class SettingsPage extends React.Component<
           value={this.state.linkText}
           multiline={true}
           numberOfLines={1}
-          style={styles.modalInput}
+          style={style.s.modalInput}
           onChangeText={this.setLinkText}
           autoFocus={true}
           onSubmit={this.doNothing}
@@ -237,6 +253,66 @@ class SettingsPage extends React.Component<
     );
   }
 
+  private renderDarkModal = () => {
+    const setting = this.props.darkModeSetting;
+    // Is it too expensive to get the system setting on render?
+    const system = getSystemPreference();
+    const derived = getDerivedDarkMode(setting);
+    const hasSystemPref = system !== 'no-preference';
+    // Note: default to light
+    // When !hasSystemPref, undefined -> light
+    const selectedIndex = hasSystemPref ? (
+      setting === undefined ? 0 : setting === false ? 1 : 2
+    ) : setting === true ? 1 : 0;
+
+    const options = [
+      {
+        label: 'Light',
+        value: false as boolean | undefined,
+      },
+      {
+        label: 'Dark',
+        value: true,
+      },
+    ];
+    if (hasSystemPref) {
+      options.unshift({
+        label: 'Use system setting (' + system + ')',
+        value: undefined,
+      });
+    }
+
+    const modalBody = (
+      <View>
+        <RadioForm
+          radio_props={options}
+          initial={selectedIndex}
+          onPress={this.saveDarkModeSetting}
+          labelStyle={style.s.settingsText}
+          buttonColor={radioColor(derived)}
+          selectedButtonColor={radioColor(derived)}
+        />
+      </View>
+    );
+    return (
+      <Modal
+        header={'Theme'}
+        body={modalBody}
+        buttons={[{ text: 'CLOSE', close: true }]}
+        open={this.state.darkModalOpen}
+        close={this.closeDarkModal}
+      />
+    );
+  }
+
+  private saveDarkModeSetting = (value: boolean | undefined) => {
+    this.closeDarkModal();
+    this.props.setDarkMode(value);
+  }
+
+  private openDarkModal = () => this.setState({darkModalOpen: true});
+  private closeDarkModal = () => this.setState({darkModalOpen: false});
+
   private renderPreExportModal = () => {
     const buttons = [
       { text: 'CANCEL', close: true },
@@ -252,7 +328,7 @@ class SettingsPage extends React.Component<
     const images = this.props.numImages === 1 ? 'image' : 'images';
     const modalBody = (
       <View>
-        <Text style={styles.settingsText}>
+        <Text style={style.s.settingsText}>
           You have {this.props.numPots} {pots} with {this.props.numImages} {images}.
           The backup will take about {numMinutes} {minutes}.
         </Text>
@@ -280,11 +356,11 @@ class SettingsPage extends React.Component<
       const uri = this.props.exportUri;
       body = (
         <View>
-          <Text style={styles.settingsText}>The export is available at:</Text>
-          <Text style={styles.settingsText}>
+          <Text style={style.s.settingsText}>The export is available at:</Text>
+          <Text style={style.s.settingsText}>
             <Anchor href={uri} />
           </Text>
-          <Text style={styles.settingsText}>
+          <Text style={style.s.settingsText}>
             This link will be active for one week. You can copy the link to a
             new phone to import the data immediately, or save the file for
             importing in the future.
@@ -307,12 +383,13 @@ class SettingsPage extends React.Component<
         },
       ];
     } else {
+      const activityIndicator = this.props.exporting || this.props.importing ? (
+        <ActivityIndicator size="small" />
+      ) : null;
       body = (
         <View style={{ flexDirection: 'row' }}>
-          {this.props.exporting || this.props.importing ? (
-            <ActivityIndicator size="small" />
-          ) : null}
-          <Text style={[styles.settingsText, { padding: 20, paddingLeft: 10 }]}>
+          {activityIndicator}
+          <Text style={[style.s.settingsText, { padding: 20, paddingLeft: 10 }]}>
             {this.props.statusMessage}
           </Text>
         </View>
@@ -337,7 +414,7 @@ class SettingsPage extends React.Component<
         close={this.closeExportImportModal}
       />
     );
-  };
+  }
 
   private closeExportImportModal = () => {
     if (this.props.exportModal && !this.props.exportUri) {
@@ -348,7 +425,7 @@ class SettingsPage extends React.Component<
     } else {
       this.props.onNavigateToList();
     }
-  };
+  }
 
   private doNothing = () => {};
 
@@ -361,7 +438,7 @@ class SettingsPage extends React.Component<
     } else {
       this.props.onNavigateToList();
     }
-  };
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);

@@ -12,6 +12,7 @@ import { getInitialState } from "../../reducers/PotsStore";
 
 jest.useFakeTimers();
 
+jest.mock("react-native-appearance");
 jest.mock("expo-permissions");
 jest.mock("expo-image-picker", () => ({
   CAMERA: "camera",

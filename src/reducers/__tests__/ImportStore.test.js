@@ -3,6 +3,7 @@ import * as exports from "../../utils/exports";
 import * as ImportStore from "../ImportStore";
 import { StorageWriter } from "../../utils/sync";
 
+jest.mock("react-native-appearance");
 jest.mock("../../utils/exports");
 jest.mock("../../utils/sync", () => ({
   StorageWriter: {

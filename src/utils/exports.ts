@@ -4,7 +4,7 @@ import { Alert, AsyncStorage } from 'react-native';
 import store from '../reducers/store';
 import { ImageState } from '../reducers/types';
 import { reloadFromImport } from '../thunks/loadInitial';
-import { deprecatedSaveToFileImpure } from './imageutils';
+import { deprecatedSaveToFileImpure } from './deprecated_imageutils';
 import * as uploader from './uploader';
 
 const EXPORT_KEY_PREFIX = ['@Pots', '@Pot:', '@ImageStore'];

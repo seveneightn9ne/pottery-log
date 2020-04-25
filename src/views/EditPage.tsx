@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 import { Pot } from '../models/Pot';
 import Status, { StatusString } from '../models/Status';
 import { EditUiState, FullState } from '../reducers/types';
-import styles from '../style';
+import style from '../style';
 import { addImage, deletePot } from '../thunks/images';
 import { PLThunkDispatch } from '../thunks/types';
 import { deleteImage } from './components/Alerts';
@@ -120,12 +120,12 @@ class EditPage extends React.Component<EditPageProps, {}> {
     }
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.props.onNavigateToList}>
-        <Text style={styles.searchBack}>arrow_back</Text>
+        <Text style={style.s.searchBack}>arrow_back</Text>
       </TouchableOpacity>
     ) : null;
     const editButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.focusTitle}>
-        <Text style={styles.search}>mode_edit</Text>
+        <Text style={style.s.search}>mode_edit</Text>
       </TouchableOpacity>
     ) : null;
     const mainImgSize = width - 100;
@@ -152,11 +152,11 @@ class EditPage extends React.Component<EditPageProps, {}> {
       ));
     const currentNoteText = pot.notes2.notes[pot.status.currentStatus()] || '';
     return (
-      <View style={styles.container}>
-        <ElevatedView style={styles.header} elevation={8}>
+      <View style={style.s.container}>
+        <ElevatedView style={style.s.header} elevation={8}>
           {backButton}
           <TextInput
-            style={styles.searchBox}
+            style={style.s.searchBox}
             ref={this.titleInput}
             underlineColorAndroid="transparent"
             placeholderTextColor="#FFCCBC"
@@ -187,21 +187,21 @@ class EditPage extends React.Component<EditPageProps, {}> {
             />
           </View>
           {details}
-          <View style={styles.detailPadding} />
+          <View style={style.s.detailPadding} />
         </KeyboardAwareScrollView>
         <ElevatedView
-          style={styles.bottomBar}
+          style={style.s.bottomBar}
           elevation={details.length ? 8 : 0}
         >
           <Button
             onPress={this.props.onDelete}
-            style={[styles.button3, styles.bbb]}
+            style={[style.s.button3, style.s.bbb]}
           >
             DELETE POT
           </Button>
           <Button
             onPress={this.props.onCopy}
-            style={[styles.button3, styles.bbb]}
+            style={[style.s.button3, style.s.bbb]}
           >
             COPY POT
           </Button>

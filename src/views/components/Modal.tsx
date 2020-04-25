@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal as RNModal, Text, View } from 'react-native';
 import Button from 'react-native-button';
 import ElevatedView from 'react-native-elevated-view';
-import styles from '../../style';
+import style from '../../style';
 
 export interface ButtonProp {
   text: string;
@@ -35,8 +35,8 @@ export default function Modal(props: ModalProps) {
           backgroundColor: 'rgba(0,0,0,0.5)',
         }}
       >
-        <ElevatedView style={styles.modal} elevation={24}>
-          <Text style={styles.modalHeader}>{props.header}</Text>
+        <ElevatedView style={style.s.modal} elevation={24}>
+          <Text style={style.s.modalHeader}>{props.header}</Text>
           {props.body}
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
             {props.buttons.map(({ text, onPress, disabled, close }) => (
@@ -46,9 +46,9 @@ export default function Modal(props: ModalProps) {
                   close && props.close();
                 }}
                 style={[
-                  styles.button3,
-                  styles.modalButton,
-                  disabled ? styles.disabledButton : null,
+                  style.s.button3,
+                  style.s.modalButton,
+                  disabled ? style.s.disabledButton : null,
                 ]}
                 key={text}
                 disabled={!!disabled}

@@ -6,6 +6,8 @@ import {
 } from "../persist";
 import { newPot } from "../../models/Pot";
 
+jest.mock("react-native-appearance");
+
 jest.mock("../../utils/sync", () => ({
   StorageWriter: {
     put: jest.fn(),

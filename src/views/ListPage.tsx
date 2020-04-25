@@ -16,10 +16,11 @@ import { newPot, Pot } from '../models/Pot';
 import Status, { capitalize } from '../models/Status';
 import { FullState } from '../reducers/types';
 import { filterBySearchTerm, filterByStatus, sort } from '../selectors/pots';
-import styles from '../style';
+import style from '../style';
 import { PLThunkDispatch } from '../thunks/types';
 import NewPotButton from './components/NewPotButton';
 import PotListItem from './components/PotListItem';
+import { getDerivedDarkMode } from '../selectors/settings';
 
 interface OwnProps {
   fontLoaded: boolean;
@@ -130,6 +131,7 @@ const mapStateToProps = (state: FullState) => {
         .mapValues(() => false)
         .value(), // the rest of the statuses are 'false'
     ), // as unknown) as { [s: string]: boolean },
+    theme: getDerivedDarkMode(state.settings.darkMode),
   };
 };
 
@@ -151,17 +153,17 @@ class ListPage extends React.Component<ListPageProps, {}> {
 
     const backButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.props.onCloseSearch}>
-        <Text style={styles.searchBack}>arrow_back</Text>
+        <Text style={style.s.searchBack}>arrow_back</Text>
       </TouchableOpacity>
     ) : null;
 
     let header;
     if (this.props.isSearching) {
       header = (
-        <ElevatedView style={styles.header} elevation={4}>
+        <ElevatedView style={style.s.header} elevation={4}>
           {backButton}
           <TextInput
-            style={styles.searchBox}
+            style={style.s.searchBox}
             underlineColorAndroid="transparent"
             placeholderTextColor="#c8e6c9"
             onChangeText={this.props.onSearch}
@@ -176,20 +178,20 @@ class ListPage extends React.Component<ListPageProps, {}> {
       const searchButton =
         this.props.fontLoaded && potsLoaded ? (
           <TouchableOpacity onPress={this.props.onOpenSearch}>
-            <Text style={[styles.search, { paddingRight: 8 }]}>search</Text>
+            <Text style={[style.s.search, { paddingRight: 8 }]}>search</Text>
           </TouchableOpacity>
         ) : null;
 
       const settingsButton =
         this.props.fontLoaded && potsLoaded ? (
           <TouchableOpacity onPress={this.props.onNavigateToSettings}>
-            <Text style={[styles.search, { paddingLeft: 8 }]}>settings</Text>
+            <Text style={[style.s.search, { paddingLeft: 8 }]}>settings</Text>
           </TouchableOpacity>
         ) : null;
 
       header = (
-        <ElevatedView style={styles.header} elevation={4}>
-          <Text style={[styles.h1, { flex: 1 }]}>Pottery Log</Text>
+        <ElevatedView style={style.s.header} elevation={4}>
+          <Text style={[style.s.h1, { flex: 1 }]}>Pottery Log</Text>
           <View style={{ flexDirection: 'row' }}>
             {searchButton}
             {settingsButton}
@@ -207,9 +209,9 @@ class ListPage extends React.Component<ListPageProps, {}> {
 
     if (!potsLoaded) {
       return (
-        <View style={styles.container}>
+        <View style={style.s.container}>
           {header}
-          <Text style={styles.listMessage}>Loading...</Text>
+          <Text style={style.s.listMessage}>Loading...</Text>
         </View>
       );
     }
@@ -219,9 +221,9 @@ class ListPage extends React.Component<ListPageProps, {}> {
         ? `There are no pots matching "${this.props.searchTerm}".`
         : "You don't have any pots yet.";
       return (
-        <View style={styles.container}>
+        <View style={style.s.container}>
           {header}
-          <Text style={styles.listMessage}>{message}</Text>
+          <Text style={style.s.listMessage}>{message}</Text>
           {newPotButton}
         </View>
       );
@@ -254,7 +256,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
      * onScroll={(e) => this.props.onScrollTo(e.nativeEvent.contentOffset.y)}
      */
     return (
-      <View style={styles.container}>
+      <View style={style.s.container}>
         {header}
         <SectionList
           renderItem={this.renderSection}
@@ -264,7 +266,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
           renderSectionFooter={this.renderSectionFooter}
         />
         {newPotButton}
-        {/*<View style={styles.eraseLastSeparator} />*/}
+        {/*<View style={style.s.eraseLastSeparator} />*/}
       </View>
     );
   }
@@ -277,7 +279,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
 
   private sectionKeyExtractor = (listdata: SectionT, index: number) =>
     listdata.title;
-  private renderSectionFooter = () => <View style={styles.separator} />;
+  private renderSectionFooter = () => <View style={style.s.separator} />;
 
   private stripCount = (sectionTitle: string): string => {
     if (sectionTitle.charAt(sectionTitle.length - 1) !== ')') {
@@ -332,7 +334,7 @@ class ListPage extends React.Component<ListPageProps, {}> {
   }): JSX.Element => {
     const section = info.section;
     const content = this.props.fontLoaded ? (
-      <Text style={styles.collapse}>
+      <Text style={style.s.collapse}>
         {this.props.collapsed[section.title]
           ? 'keyboard_arrow_down'
           : 'keyboard_arrow_up'}
@@ -340,8 +342,8 @@ class ListPage extends React.Component<ListPageProps, {}> {
     ) : null;
     return (
       <TouchableOpacity onPress={this.collapseSection(section.title)}>
-        <View style={styles.lh}>
-          <Text style={styles.lhText}>{section.title}</Text>
+        <View style={style.s.lh}>
+          <Text style={style.s.lhText}>{section.title}</Text>
           {content}
         </View>
       </TouchableOpacity>

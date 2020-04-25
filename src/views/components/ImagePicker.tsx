@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import styles from '../../style';
+import style from '../../style';
 
 interface ImagePickerProps {
   onAddImage: () => void;
@@ -9,15 +9,15 @@ interface ImagePickerProps {
 }
 
 export default function ImagePicker(props: ImagePickerProps) {
-  const style = props.full ? styles.imagePickerFull : styles.imagePickerSmall;
+  const styles = props.full ? style.s.imagePickerFull : style.s.imagePickerSmall;
   const textStyle = props.full
-    ? styles.imagePickerFullText
-    : styles.imagePickerSmallText;
+    ? style.s.imagePickerFullText
+    : style.s.imagePickerSmallText;
   const text = props.full ? 'add_a_photo' : 'add';
   return (
     <TouchableOpacity onPress={props.onAddImage}>
-      <View style={[style, styles.imagePicker, props.style]}>
-        <Text style={[textStyle, styles.imagePickerText]}>{text}</Text>
+      <View style={[styles, style.s.imagePicker, props.style]}>
+        <Text style={[textStyle, style.s.imagePickerText]}>{text}</Text>
       </View>
     </TouchableOpacity>
   );

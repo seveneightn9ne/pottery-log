@@ -4,7 +4,8 @@ import loadInitialImages, { saveImagesToFiles } from './loadInitialImages';
 import loadInitialImport from './loadInitialImport';
 import loadInitialPots from './loadInitialPots';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
-import loadInitialSettings from './loadInitialSettings';
+import loadInitialSettings, { setDarkModeFromSetting } from './loadInitialSettings';
+import { SettingsState } from '../reducers/types';
 
 export function reloadFromImport(): PLThunkAction {
   return t('reloadFromImport', {}, async (dispatch: PLThunkDispatch) => {
@@ -24,14 +25,12 @@ export function loadInitial(): PLThunkAction {
 
 function load(isImport: boolean): PLThunkAction {
   return t('load', { isImport }, async (dispatch: PLThunkDispatch) => {
+    // Note: the tests using mockAsyncStorage are dependent upon the order that items are loaded
+    // from AsyncStorage.
+    let settings: SettingsState | null = null;
     if (!isImport) {
-      // Don't block settings for all the rest of this
-      loadInitialSettings().then((settings) => {
-        dispatch({
-          type: 'loaded-settings',
-          settings,
-        });
-      });
+      settings = await loadInitialSettings();
+      setDarkModeFromSetting(settings);
     }
 
     let images = await loadInitialImages();
@@ -51,6 +50,7 @@ function load(isImport: boolean): PLThunkAction {
       pots,
       images,
       isImport,
+      settings,
     });
 
     // Save remote/local URIs

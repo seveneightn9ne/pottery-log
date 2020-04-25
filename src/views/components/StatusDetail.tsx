@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import Status, { StatusString } from '../../models/Status';
-import styles from '../../style';
+import style from '../../style';
 import Note from './Note';
 import NoteModal from './NoteModal';
 
@@ -34,7 +34,7 @@ export default class StatusDetail extends React.Component<
     const noteComponent = (
       <Note
         fontLoaded={this.props.fontLoaded}
-        textStyle={styles.statusDetailNote as TextStyle}
+        textStyle={style.s.statusDetailNote as TextStyle}
         note={this.props.note}
         status={this.props.status}
         onChangeNote={this.props.onChangeNote}
@@ -42,7 +42,7 @@ export default class StatusDetail extends React.Component<
     );
     const editButton = this.props.fontLoaded ? (
       <TouchableOpacity onPress={this.openModal}>
-        <Text style={[styles.search, styles.editDetail]}>
+        <Text style={[style.s.search, style.s.editDetail]}>
           {this.props.note ? 'mode_edit' : 'note_add'}
         </Text>
       </TouchableOpacity>
@@ -55,31 +55,31 @@ export default class StatusDetail extends React.Component<
         onChangeNote={this.props.onChangeNote}
       />
     );
-    const timelineStyles: ViewStyle[] = [styles.timeline as ViewStyle];
+    const timelineStyles: ViewStyle[] = [style.s.timeline as ViewStyle];
     if (this.props.first) {
-      timelineStyles.push(styles.timelineFirst as ViewStyle);
+      timelineStyles.push(style.s.timelineFirst as ViewStyle);
     }
     if (this.props.last) {
-      timelineStyles.push(styles.timelineLast as ViewStyle);
+      timelineStyles.push(style.s.timelineLast as ViewStyle);
     }
     if (!this.props.first && this.props.last) {
-      timelineStyles.push(styles.timelineLastOnly as ViewStyle);
+      timelineStyles.push(style.s.timelineLastOnly as ViewStyle);
     }
     if (this.props.first && this.props.last) {
-      timelineStyles.push(styles.timelineOnly as ViewStyle);
+      timelineStyles.push(style.s.timelineOnly as ViewStyle);
     }
     return (
-      <View style={[styles.statusDetail, { flexDirection: 'row' }]}>
+      <View style={[style.s.statusDetail, { flexDirection: 'row' }]}>
         {noteModal}
         <View style={timelineStyles}>
-          <View style={styles.timelineInner} />
+          <View style={style.s.timelineInner} />
         </View>
-        <View style={styles.statusDetailInner}>
+        <View style={style.s.statusDetailInner}>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.status}>
+            <Text style={style.s.status}>
               {Status.prettify(this.props.status)}
             </Text>
-            <Text style={styles.statusDetailDate}>
+            <Text style={style.s.statusDetailDate}>
               {Status.dateText(this.props.date)}
             </Text>
           </View>

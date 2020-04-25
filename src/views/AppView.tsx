@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { ImageStoreState, PotsStoreState, UIState } from '../reducers/types';
-import styles from '../style';
+import style from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
 import ListPage from './ListPage';
@@ -54,8 +54,8 @@ class AppView extends React.Component<
         );
       default:
         return (
-          <View style={styles.container}>
-            <Text style={styles.h1}>Unknown Page</Text>
+          <View style={style.s.container}>
+            <Text style={style.s.h1}>Unknown Page</Text>
           </View>
         );
     }

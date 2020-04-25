@@ -1,12 +1,12 @@
 import dispatcher from "../../reducers/store";
 import * as FileSystem from "expo-file-system";
 import {
-  deprecatedSaveToFileImpure,
   nameFromUri,
   resetDirectory,
   saveToFilePure
 } from "../imageutils";
 
+jest.mock("react-native-appearance");
 jest.mock("../uploader");
 jest.mock("../../reducers/store");
 jest.mock("expo-file-system", () => ({

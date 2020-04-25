@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { Clipboard, Linking, Text, ToastAndroid } from 'react-native';
-import styles from '../../style';
+import style from '../../style';
 
 interface Props {
   href: string;
@@ -22,7 +22,7 @@ const Anchor: FunctionComponent<Props> = (props) => {
     <Text
       onPress={handlePress}
       onLongPress={handleLongPress}
-      style={styles.anchor}
+      style={style.s.anchor}
     >
       {props.children || props.href}
     </Text>

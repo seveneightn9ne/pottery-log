@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import Status from '../../models/Status';
-import styles from '../../style';
+import style from '../../style';
 import Modal from './Modal';
 
 interface DatePickerProps {
@@ -19,15 +19,15 @@ interface DatePickerProps {
 
 const renderButton = (props: DatePickerProps, onPress: () => void) => {
   const today = props.fontLoaded ? (
-    <Text style={[styles.chipArrow, styles.chipArrowText]}>today</Text>
+    <Text style={[style.s.chipArrow, style.s.chipArrowText]}>today</Text>
   ) : null;
   return (
-    <View style={[styles.chipOuter, styles.chipInner]}>
+    <View style={[style.s.chipOuter, style.s.chipInner]}>
       <TouchableOpacity onPress={onPress}>
-        <View style={styles.chipInner}>
+        <View style={style.s.chipInner}>
           {today}
-          <Text style={styles.chipText}>{Status.dateText(props.value)}</Text>
-          <View style={styles.chipArrow} />
+          <Text style={style.s.chipText}>{Status.dateText(props.value)}</Text>
+          <View style={style.s.chipArrow} />
         </View>
       </TouchableOpacity>
     </View>

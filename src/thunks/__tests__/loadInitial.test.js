@@ -4,6 +4,7 @@ import { newPot } from '../../models/Pot';
 import * as FileSystem from 'expo-file-system';
 import { saveToFile } from '../images';
 
+jest.mock("react-native-appearance");
 jest.mock('AsyncStorage');
 jest.mock('expo-file-system', () => ({
   documentDirectory: 'file://mock-document-directory/',
@@ -31,6 +32,9 @@ const emptyImageState = {
 
 function mockAsyncStorage(kvs) {
   AsyncStorage.getItem.mockReturnValueOnce(
+    Promise.resolve(kvs['@PLSettings'] || null),
+  );
+  AsyncStorage.getItem.mockReturnValueOnce(
     Promise.resolve(kvs['@ImageStore'] || null),
   );
   AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(Object.keys(kvs)));
@@ -50,10 +54,11 @@ describe('loadInitial', () => {
     const dispatch = jest.fn();
     mockAsyncStorage({});
     await loadInitial()(dispatch);
-    expect(dispatch).toHaveBeenCalledWith({
+    expect(dispatch).toHaveBeenLastCalledWith({
       type: 'loaded-everything',
       pots: emptyPotState,
       images: emptyImageState,
+      settings: {},
       isImport: false,
     });
     expect(dispatch).toHaveBeenCalledTimes(1);
@@ -63,11 +68,12 @@ describe('loadInitial', () => {
     const dispatch = jest.fn();
     mockAsyncStorage({ 'what is this': 'who knows' });
     await loadInitial()(dispatch);
-    expect(dispatch).toHaveBeenCalledWith({
+    expect(dispatch).toHaveBeenLastCalledWith({
       type: 'loaded-everything',
       pots: emptyPotState,
       images: emptyImageState,
       isImport: false,
+      settings: {},
     });
     expect(dispatch).toHaveBeenCalledTimes(1);
   });
@@ -93,6 +99,7 @@ describe('loadInitial', () => {
         hasLoaded: true,
       },
       images: emptyImageState,
+      settings: {},
       isImport: false,
     });
   });
@@ -119,6 +126,7 @@ describe('loadInitial', () => {
         hasLoaded: true,
       },
       images: emptyImageState,
+      settings: {},
       isImport: false,
     });
   });
@@ -157,6 +165,7 @@ describe('loadInitial', () => {
         hasLoaded: true,
       },
       images: imageStore,
+      settings: {},
       isImport: false,
     });
   });
@@ -196,6 +205,7 @@ describe('loadInitial', () => {
         },
         loaded: true,
       },
+      settings: {},
       isImport: false,
     });
     expect(saveToFile).toHaveBeenCalledWith('l/img.jpg', false);
@@ -238,6 +248,7 @@ describe('loadInitial', () => {
         hasLoaded: true,
       },
       images: imageState,
+      settings: {},
       isImport: false,
     });
   });
@@ -254,7 +265,7 @@ describe('loadInitial', () => {
     mockAsyncStorage({ '@Import': JSON.stringify(existingState) });
 
     await loadInitial()(dispatch);
-    expect(dispatch).toHaveBeenCalledWith({
+    expect(dispatch).toHaveBeenLastCalledWith({
       type: 'import-resume',
       data: existingState,
     });

@@ -18,6 +18,7 @@
       "versionCode": 9
     },
     "ios": {
+      "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.jesskenney.potterylog",
       "buildNumber": "1.0.5",
       "icon": "./assets/launcher_ios_1024.png",

@@ -1,6 +1,6 @@
 import React from 'react';
 import Status, { capitalize, StatusString } from '../../models/Status';
-import styles from '../../style';
+import style from '../../style';
 import { ExpandingTextInput } from './ExpandingTextInput';
 import Modal from './Modal';
 
@@ -33,7 +33,7 @@ export default class NoteModal extends React.Component<
             value={this.props.note}
             multiline={true}
             numberOfLines={4}
-            style={styles.modalInput}
+            style={style.s.modalInput}
             onChangeText={this.onChangeNote}
             autoFocus={true}
             onSubmit={this.close}

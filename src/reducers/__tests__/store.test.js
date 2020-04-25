@@ -14,6 +14,7 @@ jest.mock("expo-file-system", () => ({
   makeDirectoryAsync: jest.fn(() => Promise.resolve())
 }));
 jest.mock("expo-constants");
+jest.mock("react-native-appearance");
 
 describe("store", () => {
   afterEach(() => {
@@ -56,6 +57,7 @@ describe("store", () => {
     jest.useFakeTimers();
 
     await store.dispatch(loadInitial());
+    jest.runAllTimers();
     expect(StorageWriter.put).not.toHaveBeenCalled();
 
     await store.dispatch({

@@ -1,29 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import _ from 'lodash';
-import store from '../reducers/store';
 import { ImageState } from '../reducers/types';
 import * as uploader from './uploader';
-
-/**
- * Errors are always caught. Dispatches 'image-file-created' or 'image-file-failed'.
- */
-export function deprecatedSaveToFileImpure(
-  uri: string,
-  isRemote = false,
-): Promise<void> {
-  return saveToFilePure(uri, isRemote)
-    .then((fileUri) => {
-      store.dispatch({
-        type: 'image-file-created',
-        name: nameFromUri(fileUri),
-        fileUri,
-      });
-    })
-    .catch((e) => {
-      console.warn('saveToFile failure:', e);
-      store.dispatch({ type: 'image-file-failed', uri });
-    });
-}
 
 /** Promise is rejected on any failure to save the file */
 export async function saveToFilePure(

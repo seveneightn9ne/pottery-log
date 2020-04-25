@@ -1,6 +1,7 @@
 import * as ExportStore from "../ExportStore";
 import * as exports from "../../utils/exports";
 
+jest.mock("react-native-appearance");
 jest.mock("../../utils/exports");
 
 describe("ExportStore", () => {

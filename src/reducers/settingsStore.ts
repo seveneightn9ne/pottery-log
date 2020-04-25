@@ -10,8 +10,17 @@ export function reduceSettings(
   action: Action,
 ): SettingsState {
   switch (action.type) {
-    case 'loaded-settings': {
-      return action.settings;
+    case 'loaded-everything': {
+      if (action.settings) {
+        return action.settings;
+      }
+      return state;
+    }
+    case 'settings-set-dark-mode': {
+      return {
+        ...state,
+        darkMode: action.value,
+      };
     }
     default:
       return state;

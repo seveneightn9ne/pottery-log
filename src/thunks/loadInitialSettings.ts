@@ -1,6 +1,8 @@
 import { AsyncStorage } from 'react-native';
 import { getInitialState } from '../reducers/settingsStore';
 import { SettingsState } from '../reducers/types';
+import { getDerivedDarkMode } from '../selectors/settings';
+import { setStyle } from '../style';
 
 export const SETTINGS_STORAGE_KEY = '@PLSettings';
 
@@ -14,9 +16,13 @@ export default async function loadInitialSettings(): Promise<SettingsState> {
   // Don't catch this because we would rather throw to see wtf happened here
   const parsed = JSON.parse(json);
 
-  const ret: SettingsState = {};
+  const state: SettingsState = {};
   if (parsed.darkMode) {
-    ret.darkMode = parsed.darkMode;
+    state.darkMode = parsed.darkMode;
   }
-  return ret;
+  return state;
+}
+
+export function setDarkModeFromSetting(state: SettingsState) {
+  setStyle(getDerivedDarkMode(state.darkMode));
 }

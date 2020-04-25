@@ -4,7 +4,7 @@ import ElevatedView from 'react-native-elevated-view';
 import { connect } from 'react-redux';
 import { Pot } from '../models/Pot';
 import { FullState, ImageState } from '../reducers/types';
-import styles from '../style';
+import style from '../style';
 import { PLThunkDispatch } from '../thunks/types';
 import { deleteImage } from './components/Alerts';
 import Image3 from './components/Image3';
@@ -68,22 +68,22 @@ const ImagePage: React.FunctionComponent<ImagePageProps> = (props) => {
   const star = props.isMainImage ? 'star' : 'star_border';
   const backButton = props.fontLoaded ? (
     <TouchableOpacity onPress={props.onBack}>
-      <Text style={styles.searchBack}>close</Text>
+      <Text style={style.s.searchBack}>close</Text>
     </TouchableOpacity>
   ) : null;
   const starButton = props.fontLoaded ? (
     <TouchableOpacity onPress={props.onSetMainImage}>
-      <Text style={styles.search}>{star}</Text>
+      <Text style={style.s.search}>{star}</Text>
     </TouchableOpacity>
   ) : null;
   const deleteButton = props.fontLoaded ? (
     <TouchableOpacity onPress={props.onDeleteImage}>
-      <Text style={styles.search}>delete</Text>
+      <Text style={style.s.search}>delete</Text>
     </TouchableOpacity>
   ) : null;
   return (
-    <View style={[styles.container, styles.imagePage]}>
-      <ElevatedView style={styles.imageBar} elevation={4}>
+    <View style={[style.s.container, style.s.imagePage]}>
+      <ElevatedView style={style.s.imageBar} elevation={4}>
         {backButton}
         <View
           style={{

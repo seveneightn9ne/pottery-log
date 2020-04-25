@@ -3,10 +3,11 @@ import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 import * as exports from "../exports";
 import * as uploader from "../uploader";
-import * as imageutils from "../imageutils";
+import * as deprecated_imageutils from "../deprecated_imageutils";
 import * as dispatcher from "../../reducers/store";
 import * as loadInitial from "../../thunks/loadInitial";
 
+jest.mock("react-native-appearance");
 jest.mock("../uploader", () => ({
   startImport: jest.fn().mockReturnValue(Promise.resolve()),
   startUrlImport: jest.fn().mockReturnValue(Promise.resolve()),
@@ -15,7 +16,7 @@ jest.mock("../uploader", () => ({
   startExport: jest.fn().mockReturnValue(Promise.resolve())
 }));
 jest.mock("AsyncStorage");
-jest.mock("../imageutils", () => ({
+jest.mock("../deprecated_imageutils", () => ({
   deprecatedSaveToFileImpure: jest.fn().mockReturnValue(Promise.resolve())
 }));
 jest.mock("../../reducers/store", () => ({
@@ -74,7 +75,7 @@ describe("exporting", () => {
         "f.jpg",
         expect.any(Function)
       );
-      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
+      expect(deprecated_imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
     });
   });
 
@@ -86,7 +87,7 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      expect(deprecated_imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
         "r.jpg",
         true
       );
@@ -100,7 +101,7 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+      expect(deprecated_imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
         "l.jpg",
         false
       );
@@ -112,7 +113,7 @@ describe("exporting", () => {
     expect(willExport).toBeFalsy();
     return promise.then(() => {
       expect(uploader.exportImage).not.toHaveBeenCalled();
-      expect(imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
+      expect(deprecated_imageutils.deprecatedSaveToFileImpure).not.toHaveBeenCalled();
     });
   });
 
@@ -201,7 +202,7 @@ describe("importing", () => {
     jest.useFakeTimers();
     exports.importImage("r.png");
     jest.runAllTimers();
-    expect(imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
+    expect(deprecated_imageutils.deprecatedSaveToFileImpure).toHaveBeenCalledWith(
       "r.png",
       true
     );

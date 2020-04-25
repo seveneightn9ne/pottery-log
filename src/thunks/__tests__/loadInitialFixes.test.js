@@ -1,6 +1,8 @@
 import { fixPotsAndImages } from '../loadInitialFixes';
 import { newPot } from '../../models/Pot';
 
+jest.mock("react-native-appearance");
+
 function somePots() {
   const p1 = newPot();
   const p2 = newPot();
