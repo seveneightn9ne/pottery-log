@@ -1,17 +1,19 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, StatusBar } from 'react-native';
 import { ImageStoreState, PotsStoreState, UIState } from '../reducers/types';
 import style from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
 import ListPage from './ListPage';
 import SettingsPage from './SettingsPage';
+import { getDerivedDarkMode } from '../selectors/settings';
 
 export interface AppViewStateProps {
   pots: PotsStoreState;
   images: ImageStoreState;
   ui: UIState;
   fontLoaded: boolean;
+  darkModeSetting: boolean | undefined;
 }
 export interface AppViewDispatchProps {
   addBackButtonHandler: () => () => void;
@@ -31,7 +33,18 @@ class AppView extends React.Component<
   public componentWillUnmount() {
     this.backHandler = this.props.removeBackButtonHandler(this.backHandler);
   }
+
   public render() {
+    const mode = getDerivedDarkMode(this.props.darkModeSetting);
+    return (
+      <React.Fragment>
+        <StatusBar barStyle={mode === 'dark' ? 'dark-content' : 'light-content'} />
+        {this.renderPage()}
+      </React.Fragment>
+    );
+  }
+
+  private renderPage() {
     const props = this.props;
     switch (props.ui.page) {
       case 'list':

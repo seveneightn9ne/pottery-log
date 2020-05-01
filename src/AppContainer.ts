@@ -18,6 +18,7 @@ const mapStateToProps = (
   images: state.images,
   ui: state.ui,
   fontLoaded: !!(props && props.fontLoaded),
+  darkModeSetting: state.settings && state.settings.darkMode,
 });
 
 // exported for testing

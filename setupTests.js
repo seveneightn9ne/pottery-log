@@ -4,6 +4,7 @@ import "react-native";
 import "jest-enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import Enzyme from "enzyme";
+import mockAsyncStorage from '@react-native-community/async-storage/jest/async-storage-mock';
 
 /**
  * Set up DOM in node.js environment for Enzyme to mount to
@@ -60,3 +61,5 @@ function makeDispatch(getState = () => undefined) {
 }
 
 global.makeDispatch = makeDispatch;
+
+jest.mock('react-native/Libraries/Storage/AsyncStorage', () => mockAsyncStorage);

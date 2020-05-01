@@ -8,6 +8,6 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/setupTests.js"],
   // Jest needs to compile some node_modules because they aren't plain js - specified below
   transformIgnorePatterns: [
-    "node_modules/(?!(react-native.*|@?sentry.*|expo-.*|@unimodules)/)"
+    "node_modules/(?!(@?react-native.*|@?sentry.*|expo-.*|@?unimodules.*)/)"
   ]
 };

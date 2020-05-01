@@ -25,8 +25,6 @@ export function loadInitial(): PLThunkAction {
 
 function load(isImport: boolean): PLThunkAction {
   return t('load', { isImport }, async (dispatch: PLThunkDispatch) => {
-    // Note: the tests using mockAsyncStorage are dependent upon the order that items are loaded
-    // from AsyncStorage.
     let settings: SettingsState | null = null;
     if (!isImport) {
       settings = await loadInitialSettings();
@@ -43,7 +41,6 @@ function load(isImport: boolean): PLThunkAction {
     const fixed = fixPotsAndImages(pots, images);
     pots = fixed.pots;
     images = fixed.images;
-
     const importt = isImport ? null : await loadInitialImport();
     dispatch({
       type: 'loaded-everything',

@@ -1,6 +1,7 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { Alert, AsyncStorage } from 'react-native';
+import { AsyncStorage } from 'react-native';
+import { Alert } from 'react-native';
 import store from '../reducers/store';
 import { ImageState } from '../reducers/types';
 import { reloadFromImport } from '../thunks/loadInitial';

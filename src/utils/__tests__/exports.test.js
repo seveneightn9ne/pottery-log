@@ -1,4 +1,4 @@
-import { Alert, AsyncStorage } from "react-native";
+import { AsyncStorage } from 'react-native';
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 import * as exports from "../exports";
@@ -15,7 +15,6 @@ jest.mock("../uploader", () => ({
   exportImage: jest.fn().mockReturnValue(Promise.resolve()),
   startExport: jest.fn().mockReturnValue(Promise.resolve())
 }));
-jest.mock("AsyncStorage");
 jest.mock("../deprecated_imageutils", () => ({
   deprecatedSaveToFileImpure: jest.fn().mockReturnValue(Promise.resolve())
 }));
@@ -31,9 +30,10 @@ jest.mock("expo-constants", () => ({
 jest.mock("expo-file-system", () => ({
   getInfoAsync: jest.fn().mockReturnValue(Promise.resolve({ exists: true }))
 }));
-jest.mock("Alert", () => ({
-  alert: jest.fn()
-}));
+// Cannot find module 'Alert' from 'exports.test.js'
+// jest.mock("Alert", () => ({
+//   alert: jest.fn(),
+// }));
 jest.mock("../../thunks/loadInitial");
 //jest.mock("FileSystem", () => ({
 //  getInfoAsync: Promise.resolve({ exists: true })
@@ -43,12 +43,11 @@ describe("exporting", () => {
   afterEach(() => jest.clearAllMocks());
 
   it("startExport", async () => {
-    AsyncStorage.getAllKeys.mockReturnValue(
-      Promise.resolve(["@Pots", "@ImageStore", "@DoNotExport"])
-    );
-    AsyncStorage.multiGet.mockReturnValue(
-      Promise.resolve([["@Pots", "{pots}"], ["@ImageStore", "{images}"]])
-    );
+    await AsyncStorage.multiSet([
+      ["@Pots", "{pots}"],
+      ["@ImageStore", "{images}"],
+      ["@DoNotExport", "{junk}"]
+    ]);
     const images = { image1: { localUri: "a.png", remoteUri: "b.png" } };
     await exports.startExport(12345, images);
 
@@ -152,12 +151,16 @@ describe("importing", () => {
 
   it.skip("importMetadata", async () => {
     jest.useFakeTimers();
-    Alert.alert.mockImplementation(async (text, whoknows, array) => {
-      return array[1].onPress();
-    });
-    AsyncStorage.getAllKeys.mockReturnValue(
-      Promise.resolve(["@Pots", "@Pot:1", "@ImageStore", "@DoNotExport"])
-    );
+    // TODO: broken (but test was skipped already)
+    // Alert.alert.mockImplementation(async (text, whoknows, array) => {
+    //   return array[1].onPress();
+    // });
+    await AsyncStorage.multiSet([
+      ["@Pots", "..."],
+      ["@Pot:1", "..."],
+      ["@ImageStore", "..."],
+      ["@DoNotExport", "..."]
+    ]);
     await exports.importMetadata('{"@Pot:5": "\\"value\\""}');
     jest.runAllTimers();
 
@@ -173,10 +176,12 @@ describe("importing", () => {
   });
 
   it("importMetadataNow", async () => {
-    AsyncStorage.getAllKeys.mockReturnValue(
-      Promise.resolve(["@Pots", "@Pot:1", "@ImageStore", "@DoNotExport"])
-    );
-    AsyncStorage.multiSet.mockReturnValue(Promise.resolve());
+    await AsyncStorage.multiSet([
+      ["@Pots", "..."],
+      ["@Pot:1", "..."],
+      ["@ImageStore", "..."],
+      ["@DoNotExport", "..."]
+    ]);
     await exports.importMetadataNow('{"@Pot:5": "\\"value\\""}');
 
     expect(AsyncStorage.removeItem).toHaveBeenCalledWith("@Pots");

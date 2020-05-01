@@ -5,7 +5,6 @@ import * as FileSystem from 'expo-file-system';
 import { saveToFile } from '../images';
 
 jest.mock("react-native-appearance");
-jest.mock('AsyncStorage');
 jest.mock('expo-file-system', () => ({
   documentDirectory: 'file://mock-document-directory/',
   makeDirectoryAsync: jest.fn().mockReturnValue(Promise.resolve()),
@@ -30,21 +29,9 @@ const emptyImageState = {
   loaded: true,
 };
 
-function mockAsyncStorage(kvs) {
-  AsyncStorage.getItem.mockReturnValueOnce(
-    Promise.resolve(kvs['@PLSettings'] || null),
-  );
-  AsyncStorage.getItem.mockReturnValueOnce(
-    Promise.resolve(kvs['@ImageStore'] || null),
-  );
-  AsyncStorage.getAllKeys.mockReturnValue(Promise.resolve(Object.keys(kvs)));
-  const potKvs = Object.keys(kvs)
-    .filter((k) => k.startsWith('@Pot'))
-    .map((k) => [k, kvs[k]]);
-  AsyncStorage.multiGet.mockReturnValue(Promise.resolve(potKvs));
-  AsyncStorage.getItem.mockReturnValueOnce(
-    Promise.resolve(kvs['@Import'] || null),
-  );
+async function mockAsyncStorage(kvs) {
+  await AsyncStorage.clear();
+  await AsyncStorage.multiSet(Object.keys(kvs).map(k => [k, kvs[k]]));
 }
 
 describe('loadInitial', () => {
@@ -52,7 +39,7 @@ describe('loadInitial', () => {
 
   it('accepts empty state', async () => {
     const dispatch = jest.fn();
-    mockAsyncStorage({});
+    await mockAsyncStorage({});
     await loadInitial()(dispatch);
     expect(dispatch).toHaveBeenLastCalledWith({
       type: 'loaded-everything',
@@ -66,7 +53,7 @@ describe('loadInitial', () => {
 
   it('ignores unexpected values', async () => {
     const dispatch = jest.fn();
-    mockAsyncStorage({ 'what is this': 'who knows' });
+    await mockAsyncStorage({ 'what is this': 'who knows' });
     await loadInitial()(dispatch);
     expect(dispatch).toHaveBeenLastCalledWith({
       type: 'loaded-everything',
@@ -83,7 +70,7 @@ describe('loadInitial', () => {
     const pot1 = newPot();
     pot1.title = 'the first pot is the best pot';
     const pot2 = newPot();
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
@@ -109,7 +96,7 @@ describe('loadInitial', () => {
     const pot1 = newPot();
     pot1.title = 'the first pot is the best pot';
     const pot2 = newPot();
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid, pot2.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
@@ -147,7 +134,7 @@ describe('loadInitial', () => {
       },
       loaded: true,
     };
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid, pot2.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
@@ -177,7 +164,7 @@ describe('loadInitial', () => {
     delete pot1.images3;
     pot1.images = ['l/img.jpg'];
     const pot2 = newPot();
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid, pot2.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
@@ -228,7 +215,7 @@ describe('loadInitial', () => {
       },
       loaded: true,
     };
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid, pot2.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
@@ -262,7 +249,7 @@ describe('loadInitial', () => {
       imageMap: { 'a.png': { uri: 'r/a.png' } },
     };
     const dispatch = jest.fn();
-    mockAsyncStorage({ '@Import': JSON.stringify(existingState) });
+    await mockAsyncStorage({ '@Import': JSON.stringify(existingState) });
 
     await loadInitial()(dispatch);
     expect(dispatch).toHaveBeenLastCalledWith({
@@ -274,7 +261,8 @@ describe('loadInitial', () => {
     //expect(exports.importImage).toHaveBeenCalledWith('r/a.png');
   });
 
-  it('fixes pots and images', () => {
+  it('fixes pots and images', async () => {
+    expect.assertions(1);
     const l = require('../loadInitialFixes');
     const spy = jest.spyOn(l, 'fixPotsAndImages');
     //l.fixPotsAndImages = jest.fn();
@@ -283,7 +271,7 @@ describe('loadInitial', () => {
     const pot1 = newPot();
     pot1.title = 'the first pot is the best pot';
     const pot2 = newPot();
-    mockAsyncStorage({
+    await mockAsyncStorage({
       '@Pots': JSON.stringify([pot1.uuid, pot2.uuid]),
       ['@Pot:' + pot1.uuid]: JSON.stringify(pot1),
       ['@Pot:' + pot2.uuid]: JSON.stringify(pot2),
