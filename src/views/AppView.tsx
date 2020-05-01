@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, StatusBar } from 'react-native';
 import { ImageStoreState, PotsStoreState, UIState } from '../reducers/types';
-import style from '../style';
+import style, {statusBarColor} from '../style';
 import EditPage from './EditPage';
 import ImagePage from './ImagePage';
 import ListPage from './ListPage';
@@ -38,7 +38,11 @@ class AppView extends React.Component<
     const mode = getDerivedDarkMode(this.props.darkModeSetting);
     return (
       <React.Fragment>
-        <StatusBar barStyle={mode === 'dark' ? 'dark-content' : 'light-content'} />
+        <StatusBar
+          barStyle={'light-content'}
+          translucent={true}
+          backgroundColor={statusBarColor(mode)}
+        />
         {this.renderPage()}
       </React.Fragment>
     );

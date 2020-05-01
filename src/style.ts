@@ -87,6 +87,7 @@ const secondaryButtonTextColor = (m: Mode) =>
   }[m]);
 
 export const radioColor = secondaryButtonTextColor;
+export const statusBarColor = headerColor;
 
 const base = (mode: Mode) =>
   StyleSheet.create({
