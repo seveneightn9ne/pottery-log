@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import _ from 'lodash';
 import React from 'react';
 import {
@@ -28,7 +29,7 @@ interface OwnProps {
   fontLoaded: boolean;
 }
 
-const APP_VERSION = '2.25.0';
+const APP_VERSION = Constants.manifest.version || 'unknown';
 
 const mapStateToProps = (state: FullState) => ({
   resumeImport:
@@ -165,10 +166,10 @@ class SettingsPage extends React.Component<
   private settingsItemKeyExtractor = (i: SettingsItem) => i.title;
 
   private importPopup = () => {
-    Alert.alert('Restore', 'Choose a source', [
+    Alert.alert('Restore a backup', 'Choose a source', [
       { text: 'Paste Link', onPress: this.openImportUrlModal },
       { text: 'Upload File', onPress: this.props.onStartImport },
-    ]);
+    ], {cancelable: true});
   }
 
   private openImportUrlModal = () =>
@@ -249,6 +250,7 @@ class SettingsPage extends React.Component<
         buttons={buttons}
         open={this.state.linkModalOpen}
         close={this.closeImportUrlModal}
+        cancelable={true}
       />
     );
   }
@@ -301,6 +303,7 @@ class SettingsPage extends React.Component<
         buttons={[{ text: 'CLOSE', close: true }]}
         open={this.state.darkModalOpen}
         close={this.closeDarkModal}
+        cancelable={true}
       />
     );
   }
@@ -341,6 +344,7 @@ class SettingsPage extends React.Component<
         buttons={buttons}
         open={this.state.preExportModalOpen}
         close={this.closePreExportModal}
+        cancelable={true}
       />
     );
   }
@@ -412,6 +416,7 @@ class SettingsPage extends React.Component<
         buttons={buttons}
         open={this.props.exportModal || this.props.importModal}
         close={this.closeExportImportModal}
+        cancelable={false}
       />
     );
   }

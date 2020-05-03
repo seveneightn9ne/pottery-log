@@ -471,6 +471,15 @@ const base = (mode: Mode) =>
       fontSize: 14,
       lineHeight: 20,
     },
+    modalBackground: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalTouchable: {
+      width: 300,
+    },
     modal: {
       width: 300,
       padding: 24,
@@ -488,11 +497,17 @@ const base = (mode: Mode) =>
       marginBottom: 20,
       color: gray90(mode),
     },
+    modalButtonBox: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+    },
     button3: {
       backgroundColor: backgroundColor(mode),
       elevation: 0,
       color: secondaryButtonTextColor(mode),
       fontSize: 14,
+      fontVariant: ['small-caps'],
+      fontWeight: 'bold',
     },
     disabledButton: {
       color: gray60(mode),

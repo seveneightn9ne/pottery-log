@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal as RNModal, Text, View } from 'react-native';
+import { Modal as RNModal, Text, TouchableWithoutFeedback, View } from 'react-native';
 import Button from 'react-native-button';
 import ElevatedView from 'react-native-elevated-view';
 import style from '../../style';
@@ -17,48 +17,56 @@ interface ModalProps {
   buttons: ButtonProp[];
   open: boolean;
   close: () => void;
+  cancelable: boolean;
 }
 
 export default function Modal(props: ModalProps) {
+  const onTouchOutside = () => props.cancelable && props.close();
+  const ignoreTouch = () => true;
+  const buttons = props.buttons.map(({ text, onPress, disabled, close }) => {
+    const onButtonPress = () => {
+      if (onPress) {
+        onPress();
+      }
+      if (close) {
+        props.close();
+      }
+    };
+    const buttonStyles = [
+      style.s.button3,
+      style.s.modalButton,
+      disabled ? style.s.disabledButton : null,
+    ];
+    return (
+      <Button
+        onPress={onButtonPress}
+        style={buttonStyles}
+        key={text}
+        disabled={!!disabled}
+      >
+        {text}
+      </Button>
+    );
+  });
   return (
     <RNModal
       transparent={true}
       visible={props.open}
       onRequestClose={props.close}
-      onDismiss={props.close}
     >
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-        }}
-      >
-        <ElevatedView style={style.s.modal} elevation={24}>
-          <Text style={style.s.modalHeader}>{props.header}</Text>
-          {props.body}
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-            {props.buttons.map(({ text, onPress, disabled, close }) => (
-              <Button
-                onPress={() => {
-                  onPress && onPress();
-                  close && props.close();
-                }}
-                style={[
-                  style.s.button3,
-                  style.s.modalButton,
-                  disabled ? style.s.disabledButton : null,
-                ]}
-                key={text}
-                disabled={!!disabled}
-              >
-                {text}
-              </Button>
-            ))}
-          </View>
-        </ElevatedView>
-      </View>
+      <TouchableWithoutFeedback onPress={onTouchOutside}>
+        <View style={style.s.modalBackground}>
+          <TouchableWithoutFeedback style={style.s.modalTouchable} onPress={ignoreTouch}>
+            <ElevatedView style={style.s.modal} elevation={24}>
+              <Text style={style.s.modalHeader}>{props.header}</Text>
+              {props.body}
+              <View style={style.s.modalButtonBox}>
+                {buttons}
+              </View>
+            </ElevatedView>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
     </RNModal>
   );
 }
