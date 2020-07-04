@@ -75,6 +75,7 @@ class ImplIOS extends React.Component<
     return (
       <View>
         <Modal
+          cancelable={true}
           header="Choose Date"
           body={
             <DatePickerIOS
@@ -111,8 +112,12 @@ class ImplIOS extends React.Component<
 }
 
 const DatePicker = Platform.select({
-  ios: ImplIOS as typeof ImplAndroid | typeof ImplIOS,
+  ios: ImplIOS as typeof ImplIOS | typeof ImplAndroid,
   android: ImplAndroid,
 });
 
-export default DatePicker;
+if (!DatePicker) {
+  throw Error('DatePicker has no implementation for this platform');
+}
+
+export default DatePicker as typeof ImplIOS | typeof ImplAndroid;

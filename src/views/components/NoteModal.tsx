@@ -27,6 +27,7 @@ export default class NoteModal extends React.Component<
   public render() {
     return (
       <Modal
+        cancelable={true}
         header={capitalize(Status.progressive(this.props.status)) + ' Note'}
         body={
           <ExpandingTextInput

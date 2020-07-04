@@ -26,11 +26,6 @@ interface OwnProps {
   fontLoaded: boolean;
 }
 
-interface SectionT {
-  title: string;
-  data: SectionData[];
-}
-
 interface SectionData {
   key: string;
   data: Pot[];
@@ -229,27 +224,23 @@ class ListPage extends React.Component<ListPageProps, {}> {
       );
     }
 
-    const sections: SectionT[] = Status.ordered()
+    const sections: Array<SectionListData<Pot>> = Status.ordered()
       .reverse()
       .map((status) => {
         return {
           data: filterByStatus(this.props.pots, status),
-          title: capitalize(Status.longterm(status)),
+          key: capitalize(Status.longterm(status)),
         };
       })
       .filter((section) => section.data.length > 0)
       .map((section) =>
-        this.props.collapsed[section.title]
+        this.props.collapsed[section.key]
           ? {
               data: [],
-              title: section.title + ' (' + section.data.length + ')',
+              key: section.key + ' (' + section.data.length + ')',
             }
           : section,
-      )
-      .map((section) => ({
-        data: [{ key: section.title, data: section.data }],
-        title: section.title,
-      }));
+      );
 
     /* TODO(jessk) - this goes in the SectionList
      * ref={sectionList => this.sectionList = sectionList}
@@ -258,11 +249,11 @@ class ListPage extends React.Component<ListPageProps, {}> {
     return (
       <View style={style.s.container}>
         {header}
-        <SectionList
+        <SectionList<Pot>
           renderItem={this.renderSection}
           renderSectionHeader={this.renderSectionHeader}
           sections={sections}
-          keyExtractor={this.sectionKeyExtractor}
+          keyExtractor={this.potKeyExtractor}
           renderSectionFooter={this.renderSectionFooter}
         />
         {newPotButton}
@@ -277,8 +268,6 @@ class ListPage extends React.Component<ListPageProps, {}> {
     }
   };
 
-  private sectionKeyExtractor = (listdata: SectionT, index: number) =>
-    listdata.title;
   private renderSectionFooter = () => <View style={style.s.separator} />;
 
   private stripCount = (sectionTitle: string): string => {
@@ -315,11 +304,11 @@ class ListPage extends React.Component<ListPageProps, {}> {
     return () => this.props.onClickPot(pot.uuid);
   }
 
-  private renderSection = (data: { item: SectionData }): JSX.Element => {
+  private renderSection = (data: { section: SectionListData<Pot> }): JSX.Element => {
     return (
       <FlatList
         numColumns={2}
-        data={data.item.data}
+        data={data.section.data}
         keyExtractor={this.potKeyExtractor}
         getItemLayout={this.sectionItemLayout}
         renderItem={this.renderPotListItem}
@@ -330,20 +319,24 @@ class ListPage extends React.Component<ListPageProps, {}> {
   private potKeyExtractor = (pot: Pot, index: number) => pot.uuid;
 
   private renderSectionHeader = (info: {
-    section: SectionListData<SectionT>;
-  }): JSX.Element => {
-    const section = info.section;
+    section: SectionListData<Pot>;
+  }): React.ReactElement => {
+    /**
+     * Typecast is neccessary because I know I put a `key` in the section
+     * but the type passed in has optional key
+     */
+    const section = info.section as SectionData;
     const content = this.props.fontLoaded ? (
       <Text style={style.s.collapse}>
-        {this.props.collapsed[section.title]
+        {this.props.collapsed[section.key]
           ? 'keyboard_arrow_down'
           : 'keyboard_arrow_up'}
       </Text>
     ) : null;
     return (
-      <TouchableOpacity onPress={this.collapseSection(section.title)}>
+      <TouchableOpacity onPress={this.collapseSection(section.key)}>
         <View style={style.s.lh}>
-          <Text style={style.s.lhText}>{section.title}</Text>
+          <Text style={style.s.lhText}>{section.key}</Text>
           {content}
         </View>
       </TouchableOpacity>
