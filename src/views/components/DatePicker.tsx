@@ -41,16 +41,15 @@ class ImplAndroid extends React.Component<DatePickerProps, {}> {
 
   public pickDateAndroid = async () => {
     try {
-      const { action, year, month, day } = await DatePickerAndroid.open({
+      const res = await DatePickerAndroid.open({
         date: this.props.value,
       });
-      const def = new Date();
-      if (action !== DatePickerAndroid.dismissedAction) {
+      if (res.action === DatePickerAndroid.dateSetAction) {
         this.props.onPickDate(
           new Date(
-            year || def.getFullYear(),
-            month || def.getMonth(),
-            day || def.getDate(),
+            res.year,
+            res.month,
+            res.day,
           ),
         );
       }
