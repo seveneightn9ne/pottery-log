@@ -304,7 +304,12 @@ class ListPage extends React.Component<ListPageProps, {}> {
     return () => this.props.onClickPot(pot.uuid);
   }
 
-  private renderSection = (data: { section: SectionListData<Pot> }): JSX.Element => {
+  private renderSection = (data: { section: SectionListData<Pot>, index: number }): JSX.Element | null => {
+    // Only the first item gets rendered, and it gets rendered as the entire section
+    // So we can use FlatList which allows setting numColumns
+    if (data.index !== 0) {
+      return null;
+    }
     return (
       <FlatList
         numColumns={2}
