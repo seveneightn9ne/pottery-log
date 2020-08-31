@@ -30,7 +30,7 @@ export type ExportState =
   | PostExportingState;
 
 interface ExportingState {
-  exporting: true;
+  exporting: boolean;
   statusMessage: string;
   exportId: number;
 }

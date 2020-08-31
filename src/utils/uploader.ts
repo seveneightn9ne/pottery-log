@@ -1,6 +1,5 @@
 import Constants from 'expo-constants';
 import _ from 'lodash';
-import store from '../reducers/store';
 import { nameFromUri } from './imageutils';
 
 // Routes
@@ -110,7 +109,7 @@ export async function finishExport() {
   );
 }
 
-export async function startImport(uri: string) {
+export async function startFileImport(uri: string) {
   return postAndReturn(
     IMPORT,
     {
@@ -122,7 +121,6 @@ export async function startImport(uri: string) {
       },
     },
     handleImportResponse,
-    handleImportFailure,
   );
 }
 
@@ -134,23 +132,16 @@ export async function startUrlImport(uri: string) {
       importURL: uri,
     },
     handleImportResponse,
-    handleImportFailure,
   );
 }
 
 const handleImportResponse = (res: {
   metadata: string;
   image_map: { [i: string]: string };
-}) => {
-  store.dispatch({
-    type: 'import-started',
-    metadata: res.metadata,
-    imageMap: res.image_map,
-  });
-};
-
-const handleImportFailure = (e: string | Error) =>
-  store.dispatch({ type: 'import-failure', error: e });
+}) => ({
+  metadata: res.metadata,
+  imageMap: _.mapValues(res.image_map, (uri) => ({uri})),
+});
 
 export async function debug(name: string, data: any) {
   console.log('DEBUG: ', name, data);

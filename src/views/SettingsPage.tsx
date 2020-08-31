@@ -19,8 +19,9 @@ import { connect } from 'react-redux';
 import { FullState } from '../reducers/types';
 import { getDerivedDarkMode, getSystemPreference } from '../selectors/settings';
 import style, {radioColor} from '../style';
-import { setDarkMode } from '../thunks/settings';
 import { exportEverything } from '../thunks/export';
+import { importFromFile, importFromUrl, resumeImport } from '../thunks/import';
+import { setDarkMode } from '../thunks/settings';
 import { PLThunkDispatch } from '../thunks/types';
 import Anchor from './components/Anchor';
 import { ExpandingTextInput } from './components/ExpandingTextInput';
@@ -55,13 +56,9 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch) => ({
     }),
 
   onStartExport: () => dispatch(exportEverything()),
-  onStartImport: () => dispatch({ type: 'import-initiate' }),
-  onStartUrlImport: (url: string) =>
-    dispatch({
-      type: 'import-initiate-url',
-      url,
-    }),
-  onResumeImport: () => dispatch({ type: 'import-resume-affirm' }),
+  onStartFileImport: () => dispatch(importFromFile()),
+  onStartUrlImport: (url: string) => dispatch(importFromUrl(url)),
+  onResumeImport: () => dispatch(resumeImport()),
   onCancelResumeImport: () => dispatch({ type: 'import-resume-cancel' }),
   setDarkMode: (value: boolean | undefined) => dispatch(setDarkMode(value)),
 });
@@ -74,6 +71,7 @@ interface SettingsPageState {
   linkText: string;
   preExportModalOpen: boolean;
   darkModalOpen: boolean;
+  resumeImport?: boolean;
 }
 
 interface SettingsItem {
@@ -169,7 +167,7 @@ class SettingsPage extends React.Component<
   private importPopup = () => {
     Alert.alert('Restore a backup', 'Choose a source', [
       { text: 'Paste Link', onPress: this.openImportUrlModal },
-      { text: 'Upload File', onPress: this.props.onStartImport },
+      { text: 'Upload File', onPress: this.props.onStartFileImport },
     ], {cancelable: true});
   }
 

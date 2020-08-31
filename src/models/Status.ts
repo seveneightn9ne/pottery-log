@@ -113,7 +113,7 @@ export default class Status {
     const status: EmptyableBareStatus = {};
 
     _.forOwn(from, (item, ss) => {
-      const s = ss as keyof EmptyableBareStatus;
+      const s = ss as StatusString;
       status[s] =
         typeof item === 'string' || typeof item === 'number'
           ? (status[s] = new Date(item))
@@ -171,7 +171,7 @@ export default class Status {
 
   public currentStatus(): StatusString {
     let current: StatusString | undefined;
-    _.forEach(Status.ordered(), (s: keyof BareStatus) => {
+    _.forEach(Status.ordered(), (s: StatusString) => {
       if (this.status[s]) {
         current = s;
         return false;

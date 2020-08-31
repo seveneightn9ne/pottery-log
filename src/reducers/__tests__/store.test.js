@@ -68,7 +68,10 @@ describe("store", () => {
     expect(StorageWriter.put).not.toHaveBeenCalled();
 
     await store.dispatch({
-      type: "import-resume-affirm"
+      type: "import-status",
+      importing: true,
+      statusMessage: "foo",
+      imageMap: {},
     });
     jest.runAllTimers();
     expect(StorageWriter.put).toHaveBeenCalledWith(
@@ -77,7 +80,9 @@ describe("store", () => {
     );
 
     await store.dispatch({
-      type: "import-cancel"
+      type: "import-status",
+      importing: false,
+      statusMessage: "Finished",
     });
     jest.runAllTimers();
     expect(StorageWriter.delete).toHaveBeenCalledWith("@Import");

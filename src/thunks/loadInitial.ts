@@ -1,11 +1,11 @@
 import _ from 'lodash';
+import { SettingsState } from '../reducers/types';
 import { fixPotsAndImages, migrateFromImages2 } from './loadInitialFixes';
 import loadInitialImages, { saveImagesToFiles } from './loadInitialImages';
 import loadInitialImport from './loadInitialImport';
 import loadInitialPots from './loadInitialPots';
-import { PLThunkAction, PLThunkDispatch, t } from './types';
 import loadInitialSettings, { setDarkModeFromSetting } from './loadInitialSettings';
-import { SettingsState } from '../reducers/types';
+import { PLThunkAction, PLThunkDispatch, t } from './types';
 
 export function reloadFromImport(): PLThunkAction {
   return t('reloadFromImport', {}, async (dispatch: PLThunkDispatch) => {
@@ -13,9 +13,6 @@ export function reloadFromImport(): PLThunkAction {
       type: 'initial-pots-images',
     });
     await dispatch(load(true));
-    dispatch({
-      type: 'imported-metadata',
-    });
   });
 }
 

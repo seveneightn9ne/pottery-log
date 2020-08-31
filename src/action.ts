@@ -6,6 +6,7 @@ import {
   ImportStatePersisted,
   PotsStoreState,
   SettingsState,
+  ImageMapState,
 } from './reducers/types';
 
 export type Action =
@@ -49,14 +50,7 @@ type UiAction =
   | PageImage;
 
 type ImportAction =
-  | ImportInitiate
-  | ImportInitiateUrl
-  | ImportStarted
-  | ImportedMetadata
-  | ImportMetadataAgain
-  | ImageTimeout
-  | ImportCancel
-  | ImportFailure
+  | ImportStatus
   | ImportResume
   | ImportResumeAffirm
   | ImportResumeCancel;
@@ -145,10 +139,6 @@ interface Reload {
   type: 'initial-pots-images';
 }
 
-interface ImportedMetadata {
-  type: 'imported-metadata';
-}
-
 interface ImageDeleteFromPot {
   type: 'image-delete-from-pot';
   imageName: string;
@@ -188,51 +178,24 @@ interface ImageFileFailed {
   uri: string;
 }
 
-interface ImportInitiate {
-  type: 'import-initiate';
-}
-
-interface ImportInitiateUrl {
-  type: 'import-initiate-url';
-  url: string;
-}
-
-interface ImportStarted {
-  type: 'import-started';
-  metadata: string;
-  imageMap: { [name: string]: string };
-}
-
-interface ImageTimeout {
-  type: 'image-timeout';
-  uri: string;
-}
-
-interface ImportCancel {
-  type: 'import-cancel';
-}
-
-interface ImportFailure {
-  type: 'import-failure';
-  error: string | Error;
-}
-
-interface ImportMetadataAgain {
-  type: 'import-metadata-again';
-  metadata: string;
-}
-
 interface ImportResume {
   type: 'import-resume';
   data: ImportStatePersisted;
+}
+
+interface ImportResumeCancel {
+  type: 'import-resume-cancel';
 }
 
 interface ImportResumeAffirm {
   type: 'import-resume-affirm';
 }
 
-interface ImportResumeCancel {
-  type: 'import-resume-cancel';
+interface ImportStatus {
+  type: 'import-status';
+  importing: boolean;
+  statusMessage: string;
+  imageMap?: ImageMapState;
 }
 
 interface ExportStatus {
