@@ -11,7 +11,10 @@ import mockAsyncStorage from '@react-native-community/async-storage/jest/async-s
  */
 const { JSDOM } = require("jsdom");
 
-const jsdom = new JSDOM("<!doctype html><html><body></body></html>");
+const jsdom = new JSDOM("<!doctype html><html><body></body></html>", {
+  // https://github.com/jsdom/jsdom/issues/2304#issuecomment-662972525
+  url: 'http://localhost/'
+});
 const { window } = jsdom;
 
 function copyProps(src, target) {
