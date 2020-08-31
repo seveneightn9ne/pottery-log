@@ -71,6 +71,7 @@ export function exportEverything(): PLThunkAction {
 
         // export-image
         let imagesExported = 0;
+        let fails = 0;
 
         const promises = imagesToExport.map((image) =>
           exportImage(image)
@@ -83,7 +84,11 @@ export function exportEverything(): PLThunkAction {
                 ),
               );
             })
-            .catch((e: Error) => fail(dispatch, id)(e.message)),
+            .catch((e: Error) => {
+              fails += 1;
+              console.warn(e);
+              fail(dispatch, id)(`Failed to export an image: ${e.message}\nPlease try again.`))
+            },
         );
 
         await Promise.all(promises);
@@ -96,7 +101,10 @@ export function exportEverything(): PLThunkAction {
             imagesExported,
             totalImages,
           });
-          fail(dispatch, id)('Some images failed to export');
+          if (imagesExported + fails < totalImages) {
+            // If they do add up, fail() has already been called with a better error message
+            fail(dispatch, id)('Some images failed to export. Please try again.');
+          }
         }
 
         await finish(dispatch, id);

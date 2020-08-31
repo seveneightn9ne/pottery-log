@@ -83,7 +83,6 @@ async function importMetadataNow(metadata: string) {
 }
 
 function importImage(remoteUri: string) {
-  // console.log("importImage");
   deprecatedSaveToFileImpure(remoteUri, true /* isRemote */);
   setTimeout(
     () =>
@@ -97,7 +96,6 @@ function importImage(remoteUri: string) {
 
 const isStillExporting = (exportId: number, getState: () => FullState) => {
   const state = getState();
-  console.log('REAL isStillExporting');
   return (
     state && state.exports.exporting && state.exports.exportId === exportId
   );

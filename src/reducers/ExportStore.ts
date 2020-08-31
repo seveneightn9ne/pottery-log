@@ -27,21 +27,17 @@ export function reduceExport(
       console.log('Action for finished export: ', action);
       return state;
     }
-    if (action.exporting) {
-      return {
-        exporting: true,
-        exportId: action.exportId,
-        statusMessage: action.status,
-      };
-    } else {
-      return {
-        exporting: false,
-        exportId: action.exportId,
-        statusMessage: action.status,
-      };
-    }
+    return {
+      exporting: action.exporting,
+      exportId: action.exportId,
+      statusMessage: action.status,
+    };
   }
-  if (action.type === 'export-finished' && action.exportId === state.exportId) {
+  if (action.type === 'export-finished') {
+    if (action.exportId !== state.exportId) {
+      console.log('Finished a stale export: ', action);
+      return state;
+    }
     return {
       exporting: false,
       exportId: state.exportId,
