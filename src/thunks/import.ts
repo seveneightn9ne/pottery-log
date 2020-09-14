@@ -119,9 +119,17 @@ async function importImages(dispatch: PLThunkDispatch, getState: () => FullState
   dispatch(status(`Importing images (0/${numImages})`, _.cloneDeep(imageMap)));
   let finished = 0;
   const promises: Array<Promise<void>> = [];
-  const onFinishOne = () => {
+  const onFinishOne = (imageName: string, fileUri: string) => {
       finished += 1;
-      dispatch(status(`Importing images (${finished}/${numImages})`, _.cloneDeep(imageMap)));
+      if (fileUri) {
+        // fileUri might not exist if this worker was circumvented by another one with the same image
+        dispatch({
+          type: 'image-file-created',
+          name: imageName,
+          fileUri: fileUri,
+        });
+        dispatch(status(`Importing images (${finished}/${numImages})`, _.cloneDeep(imageMap)));
+      }
   };
   _.times(PARALLEL_IMAGE_IMPORTS, () => {
       // importImageWorkers all share the same copy of imageMap for coordination
@@ -131,7 +139,7 @@ async function importImages(dispatch: PLThunkDispatch, getState: () => FullState
   await Promise.all(promises);
 }
 
-async function importImageWorker(getState: () => FullState, imageMap: ImageMapState, onFinishOne: () => void) {
+async function importImageWorker(getState: () => FullState, imageMap: ImageMapState, onFinishOne: (imageName: string, fileUri: string) => void) {
     const imagesToStart = Object.keys(imageMap).sort().filter( // sort makes it deterministic for tests
         (n) => !imageMap[n].started,
     );
@@ -142,10 +150,10 @@ async function importImageWorker(getState: () => FullState, imageMap: ImageMapSt
     const image = imageMap[imageName];
     image.started = true; // "started" doesn't have to be persisted so no need to dispatch status here
 
-    await importImageRetrying(image.uri, getState);
+    const fileUri = await importImageRetrying(image.uri, getState);
 
     delete imageMap[imageName];
-    onFinishOne();
+    onFinishOne(imageName, fileUri);
 
     await importImageWorker(getState, imageMap, onFinishOne);
 }

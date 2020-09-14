@@ -58,7 +58,7 @@ export async function importMetadataNow(metadata: string) {
  * Promise will never reject - it will retry every 30 seconds until the image
  * is imported or the import has finished/been cancelled.
  */
-export function importImageRetrying(remoteUri: string, getState: () => FullState) {
+export function importImageRetrying(remoteUri: string, getState: () => FullState): Promise<string> {
     return new Promise((resolve) => {
         importImageRetryingInner(remoteUri, getState, resolve);
     });
@@ -67,7 +67,7 @@ export function importImageRetrying(remoteUri: string, getState: () => FullState
 function importImageRetryingInner(
     remoteUri: string,
     getState: () => FullState,
-    resolve: () => void,
+    resolve: (fileUri: string) => void,
 ) {
     const retry = () => {
         // Check if we still do need to import this image
@@ -83,9 +83,9 @@ function importImageRetryingInner(
     };
     const timeout = setTimeout(retry, IMAGE_TIMEOUT_MS);
     saveToFilePure(remoteUri, true /* isRemote */)
-        .then(() => {
+        .then((fileUri) => {
             clearTimeout(timeout);
-            resolve();
+            resolve(fileUri);
         })
         .catch((error) => {
             console.warn(error);

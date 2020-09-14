@@ -33,7 +33,7 @@ jest.mock("../loadInitial", () => ({
 
 jest.mock("../../utils/imports", () => ({
   importMetadataNow: jest.fn().mockResolvedValue(),
-  importImageRetrying: jest.fn().mockResolvedValue(),
+  importImageRetrying: jest.fn().mockResolvedValue("new-file.jpg"),
   confirmImport: jest.fn().mockImplementation(async (confirm, cancel) => await confirm()),
 }));
 
@@ -79,6 +79,11 @@ describe('importFromFile', () => {
         },
       },
       {
+        type: "image-file-created",
+        name: "a.jpg",
+        fileUri: "new-file.jpg",
+      },
+      {
         type: "import-status",
         importing: true,
         statusMessage: "Importing images (1/3)",
@@ -88,12 +93,22 @@ describe('importFromFile', () => {
         },
       },
       {
+        type: "image-file-created",
+        name: "b.jpg",
+        fileUri: "new-file.jpg",
+      },
+      {
         type: "import-status",
         importing: true,
         statusMessage: "Importing images (2/3)",
         imageMap: {
           "c.jpg": {uri: "http://s3/c.jpg", started: true},
         }
+      },
+      {
+        type: "image-file-created",
+        name: "c.jpg",
+        fileUri: "new-file.jpg",
       },
       {
         type: "import-status",
@@ -273,6 +288,11 @@ describe('importFromUrl', () => {
         },
       },
       {
+        type: "image-file-created",
+        name: "a.jpg",
+        fileUri: "new-file.jpg",
+      },
+      {
         type: "import-status",
         importing: true,
         statusMessage: "Importing images (1/3)",
@@ -282,12 +302,22 @@ describe('importFromUrl', () => {
         },
       },
       {
+        type: "image-file-created",
+        name: "b.jpg",
+        fileUri: "new-file.jpg",
+      },
+      {
         type: "import-status",
         importing: true,
         statusMessage: "Importing images (2/3)",
         imageMap: {
           "c.jpg": {uri: "http://s3/c.jpg", started: true},
         }
+      },
+      {
+        type: "image-file-created",
+        name: "c.jpg",
+        fileUri: "new-file.jpg",
       },
       {
         type: "import-status",
@@ -394,12 +424,22 @@ describe('resumeImport', () => {
         },
       },
       {
+        type: "image-file-created",
+        name: "b.jpg",
+        fileUri: "new-file.jpg",
+      },
+      {
         type: "import-status",
         importing: true,
         statusMessage: "Importing images (1/2)",
         imageMap: {
           "c.jpg": {uri: "http://s3/c.jpg", started: true},
         },
+      },
+      {
+        type: "image-file-created",
+        name: "c.jpg",
+        fileUri: "new-file.jpg",
       },
       {
         type: "import-status",
