@@ -87,8 +87,8 @@ export function exportEverything(): PLThunkAction {
             .catch((e: Error) => {
               fails += 1;
               console.warn(e);
-              fail(dispatch, id)(`Failed to export an image: ${e.message}\nPlease try again.`))
-            },
+              fail(dispatch, id)(`Failed to export an image: ${e.message}\nPlease try again.`);
+            }),
         );
 
         await Promise.all(promises);
