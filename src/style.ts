@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import Constants from 'expo-constants';
 
 type Mode = 'light' | 'dark';
 
@@ -97,7 +98,6 @@ const base = (mode: Mode) =>
       justifyContent: 'flex-start',
       position: 'relative',
       color: gray90(mode),
-      // paddingTop: 20,
     },
     imagePage: {
       justifyContent: 'center',
@@ -133,11 +133,11 @@ const base = (mode: Mode) =>
       backgroundColor: headerColor(mode),
       flexDirection: 'row',
       justifyContent: 'space-between',
-      paddingTop: 20,
+      paddingTop: Constants.statusBarHeight,
       // marginBottom: 16,
       // position: 'relative'
       // zIndex: 1,
-      height: 56 + 20,
+      height: 56 + Constants.statusBarHeight,
     },
     h1: {
       color: headerTextColor(mode),
