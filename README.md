@@ -15,8 +15,9 @@ yarn start # the expo dev server
 
 1. increment the `expo.version` and `expo.ios.buildNumber` in `app.json`
 2. `./expo-cli build:ios`
-
-- If you get errors related to duplicate certificates, go delete all [iOS Certificates](https://developer.apple.com/account/ios/certificate/) and [iOS Provisioning Profiles](https://developer.apple.com/account/ios/profile/) and try again, maybe with `-c`
+ - select `archive` option
+ - <unresolved> error that apple id password is incorrect
+ - If you get errors related to duplicate certificates, go delete all [iOS Certificates](https://developer.apple.com/account/ios/certificate/) and [iOS Provisioning Profiles](https://developer.apple.com/account/ios/profile/) and try again, maybe with `-c`
 
 3. Download the build `ipa` file
 4. Launch `Xcode`
