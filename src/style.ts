@@ -276,6 +276,15 @@ const base = (mode: Mode) =>
     },
     imagePickerFullText: {},
     imagePickerSmallText: {},
+    imagePickerIcons: {
+      // backgroundColor: backgroundColor(mode),
+      backgroundColor: placeholderBackgroundColor(mode),
+      alignItems: 'center',
+      textAlignVertical: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: listSeparatorColor(mode),
+    },
 
     imageBar: {
       flexDirection: 'row',

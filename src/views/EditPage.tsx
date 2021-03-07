@@ -15,7 +15,7 @@ import { Pot } from '../models/Pot';
 import Status, { StatusString } from '../models/Status';
 import { EditUiState, FullState } from '../reducers/types';
 import style from '../style';
-import { addImage, deletePot } from '../thunks/images';
+import { addImage, addImageCamera, addImageLibrary, deletePot } from '../thunks/images';
 import { PLThunkDispatch } from '../thunks/types';
 import { deleteImage } from './components/Alerts';
 import ImageList from './components/ImageList';
@@ -54,6 +54,8 @@ const mapDispatchToProps = (dispatch: PLThunkDispatch, { pot }: OwnProps) => ({
       type: 'page-list',
     }),
   onAddImage: () => dispatch(addImage(pot)),
+  onAddImageLibrary: () => dispatch(addImageLibrary(pot)),
+  onAddImageCamera: () => dispatch(addImageCamera(pot)),
   onExpandImage: (name: string) =>
     dispatch({
       type: 'page-image',
@@ -173,6 +175,8 @@ class EditPage extends React.Component<EditPageProps, {}> {
               size={mainImgSize}
               images={this.props.images}
               onAddImage={this.props.onAddImage}
+              onAddImageLibrary={this.props.onAddImageLibrary}
+              onAddImageCamera={this.props.onAddImageCamera}
               onClickImage={this.props.onExpandImage}
               onDeleteImage={this.props.onDeleteImage}
             />
