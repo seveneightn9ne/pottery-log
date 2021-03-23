@@ -31,6 +31,25 @@ const headerColor = (m: Mode) =>
     dark: '#222222',
   }[m]);
 
+const materialTextColor = (m: Mode) =>
+  ({
+    light: 'rgba(0,0,0,0.6)',
+    dark: 'rgba(255,255,255,0.4)',
+  }[m]);
+
+const materialTextColor2 = (m: Mode) =>
+  ({
+    light: '#000',
+    dark: '#fff',
+  }[m]);
+
+const coffeeTextColor = (m: Mode) =>
+  ({
+    light: '#fff',
+    // light: 'rgba(0,0,0,0.6)',
+    dark: '#fff',
+  }[m]);
+
 const headerTextColor = (m: Mode) =>
   ({
     light: '#fff',
@@ -255,8 +274,21 @@ const base = (mode: Mode) =>
       backgroundColor: listSeparatorColor(mode),
     },
     imagePicker: {
+      backgroundColor: backgroundColor(mode),
+      borderStyle: 'solid',
+      borderWidth: 2,
+      borderColor: gray20(mode),
+      borderRadius: 5,
+      justifyContent: 'center',
+      marginRight: 3,
+      margin: 2,
+      marginLeft: 0,
+      width: 48,
+      height: 72,
+    },
+    imagePicker2: {
       borderStyle: 'dashed',
-      borderWidth: 4,
+      borderWidth: 2,
       borderColor: gray20(mode),
       alignItems: 'center',
       flexDirection: 'column',
@@ -265,27 +297,40 @@ const base = (mode: Mode) =>
       borderRadius: 1,
       justifyContent: 'center',
     },
-    imagePickerFull: {},
-    imagePickerSmall: {
-      marginLeft: 0,
+    imagePicker4: {
+      borderStyle: 'solid',
+      borderWidth: 2,
+      borderColor: gray20(mode),
+      alignItems: 'center',
+      flexDirection: 'column',
+      backgroundColor: backgroundColor(mode),
+      // The borderRadius thing is a react-native bug with the dashed border
+      borderRadius: 5,
+      justifyContent: 'center',
+      margin: 1,
+      marginRight: 3,
+    },
+    imagePicker3: {
+      alignContent: 'center',
+      backgroundColor: backgroundColor(mode),
+      margin: 2,
+      width: 48,
+      height: 48,
     },
     imagePickerText: {
       fontFamily: 'material-icons',
-      fontSize: 72,
-      color: gray20(mode),
+      fontSize: 48,
+      color: materialTextColor(mode),
     },
-    imagePickerFullText: {},
-    imagePickerSmallText: {},
-    imagePickerIcons: {
-      // backgroundColor: backgroundColor(mode),
-      backgroundColor: placeholderBackgroundColor(mode),
-      alignItems: 'center',
+    imagePickerText2: {
+      fontFamily: 'material-icons',
+      fontSize: 48,
       textAlignVertical: 'center',
+      textAlign: 'center',
+      alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: listSeparatorColor(mode),
+      color: materialTextColor2(mode),
     },
-
     imageBar: {
       flexDirection: 'row',
       // alignContent: 'space-between',
