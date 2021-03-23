@@ -1,8 +1,8 @@
 import { isNumber } from 'lodash';
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import style from '../../style';
-import { getDerivedDarkMode } from '../../selectors/settings';
+// import { getDerivedDarkMode } from '../../selectors/settings';
 
 interface ImagePickerProps {
   onAddImage: () => void;
@@ -13,12 +13,6 @@ interface ImagePickerProps {
 }
 
 export default function ImagePicker(props: ImagePickerProps) {
-  const { width } = Dimensions.get('window');
-  // TG: Calculate the height and width of the buttons based on if we are in a new pot with no images,
-  // an existing pot with at least one image. Then subtract a few pixels based on the margin
-  const imageHeight = isNumber(props.style.height) ? (props.style.height / 2) : (width / 3);
-  const imageWidth = props.full ? width : (width / 6);
-
 // camera
 // camera_alt
 // add_photo_alternate
@@ -31,12 +25,6 @@ export default function ImagePicker(props: ImagePickerProps) {
 // photo_size_select_actual
 // panorama
 // local_see
-
-// local_cafe
-// free_breakfast
-// coffee
-
-// https://material.io/resources/icons/?icon=add_photo_alternate&style=baseline
 
   {/* <View style={style.s.imagePicker2} height={imageHeight}> */}
   // TG: This configuration will show the image picker with dark or light gray icon based on theme,
@@ -76,6 +64,12 @@ export default function ImagePicker(props: ImagePickerProps) {
 
   // TG: This configuration will show the image picker with black or white icon based on theme,
   // with solid borders around the buttons filling height of image
+  // const { width } = Dimensions.get('window');
+  // // TG: Calculate the height and width of the buttons based on if we are in a new pot with no images,
+  // // an existing pot with at least one image. Then subtract a few pixels based on the margin
+  // const imageHeight = isNumber(props.style.height) ? (props.style.height / 2) : (width / 3);
+  // const imageWidth = props.full ? width : (width / 6);
+
   // return (
   //   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
   //       <TouchableOpacity onPress={props.onAddImageCamera}>
