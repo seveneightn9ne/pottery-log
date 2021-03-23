@@ -111,6 +111,15 @@ export const statusBarColor = headerColor;
 
 const base = (mode: Mode) =>
   StyleSheet.create({
+    coffeeImageText: {
+      fontFamily: 'material-icons',
+      fontSize: 48,
+      textAlignVertical: 'center',
+      textAlign: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: coffeeTextColor(mode),
+    },
     container: {
       flex: 1,
       backgroundColor: backgroundColor(mode),
