@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
+import { StyleSheet } from 'react-native';
 
 type Mode = 'light' | 'dark';
 
@@ -35,12 +35,6 @@ const materialTextColor = (m: Mode) =>
   ({
     light: 'rgba(0,0,0,0.6)',
     dark: 'rgba(255,255,255,0.4)',
-  }[m]);
-
-const materialTextColor2 = (m: Mode) =>
-  ({
-    light: '#000',
-    dark: '#fff',
   }[m]);
 
 const coffeeTextColor = (m: Mode) =>
@@ -126,6 +120,9 @@ const base = (mode: Mode) =>
       justifyContent: 'flex-start',
       position: 'relative',
       color: gray90(mode),
+    },
+    elevatedViewBackground: {
+      backgroundColor: backgroundColor(mode),
     },
     imagePage: {
       justifyContent: 'center',
@@ -282,63 +279,36 @@ const base = (mode: Mode) =>
       height: 1,
       backgroundColor: listSeparatorColor(mode),
     },
+    imageListPlaceholder: {
+      paddingBottom: 0,
+    },
     imagePicker: {
       backgroundColor: backgroundColor(mode),
       borderStyle: 'solid',
-      borderWidth: 2,
+      borderWidth: 1,
       borderColor: gray20(mode),
       borderRadius: 5,
       justifyContent: 'center',
       marginRight: 3,
-      margin: 2,
+      marginBottom: -1,
       marginLeft: 0,
       width: 48,
       height: 72,
     },
-    imagePicker2: {
-      borderStyle: 'dashed',
-      borderWidth: 2,
-      borderColor: gray20(mode),
-      alignItems: 'center',
-      flexDirection: 'column',
-      backgroundColor: backgroundColor(mode),
-      // The borderRadius thing is a react-native bug with the dashed border
-      borderRadius: 1,
-      justifyContent: 'center',
+    ip1: {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
     },
-    imagePicker4: {
-      borderStyle: 'solid',
-      borderWidth: 2,
-      borderColor: gray20(mode),
-      alignItems: 'center',
-      flexDirection: 'column',
-      backgroundColor: backgroundColor(mode),
-      // The borderRadius thing is a react-native bug with the dashed border
-      borderRadius: 5,
-      justifyContent: 'center',
-      margin: 1,
-      marginRight: 3,
-    },
-    imagePicker3: {
-      alignContent: 'center',
-      backgroundColor: backgroundColor(mode),
-      margin: 2,
-      width: 48,
-      height: 48,
+    ip2: {
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+      marginBottom: 5,
     },
     imagePickerText: {
       fontFamily: 'material-icons',
-      fontSize: 48,
-      color: materialTextColor(mode),
-    },
-    imagePickerText2: {
-      fontFamily: 'material-icons',
-      fontSize: 48,
-      textAlignVertical: 'center',
+      fontSize: 44,
       textAlign: 'center',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: materialTextColor2(mode),
+      color: materialTextColor(mode),
     },
     imageBar: {
       flexDirection: 'row',
