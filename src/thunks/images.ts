@@ -11,6 +11,18 @@ import {
 import * as ImageUploader from '../utils/uploader';
 import { PLThunkAction, PLThunkDispatch, t } from './types';
 
+export function addImageCamera(pot: Pot): PLThunkAction {
+  return t('addImageCamera', { pot }, (dispatch: PLThunkDispatch) => {
+     dispatch(pickImageFromCamera(pot));
+  });
+}
+
+export function addImageLibrary(pot: Pot): PLThunkAction {
+  return t('addImageLibrary', { pot }, (dispatch: PLThunkDispatch) => {
+    dispatch(pickImageFromLibrary(pot));
+  });
+}
+
 export function addImage(pot: Pot): PLThunkAction {
   return t('addImage', { pot }, (dispatch: PLThunkDispatch) => {
     Alert.alert('Add Image', 'Choose a source', [
@@ -83,7 +95,13 @@ async function deleteUnusedImageFiles(
 
 export function pickImageFromCamera(pot: Pot): PLThunkAction {
   return t('pickImageFromCamera', { pot }, (dispatch: PLThunkDispatch) =>
-    dispatch(pickImage(pot, getCameraPermission, ImagePicker.launchCameraAsync)),
+    dispatch(
+      pickImage(
+        pot,
+        getCameraPermission,
+        ImagePicker.launchCameraAsync,
+        ),
+      ),
   );
 }
 

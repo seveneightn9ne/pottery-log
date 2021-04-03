@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Pot } from '../../models/Pot';
 import { ImageState } from '../../reducers/types';
 import style from '../../style';
@@ -16,29 +16,24 @@ interface PotListItemProps {
 export default function(props: PotListItemProps) {
   const { width } = Dimensions.get('window');
   const size = { width: width / 2 - 6, height: width / 2 - 6 };
-  const darkImage = (
-    <Image
-      source={require('../../../assets/coffee-dark.png')}
-      style={{ width: 48, height: 48 }}
-    />
-  );
-  const lightImage = (
-    <Image
-      source={require('../../../assets/coffee-light.png')}
-      style={{ width: 48, height: 48 }}
-    />
-  );
+
   const img = props.image ? (
     <Image3 style={size} image={props.image} />
   ) : (
+    // material-icons
+    // free_breakfast
+    // coffee -- for some reason this one doesn't show
+    // local_cafe
     <View style={[style.s.liImagePlaceholder, size]}>
-      {props.theme === 'dark' ? darkImage : lightImage}
+      <Text style={[style.s.coffeeImageText]}>local_cafe</Text>
     </View>
   );
+
   const old =
     props.fontLoaded && props.pot.status.isOld() ? (
       <Text style={style.s.old}>alarm</Text>
     ) : null;
+
   return (
     <TouchableOpacity onPress={props.onPress}>
       <View style={[style.s.listItem, size]}>

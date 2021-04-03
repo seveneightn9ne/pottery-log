@@ -1,24 +1,32 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
 import style from '../../style';
-
 interface ImagePickerProps {
   onAddImage: () => void;
+  onAddImageLibrary: () => void;
+  onAddImageCamera: () => void;
   full: boolean;
   style: ViewStyle;
 }
 
 export default function ImagePicker(props: ImagePickerProps) {
-  const styles = props.full ? style.s.imagePickerFull : style.s.imagePickerSmall;
-  const textStyle = props.full
-    ? style.s.imagePickerFullText
-    : style.s.imagePickerSmallText;
-  const text = props.full ? 'add_a_photo' : 'add';
+  // TG: This configuration will show the image picker with dark or light gray icon based on theme,
+  // with grey borders around the buttons, sitting near the top
   return (
-    <TouchableOpacity onPress={props.onAddImage}>
-      <View style={[styles, style.s.imagePicker, props.style]}>
-        <Text style={[textStyle, style.s.imagePickerText]}>{text}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  <View>
+    <ElevatedView elevation={1} style={style.s.elevatedViewBackground}>
+      <TouchableOpacity onPress={props.onAddImageCamera}>
+        <View style={[style.s.imagePicker, style.s.ip1]}>
+          <Text style={[style.s.imagePickerText]}>camera_alt</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={props.onAddImageLibrary}>
+      <View style={[style.s.imagePicker, style.s.ip2]}>
+          <Text style={[style.s.imagePickerText]}>photo</Text>
+        </View>
+      </TouchableOpacity>
+    </ElevatedView>
+  </View>
+);
 }
