@@ -16,22 +16,17 @@ yarn start # the expo dev server
 1. increment the `expo.version` and `expo.ios.buildNumber` in `app.json`
 2. `./expo-cli build:ios`
  - select `archive` option
- - <unresolved> error that apple id password is incorrect
  - If you get errors related to duplicate certificates, go delete all [iOS Certificates](https://developer.apple.com/account/ios/certificate/) and [iOS Provisioning Profiles](https://developer.apple.com/account/ios/profile/) and try again, maybe with `-c`
 
 3. Download the build `ipa` file
-4. Launch `Xcode`
-5. Go to XCode -> Open Developer Tool -> Application Loader
-6. Press the big button, or maybe the Choose button
-7. Select your `ipa` file
-8. Click through until it tells you you're done
-9. Ignore any email from Apple about Missing Push Notification Entitlement
-10. Wait for the "completed processing" email
-11. From [App Store Connect](https://appstoreconnect.apple.com/), go to My Apps -> Pottery Log -> +Version or Platform
-12. Set App Version to the value in `expo.ios.buildNumber` e.g. `1.0.5`
-13. Fill in the description, Add the new build, Save, Submit for review
-14. Answer "No" to encryption question
-15. Answer "Yes" to IDFA question - check the two "Attribute" boxes ([details](https://docs.expo.io/versions/latest/distribution/app-stores/#ios-specific-guidelines)}
+4. Launch `Transporter`
+5. Drag & drop your `ipa` file
+6. Hit `Deliver`
+7. Ignore any email from Apple about Missing Push Notification Entitlement
+8. Wait for the "completed processing" email
+9. From [App Store Connect](https://appstoreconnect.apple.com/), go to My Apps -> Pottery Log -> +Version or Platform
+10. Set App Version to the value in `expo.ios.buildNumber` e.g. `1.0.5`
+11. Fill in the description, Add the new build, Answer "No" to encryption question, Save, Submit for review
 
 ## How to update the Google Play Store app
 
