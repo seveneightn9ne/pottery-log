@@ -1,12 +1,15 @@
 # Pottery Log
 
-Log your pottery.
+Log your pottery. This is an app for iOS and Android.
 
 ## Development
 
+This is an [Expo](https://docs.expo.io/) project. 
+
 ```
-yarn # install node dependencies
-yarn start # the expo dev server
+$ npm install -g expo-cli # Install Expo tools
+$ npm install # Install project dependencies
+$ expo start # Run the dev server
 ```
 
 ## How to update the iOS App Store app
