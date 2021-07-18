@@ -6,6 +6,7 @@ import {
   Alert,
   Clipboard,
   FlatList,
+  Keyboard,
   ListRenderItem,
   Text,
   ToastAndroid,
@@ -72,6 +73,7 @@ type SettingsPageProps = PropsFromState & PropsFromDispatch & OwnProps;
 interface SettingsPageState {
   linkModalOpen: boolean;
   linkText: string;
+  linkTextProbablyPasted: boolean;
   preExportModalOpen: boolean;
   darkModalOpen: boolean;
 }
@@ -90,6 +92,7 @@ class SettingsPage extends React.Component<
   public state = {
     linkModalOpen: false,
     linkText: '',
+    linkTextProbablyPasted: false,
     preExportModalOpen: false,
     darkModalOpen: false,
   };
@@ -174,7 +177,7 @@ class SettingsPage extends React.Component<
   }
 
   private openImportUrlModal = () =>
-    this.setState({ linkModalOpen: true, linkText: '' })
+    this.setState({ linkModalOpen: true, linkText: '', linkTextProbablyPasted: false })
   private closeImportUrlModal = () => this.setState({ linkModalOpen: false });
 
   private renderResumeImport = () => {
@@ -199,7 +202,14 @@ class SettingsPage extends React.Component<
 
   private startUrlImport = () =>
     this.props.onStartUrlImport(this.state.linkText)
-  private setLinkText = (linkText: string) => this.setState({ linkText });
+  private setLinkText = (linkText: string) => this.setState((prevState) => {
+    const prevLinkText = prevState.linkText;
+    const linkTextProbablyPasted = 
+      linkText.length !== prevLinkText.length + 1 // change was not adding 1 character
+      && linkText.length !== prevLinkText.length - 1 // change was not backspace
+      && linkText !== '' // change was not to erase everything
+    return { linkText, linkTextProbablyPasted };
+  });
 
   private renderImportUrlModal() {
     let belowInput: JSX.Element | null = null;
@@ -213,21 +223,21 @@ class SettingsPage extends React.Component<
       },
     ];
     if (this.state.linkText) {
-      if (
-        this.state.linkText.indexOf(
-          'https://pottery-log-exports.s3.amazonaws.com/',
-        ) !== 0
-      ) {
+      const validPfx = 'https://pottery-log-exports.s3.amazonaws.com/';
+      if (this.state.linkText.indexOf(validPfx) !== 0) {
         // Something that isn't a valid link
         belowInput = (
           <Text style={{ color: 'red' }}>
             The link should start with
-            https://pottery-log-exports.s3.amazonaws.com/
+            {' ' + validPfx}
           </Text>
         );
       } else {
         // valid link
         buttons[1].disabled = false;
+        if (this.state.linkTextProbablyPasted) {
+          Keyboard.dismiss();
+        }
       }
     }
     const modalBody = (
