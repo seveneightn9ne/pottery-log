@@ -28,7 +28,7 @@
     "jest-enzyme": "^7.0.1",
     "jest-expo": "^37.0.0",
     "jsdom": "^13.1.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "react-dom": "16.9.0",
     "react-native-scripts": "^1.14.0",
     "react-native-typescript-transformer": "^1.2.11",
