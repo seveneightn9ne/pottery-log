@@ -1,12 +1,20 @@
-Pottery Log Privacy Policy version 1.1
-Effective June 4, 2017
+Pottery Log Privacy Policy version 1.2
+Effective January 28, 2022
 
 This policy describes how we handle your personally identifiable information collected through the use of the app.
+
 The following personally identifying information is collected by the app:
 (1) Text that you enter in the Title and Notes fields
 (2) Images that you select and save in the app
-Text information is only stored locally. We do not collect this information, and we do not distribute it to any third parties. The information will be retained on your local device until you delete it using the delete buttons available in the app.
-When you add an image, it is uploaded to Amazon S3 and accessible via the URL, which is only given to your device.
+(3) Your device ID
+(4) Diagnostic data 
+
+All information collected is only stored on your local device, except in the following situations:
+(1) If you use the Backup tool, then your collected Device ID, Text and Images will be transmitted to our server to create a backup file. The backup file will be stored on Amazon S3 servers and will be accessible via the URL, which is only given to your device. The backup file is automatically deleted after 7 days.
+(2) If you use the Restore tool and provide a backup file, then the file will be transmitted to our server and unpacked. The data in the backup is transmitted back to your device, and the images are stored temporarily in Amazon S3. The backup file and all contained data are automatically deleted after 7 days.
+(3) If your app crashes, it will send your Device ID and diagnostic data to Sentry.IO which is a third party we use to track crashes. The diagnostic data includes information like your phone model and what you had clicked on recently, and is visible to the Pottery Log developer for diagnostic purposes. This does not transmit any of your personal data such as your saved notes.
+
 Any information stored by the app can be edited or deleted by you at any time.
 We may amend this privacy policy at any time by posting the amended terms which will be available on the Google Play page for the app.
-If you have any questions or concerns, please contact jess+pottery-log-privacy@jesskenney.com
+
+If you have any questions or concerns, or would like to request your data to be deleted from our servers, please contact jess+pottery-log-privacy@jesskenney.com
