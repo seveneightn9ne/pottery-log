@@ -4,7 +4,12 @@ import * as imageutils from "../../utils/imageutils";
 
 jest.mock("../../utils/uploader", () => ({
   startExport: jest.fn().mockResolvedValue(),
-  exportImage: jest.fn().mockResolvedValue(),
+  exportImage: jest.fn().mockImplementation(uri => {
+    if (uri.indexOf("notreadable")!== -1) {
+      throw new Error(`File '${uri}' isn't readable.`);
+    }
+    return Promise.resolve();
+  }),
   finishExport: jest.fn().mockResolvedValue("https://export-file-uri"),
   debug: jest.fn()
 }));
@@ -19,7 +24,12 @@ jest.mock("../../utils/imageutils", () => ({
   //saveToFilePure: jest.fn().mockResolvedValue("file-uri.jpg"),
   saveToFilePure: jest
     .fn()
-    .mockImplementation(l => Promise.resolve("f/" + l.split("/")[1]))
+    .mockImplementation(l => {
+      if (l.indexOf("dne.jpg") !== -1) {
+        throw(`Source ${l} does not exist`);
+      }
+      return Promise.resolve("f/" + l.split("/")[1])
+    })
 }));
 
 describe("exportEverything", () => {
@@ -204,6 +214,14 @@ describe("exportEverything", () => {
             "2.jpg": {
               name: "2.jpg",
               localUri: "l/2.jpg"
+            },
+            "dne.jpg": {
+              name: "dne.jpg",
+              localUri: "l/dne.jpg"
+            },
+            "notreadable.jpg": {
+              name: "notreadable.jpg",
+              fileUri: "f/notreadable.jpg"
             }
           }
         }
@@ -221,19 +239,25 @@ describe("exportEverything", () => {
         type: "export-status",
         exportId: expect.any(Number),
         exporting: true,
-        status: "Saving 1 images..."
+        status: "Saving 2 images..."
       },
       {
         type: "export-status",
         exportId: expect.any(Number),
         exporting: true,
-        status: "Exporting images (0/1)..."
+        status: "Exporting images (0/2)..."
       },
       {
         type: "export-status",
         exportId: expect.any(Number),
         exporting: true,
-        status: "Exporting images (1/1)..."
+        status: "Exporting images (1/2)..."
+      },
+      {
+        type: "export-status",
+        exportId: expect.any(Number),
+        exporting: true,
+        status: "Exporting images (2/2)..."
       },
       {
         type: "export-status",
@@ -250,7 +274,9 @@ describe("exportEverything", () => {
     expect(dispatchMock.mock.calls).toEqual(dispatchCalls.map(a => [a]));
     expect(uploader.startExport).toHaveBeenCalled();
     expect(imageutils.saveToFilePure).toHaveBeenCalledWith("l/2.jpg", false);
+    expect(imageutils.saveToFilePure).toHaveBeenCalledWith("l/dne.jpg", false);
     expect(uploader.exportImage).toHaveBeenCalledWith("f/2.jpg");
+    expect(uploader.exportImage).toHaveBeenCalledWith("f/notreadable.jpg");
     expect(uploader.finishExport).toHaveBeenCalled();
   });
 

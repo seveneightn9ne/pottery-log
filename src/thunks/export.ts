@@ -44,10 +44,20 @@ export function exportEverything(): PLThunkAction {
         await Promise.all(
           imagesToSave.map(async (i) => {
             let fileUri;
-            if (i.remoteUri) {
-              fileUri = await saveToFilePure(i.remoteUri, true /* isRemote */);
-            } else if (i.localUri) {
-              fileUri = await saveToFilePure(i.localUri, false /* isRemote */);
+            try {
+              if (i.remoteUri) {
+                fileUri = await saveToFilePure(i.remoteUri, true /* isRemote */);
+              } else if (i.localUri) {
+                fileUri = await saveToFilePure(i.localUri, false /* isRemote */);
+              }
+            } catch (e) {
+              if (`${e}`.indexOf(" does not exist") !== -1) {
+                // silently swallow
+                console.log("Skipping image that does not exist")
+                return;
+              } else {
+                throw e;
+              }
             }
             imagesToExport.push({
               ...i,
@@ -85,9 +95,20 @@ export function exportEverything(): PLThunkAction {
               );
             })
             .catch((e: Error) => {
-              fails += 1;
-              console.warn(e);
-              fail(dispatch, id)(`Failed to export an image: ${e.message}\nPlease try again.`);
+              if (e.message.indexOf(" isn't readable") !== -1) {
+                // Ignore this error (it isn't recoverable)
+                imagesExported += 1;
+                dispatch(
+                  status(
+                    id,
+                    `Exporting images (${imagesExported}/${totalImages})...`,
+                  ),
+                );
+              } else {
+                fails += 1;
+                console.warn(e);
+                fail(dispatch, id)(`Failed to export an image: ${e.message}\nPlease try again.`);
+              }
             }),
         );
 

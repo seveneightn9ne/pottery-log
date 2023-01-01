@@ -3,7 +3,7 @@
     "name": "Pottery Log",
     "icon": "./assets/launcher_512.png",
     "slug": "pottery-log",
-    "version": "2.41.1",
+    "version": "2.41.2",
     "privacy": "public",
     "assetBundlePatterns": [
       "./assets/*.png",
