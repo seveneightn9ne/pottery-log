@@ -95,7 +95,7 @@ export function exportEverything(): PLThunkAction {
               );
             })
             .catch((e: Error) => {
-              if (e.message.indexOf(" isn't readable") !== -1) {
+              if (`${e}`.indexOf(" isn't readable") !== -1) {
                 // Ignore this error (it isn't recoverable)
                 imagesExported += 1;
                 dispatch(
