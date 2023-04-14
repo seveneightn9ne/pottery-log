@@ -6,10 +6,12 @@ Log your pottery. This is an app for iOS and Android.
 
 This is an [Expo](https://docs.expo.io/) project. 
 
+1. Install Expo CLI (see [here](https://docs.expo.dev/get-started/installation/#expo-cli))
+
 ```
-$ npm install -g expo-cli # Install Expo tools
-$ npm install # Install project dependencies
-$ expo start # Run the dev server
+$ npx expo -h # Ensure Expo tools are installed
+$ npm ci # Install project dependencies
+$ npx expo start # Run the dev server
 ```
 
 ## How to update the iOS App Store app
