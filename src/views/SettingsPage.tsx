@@ -31,7 +31,7 @@ interface OwnProps {
   fontLoaded: boolean;
 }
 
-const APP_VERSION = Constants.manifest.version || 'unknown';
+const APP_VERSION = Constants.nativeAppVersion || 'unknown';
 
 const mapStateToProps = (state: FullState) => ({
   resumeImport:
